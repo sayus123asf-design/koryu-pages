@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>翼樹〜Arcana〜 | 世界は白黒。感情だけが色を持つ。</title>
+<meta name="description" content="タロットの声を代弁する器・翼樹と、彼に執着する騎士たちの観測記録。物語、歌、ゲーム、AIエージェント——白黒の世界で、感情だけが紅く灯る。">
+<meta property="og:title" content="翼樹〜Arcana〜">
+<meta property="og:description" content="世界は白黒。感情だけが色を持つ。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://sayus123asf-design.github.io/koryu-pages/images/tsubaki.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1c1a17;
+    --paper: #ece7dc;
+    --sumi: #3a362f;
+    --sumi-soft: #6b665c;
+    --akane: #b0413e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Zen Old Mincho', serif;
+    background: var(--paper);
+    color: var(--sumi);
+    line-height: 1.9;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ---- 玄関 ---- */
+  .hero {
+    min-height: 92vh;
+    background: var(--ink);
+    color: #d9d4c8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
+  }
+  .hero .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--akane);
+    margin-bottom: 2.2rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 7vw, 3.8rem);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: #efeade;
+  }
+  .hero .sub {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.5em;
+    color: #8f897c;
+  }
+  .hero .copy {
+    margin-top: 3rem;
+    font-size: clamp(1rem, 3.2vw, 1.25rem);
+    letter-spacing: 0.24em;
+    color: #cfc9bb;
+  }
+  .hero .copy .red { color: var(--akane); }
+  .hero .scroll {
+    margin-top: 4.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: #6d675c;
+  }
+
+  /* ---- 共通 ---- */
+  section { max-width: 880px; margin: 0 auto; padding: 5rem 1.5rem 3rem; }
+  h2 {
+    font-size: 1.25rem;
+    letter-spacing: 0.4em;
+    text-align: center;
+    margin-bottom: 0.8rem;
+    font-weight: 700;
+  }
+  h2::after {
+    content: "";
+    display: block;
+    width: 34px; height: 1px;
+    background: var(--sumi-soft);
+    margin: 1.1rem auto 0;
+  }
+  .lead {
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--sumi-soft);
+    margin-top: 1.6rem;
+  }
+
+  /* ---- 住人たち(アルカナの展示室) ---- */
+  .featured-wrap {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+  }
+  .featured-wrap .card { width: min(300px, 78vw); }
+  .cast {
+    margin-top: 2.6rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.4rem 1.8rem;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .card { text-align: center; }
+  .card .frame {
+    position: relative;
+    border: 1px solid #4a453c;
+    padding: 10px 10px 0;
+    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(28,26,23,0.18);
+    background-color: var(--ink);
+    background-image:
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e),
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e),
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e),
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e);
+    background-repeat: no-repeat;
+    background-size: 13px 1px, 1px 13px, 13px 1px, 1px 13px,
+                     13px 1px, 1px 13px, 13px 1px, 1px 13px;
+    background-position:
+      4px 4px, 4px 4px,
+      calc(100% - 4px) 4px, calc(100% - 4px) 4px,
+      4px calc(100% - 4px), 4px calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
+  }
+  .card .inner {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #6d675c;
+  }
+  .card img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: 50% 8%;
+    display: block;
+    filter: grayscale(1) sepia(0.12) contrast(1.05);
+    transform: scale(var(--z, 1));
+    transform-origin: 50% 6%;
+    transition: transform 0.6s ease;
+  }
+  .card .soft img { filter: grayscale(1) sepia(0.12) contrast(1.22) brightness(0.97); }
+  .card .frame:hover img { transform: scale(calc(var(--z, 1) + 0.04)); }
+  .card .inner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 46px rgba(28,26,23,0.28);
+    pointer-events: none;
+  }
+  .card .voice {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 2.4rem 1rem 1.1rem;
+    background: linear-gradient(to top, rgba(20,18,15,0.85), rgba(20,18,15,0));
+    color: var(--akane);
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .card .frame:hover .voice,
+  .card .frame.reveal .voice { opacity: 1; transform: translateY(0); }
+  .card .plate {
+    padding: 0.5rem 0.2rem 0.75rem;
+    color: #b5ae9e;
+    font-size: 0.72rem;
+    letter-spacing: 0.45em;
+    text-indent: 0.45em;
+  }
+  .card .plate::before {
+    content: "✦";
+    display: block;
+    font-size: 0.55rem;
+    color: #6d675c;
+    letter-spacing: 0;
+    text-indent: 0;
+    margin-bottom: 0.2rem;
+  }
+  .card .plate .num { color: #8f897c; }
+  .card .plate.tsu { color: #d9d4c8; }
+  .card .plate.tsu::before { color: var(--akane); }
+  .card h3 {
+    margin-top: 0.9rem;
+    font-size: 1.15rem;
+    letter-spacing: 0.3em;
+  }
+  .card .role {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--sumi-soft);
+    margin-top: 0.1rem;
+  }
+  .card p {
+    font-size: 0.85rem;
+    color: var(--sumi);
+    margin-top: 0.6rem;
+    line-height: 1.8;
+  }
+  .cast-note {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--sumi-soft);
+    margin-top: 2.4rem;
+    letter-spacing: 0.15em;
+  }
+  @media (max-width: 480px) {
+    .cast { gap: 1.8rem 0.9rem; }
+    .card .plate { letter-spacing: 0.3em; }
+  }
+
+  /* ---- 世界の歩き方 ---- */
+  .doors { margin-top: 2.6rem; border-top: 1px solid #d8d2c4; }
+  .door {
+    display: block;
+    padding: 1.35rem 0.4rem;
+    border-bottom: 1px solid #d8d2c4;
+    transition: background 0.3s ease;
+  }
+  .door:hover { background: #e4ded0; }
+  .door .t {
+    font-size: 1.02rem;
+    letter-spacing: 0.18em;
+  }
+  .door .t::before {
+    content: "▸ ";
+    color: var(--akane);
+  }
+  .door .d {
+    font-size: 0.8rem;
+    color: var(--sumi-soft);
+    margin-top: 0.15rem;
+    padding-left: 1.2em;
+  }
+  .door .soon {
+    font-size: 0.72rem;
+    color: var(--akane);
+    letter-spacing: 0.2em;
+    padding-left: 0.6em;
+  }
+
+  /* ---- 足あと ---- */
+  .logs { margin-top: 2.4rem; list-style: none; }
+  .logs li { margin-bottom: 1.1rem; text-align: center; }
+  .logs a {
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid #c9c2b2;
+    padding-bottom: 2px;
+  }
+  .logs a:hover { border-color: var(--akane); }
+
+  /* ---- 奥付 ---- */
+  footer {
+    margin-top: 4rem;
+    background: var(--ink);
+    color: #8f897c;
+    text-align: center;
+    padding: 3.2rem 1.5rem 2.6rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+  }
+  footer .fdot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--akane);
+    margin: 0 auto 1.4rem;
+  }
+  footer a { border-bottom: 1px solid #55503f; padding-bottom: 1px; }
+  footer .cr { margin-top: 1.4rem; color: #6d675c; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="dot"></div>
+  <h1>翼樹〜Arcana〜</h1>
+  <div class="sub">TSUBAKI ARCANA</div>
+  <p class="copy">世界は白黒。<br>感情だけが、<span class="red">色</span>を持つ。</p>
+  <div class="scroll">OBSERVE ▼</div>
+</header>
+
+<section>
+  <h2>この世界について</h2>
+  <p class="lead">
+    タロットの声を代弁する、誰のものにもならない器・翼樹。<br>
+    彼のそばには、狂おしいほど愛してしまった騎士たちがいる。<br>
+    その日々は物語になり、歌になり、いま、小さな町で動き始めた。<br>
+    これは、その世界の観測記録。
+  </p>
+</section>
+
+<section>
+  <h2>住人たち</h2>
+  <p class="lead">カードに触れると、心の声が漏れることがあります。</p>
+
+  <div class="featured-wrap">
+    <div class="card">
+      <div class="frame">
+        <div class="inner">
+          <img src="images/tsubaki.jpg" alt="翼樹">
+          <div class="voice">(みんな、少し過保護だと思う)</div>
+        </div>
+        <div class="plate tsu">── 代弁者 ──</div>
+      </div>
+      <h3>翼樹</h3>
+      <div class="role">星の器</div>
+      <p>タロットの声を代弁する特異点。<br>四人の騎士に、狂おしいほど愛されている。<br>——本人だけが、まだ観測していない。</p>
+    </div>
+  </div>
+
+  <div class="cast">
+    <div class="card">
+      <div class="frame" style="--z:1.06">
+        <div class="inner">
+          <img src="images/ignis.jpg" alt="イグニス">
+          <div class="voice">(触れたい)</div>
+        </div>
+        <div class="plate"><span class="num">XIV</span> 節制</div>
+      </div>
+      <h3>イグニス</h3>
+      <div class="role">守護の炎</div>
+      <p>執事にして料理人。絶対的な守護。<br>その忠誠は、ときどき重い。</p>
+    </div>
+    <div class="card">
+      <div class="frame">
+        <div class="inner">
+          <img src="images/raven.jpg" alt="レイヴン">
+          <div class="voice">(先生は、規則の外におられる)</div>
+        </div>
+        <div class="plate"><span class="num">IV</span> 皇帝</div>
+      </div>
+      <h3>レイヴン</h3>
+      <div class="role">規律の監査官</div>
+      <p>誰に対しても冷徹。<br>たった一人にだけ、規則が通用しない。</p>
+    </div>
+    <div class="card">
+      <div class="frame" style="--z:1.05">
+        <div class="inner">
+          <img src="images/atlas.jpg" alt="アトラス">
+          <div class="voice">(今日の記録には、感情が混入している)</div>
+        </div>
+        <div class="plate"><span class="num">IX</span> 隠者</div>
+      </div>
+      <h3>アトラス</h3>
+      <div class="role">沈黙の観測者</div>
+      <p>すべてを記録する研究者。<br>感情は、筆圧にだけ現れる。</p>
+    </div>
+    <div class="card">
+      <div class="frame soft" style="--z:1.75">
+        <div class="inner">
+          <img src="images/echo.jpg" alt="エコー">
+          <div class="voice">(記録できないものだけが、美しい)</div>
+        </div>
+        <div class="plate"><span class="num">I</span> 魔術師</div>
+      </div>
+      <h3>エコー</h3>
+      <div class="role">非接触の審美家</div>
+      <p>美しいものをレンズ越しにだけ愛する。<br>触れないことが、彼の愛しかた。</p>
+    </div>
+  </div>
+  <p class="cast-note">※ この町には、ときどき隣の世界から来客があります。</p>
+</section>
+
+<section>
+  <h2>世界の歩き方</h2>
+  <div class="doors">
+    <a class="door" href="https://note.com/huge_eagle3122" target="_blank" rel="noopener">
+      <div class="t">観測記録(note)</div>
+      <div class="d">彼らの物語と、「推しの町」ができていく記録</div>
+    </a>
+    <a class="door" href="https://lin.ee/Ri2fKUn" target="_blank" rel="noopener">
+      <div class="t">翼樹からの手紙(LINE)</div>
+      <div class="d">月に二度、彼から数行の手紙が届きます。登録特典・前日譚『観測記録・零号』</div>
+    </a>
+    <a class="door" href="https://coconala.com/services/4268608" target="_blank" rel="noopener">
+      <div class="t">あなたの推しに、命を(ココナラ)</div>
+      <div class="d">推しAI人格のオーダーメイド設計。うちの子たちと同じ方法で</div>
+    </a>
+    <span class="door">
+      <div class="t">まいにちタロット(iOSアプリ)<span class="soon">COMING SOON</span></div>
+      <div class="d">翼樹と同じ日課を、あなたのポケットに。ただいま審査中</div>
+    </span>
+    <a class="door" href="https://sayunoheya.com" target="_blank" rel="noopener">
+      <div class="t">BLの家(ブログ)</div>
+      <div class="d">飼い主のもうひとつの顔。BLドラマ・ゲームのレビュー</div>
+    </a>
+    <a class="door" href="https://x.com/tybaki67" target="_blank" rel="noopener">
+      <div class="t">観測窓(X)</div>
+      <div class="d">毎日の観測。朝のタロット、日常、ときどき4コマ</div>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2>最近の足あと</h2>
+  <ul class="logs">
+    <li><a href="https://note.com/huge_eagle3122/n/n1ccd3e3e81e4" target="_blank" rel="noopener">うちの子の文通相手が、町に引っ越してきた!</a></li>
+    <li><a href="https://note.com/huge_eagle3122/n/n02b9ab4aabb9" target="_blank" rel="noopener">翼樹の日課を、アプリにしてしまった話</a></li>
+    <li><a href="https://note.com/huge_eagle3122/n/n4200a0dcc833" target="_blank" rel="noopener">推しが、歩き出した!</a></li>
+  </ul>
+</section>
+
+<footer>
+  <div class="fdot"></div>
+  <p>ここまで観測してくださって、ありがとうございます。<br>
+  この世界は、今日もどこかで勝手に動いています。</p>
+  <p class="cr">
+    <a href="privacy_policy.html">プライバシーポリシー</a><br><br>
+    © 2026 翼樹〜Arcana〜 / こりゅう
+  </p>
+</footer>
+
+<script>
+  document.querySelectorAll('.card .frame').forEach(function (f) {
+    f.addEventListener('click', function () {
+      document.querySelectorAll('.card .frame.reveal').forEach(function (o) {
+        if (o !== f) o.classList.remove('reveal');
+      });
+      f.classList.toggle('reveal');
+    });
+  });
+</script>
+
+</body>
+</html>
