@@ -223,6 +223,46 @@
     .card .plate { letter-spacing: 0.3em; }
   }
 
+  /* ---- 歌 ---- */
+  .mv-wrap { margin-top: 2.6rem; }
+  .mv-frame {
+    border: 1px solid #4a453c;
+    background-color: var(--ink);
+    padding: 10px;
+    box-shadow: 0 10px 26px rgba(28,26,23,0.18);
+    background-image:
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e),
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e),
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e),
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e);
+    background-repeat: no-repeat;
+    background-size: 13px 1px, 1px 13px, 13px 1px, 1px 13px,
+                     13px 1px, 1px 13px, 13px 1px, 1px 13px;
+    background-position:
+      4px 4px, 4px 4px,
+      calc(100% - 4px) 4px, calc(100% - 4px) 4px,
+      4px calc(100% - 4px), 4px calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
+  }
+  .mv-frame iframe {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+  }
+  .mv-caption {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--sumi-soft);
+    margin-top: 1.3rem;
+    letter-spacing: 0.12em;
+  }
+  .mv-caption .title {
+    color: var(--sumi);
+    font-size: 0.98rem;
+    letter-spacing: 0.22em;
+  }
+
   /* ---- 世界の歩き方 ---- */
   .doors { margin-top: 2.6rem; border-top: 1px solid #d8d2c4; }
   .door {
@@ -374,6 +414,20 @@
     </div>
   </div>
   <p class="cast-note">※ この町には、ときどき隣の世界から来客があります。</p>
+</section>
+
+<section>
+  <h2>歌</h2>
+  <p class="lead">この世界の日々は、ときどき歌になります。</p>
+  <div class="mv-wrap">
+    <div class="mv-frame">
+      <iframe src="https://www.youtube-nocookie.com/embed/U6I6k4Iu83s" title="『大器晩成の虹』MV | 翼樹〜Arcana〜" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+    </div>
+    <p class="mv-caption">
+      <span class="title">『大器晩成の虹』</span><br>
+      隣の世界の歌い手・晴虹さんに贈った一曲。翼樹の声で。
+    </p>
+  </div>
 </section>
 
 <section>
