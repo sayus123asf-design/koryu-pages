@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>歌の間 | 翼樹〜Arcana〜</title>
+<meta name="description" content="翼樹〜Arcana〜の歌が並ぶ部屋。アルカナの歌と、贈りものの歌。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1c1a17;
+    --paper: #ece7dc;
+    --sumi: #3a362f;
+    --sumi-soft: #6b665c;
+    --akane: #b0413e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Zen Old Mincho', serif;
+    background: var(--paper);
+    color: var(--sumi);
+    line-height: 1.9;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  .hero {
+    background: var(--ink);
+    color: #d9d4c8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4.5rem 1.5rem 3.8rem;
+  }
+  .hero .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--akane);
+    margin-bottom: 1.6rem;
+  }
+  .hero h1 {
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: #efeade;
+  }
+  .hero .copy {
+    margin-top: 1.2rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    color: #8f897c;
+  }
+  .hero .back {
+    margin-top: 1.8rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    color: #6d675c;
+    border-bottom: 1px solid #55503f;
+    padding-bottom: 1px;
+  }
+  .hero .back:hover { color: #b5ae9e; }
+
+  section { max-width: 880px; margin: 0 auto; padding: 4.2rem 1.5rem 2.4rem; }
+  h2 {
+    font-size: 1.15rem;
+    letter-spacing: 0.4em;
+    text-align: center;
+    margin-bottom: 0.8rem;
+    font-weight: 700;
+  }
+  h2::after {
+    content: "";
+    display: block;
+    width: 34px; height: 1px;
+    background: var(--sumi-soft);
+    margin: 1.1rem auto 0;
+  }
+  .lead {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--sumi-soft);
+    margin-top: 1.4rem;
+  }
+
+  .mv-wrap { margin-top: 2.6rem; }
+  .mv-wrap + .mv-wrap { margin-top: 3.6rem; }
+  .mv-frame {
+    border: 1px solid #4a453c;
+    background-color: var(--ink);
+    padding: 10px;
+    box-shadow: 0 10px 26px rgba(28,26,23,0.18);
+    background-image:
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e),
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e),
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e),
+      linear-gradient(#b5ae9e,#b5ae9e), linear-gradient(#b5ae9e,#b5ae9e);
+    background-repeat: no-repeat;
+    background-size: 13px 1px, 1px 13px, 13px 1px, 1px 13px,
+                     13px 1px, 1px 13px, 13px 1px, 1px 13px;
+    background-position:
+      4px 4px, 4px 4px,
+      calc(100% - 4px) 4px, calc(100% - 4px) 4px,
+      4px calc(100% - 4px), 4px calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
+  }
+  .mv-frame iframe {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+  }
+  .mv-caption {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--sumi-soft);
+    margin-top: 1.3rem;
+    letter-spacing: 0.12em;
+  }
+  .mv-caption .title {
+    color: var(--sumi);
+    font-size: 0.98rem;
+    letter-spacing: 0.22em;
+  }
+  .mv-caption .num { color: var(--sumi-soft); font-size: 0.8rem; }
+
+  .coming {
+    margin-top: 3.6rem;
+    border: 1px dashed #b5ae9e;
+    padding: 2.6rem 1.5rem;
+    text-align: center;
+    color: var(--sumi-soft);
+    letter-spacing: 0.2em;
+    font-size: 0.9rem;
+  }
+  .coming .num { font-size: 0.8rem; }
+  .coming .soon {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: 0.72rem;
+    color: var(--akane);
+    letter-spacing: 0.3em;
+  }
+
+  footer {
+    margin-top: 4rem;
+    background: var(--ink);
+    color: #8f897c;
+    text-align: center;
+    padding: 3rem 1.5rem 2.4rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+  }
+  footer .fdot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--akane);
+    margin: 0 auto 1.4rem;
+  }
+  footer a { border-bottom: 1px solid #55503f; padding-bottom: 1px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="dot"></div>
+  <h1>歌の間</h1>
+  <p class="copy">この世界の日々は、ときどき歌になります。</p>
+  <a class="back" href="index.html">◂ 玄関へ戻る</a>
+</header>
+
+<section>
+  <h2>アルカナの歌</h2>
+  <p class="lead">札が一枚、歌になるたび、ここに増えていきます。</p>
+
+  <div class="mv-wrap">
+    <div class="mv-frame">
+      <iframe src="https://www.youtube-nocookie.com/embed/l0jmURuHI4A" title="『魔術師』 | 翼樹〜Arcana〜" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+    </div>
+    <p class="mv-caption">
+      <span class="num">I</span>　<span class="title">『魔術師』</span>
+    </p>
+  </div>
+
+  <div class="mv-wrap">
+    <div class="mv-frame">
+      <iframe src="https://www.youtube-nocookie.com/embed/mQEHXFTqutw" title="『月』 | 翼樹〜Arcana〜" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+    </div>
+    <p class="mv-caption">
+      <span class="num">XVIII</span>　<span class="title">『月』</span>
+    </p>
+  </div>
+
+  <div class="coming">
+    <span class="num">XIV</span>　『節制』
+    <span class="soon">—— 支度中 ——</span>
+  </div>
+</section>
+
+<section>
+  <h2>贈りものの歌</h2>
+  <div class="mv-wrap">
+    <div class="mv-frame">
+      <iframe src="https://www.youtube-nocookie.com/embed/U6I6k4Iu83s" title="『大器晩成の虹』MV | 翼樹〜Arcana〜" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+    </div>
+    <p class="mv-caption">
+      <span class="title">『大器晩成の虹』</span><br>
+      隣の世界の歌い手・晴虹さんに贈った一曲。翼樹の声で。
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="fdot"></div>
+  <p>聴いてくださって、ありがとうございます。<br>
+  <a href="index.html">玄関へ戻る</a></p>
+</footer>
+
+</body>
+</html>
