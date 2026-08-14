@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>登録テスト</title>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <style>
+    body { background: #ece7dc; color: #3a362f; font-family: "Yu Mincho", serif;
+           display: grid; place-items: center; min-height: 100vh; margin: 0; }
+    form { background: #f6f3ea; border: 1px solid #d8d2c4; border-radius: 8px;
+           padding: 32px; width: min(90vw, 400px); }
+    h1 { font-size: 18px; margin: 0 0 16px; }
+    label { display: block; margin-bottom: 6px; }
+    input[type=email] { width: 100%; padding: 10px; border: 1px solid #d8d2c4;
+                        border-radius: 6px; box-sizing: border-box; margin-bottom: 14px; }
+    button { background: #3a362f; color: #fff; border: 0; border-radius: 6px;
+             padding: 12px 18px; cursor: pointer; margin-top: 14px; }
+    #rondo-status { min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <form id="rondo-subscribe">
+    <h1>翼樹〜Arcana〜 配信テスト</h1>
+    <label for="rondo-email">メールアドレス</label>
+    <input
+      id="rondo-email"
+      name="email"
+      type="email"
+      inputmode="email"
+      autocomplete="email"
+      spellcheck="false"
+      required
+    >
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAAEPmDMpHFf6MaFdp"></div>
+    <div aria-hidden="true" style="position:absolute;left:-10000px">
+      <label for="rondo-website">Website</label>
+      <input id="rondo-website" name="website" type="text" tabindex="-1" autocomplete="off">
+    </div>
+    <button type="submit">登録確認メールを受け取る</button>
+    <p id="rondo-status" role="status" aria-live="polite"></p>
+  </form>
+
+  <script>
+    (() => {
+      const form = document.getElementById('rondo-subscribe');
+      const status = document.getElementById('rondo-status');
+      const button = form.querySelector('button[type="submit"]');
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const data = new FormData(form);
+        const cfToken = data.get('cf-turnstile-response');
+        if (!cfToken) {
+          status.textContent = 'bot確認を完了してから、もう一度お試しください。';
+          return;
+        }
+        button.disabled = true;
+        button.textContent = '送信中…';
+        status.textContent = '';
+        try {
+          const response = await fetch('https://rondo.tubaki-arcana.workers.dev/api/subscribe', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({
+              email: data.get('email'),
+              website: data.get('website'),
+              cfToken,
+              source: 'web',
+            }),
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          form.reset();
+          status.textContent = '確認メールを送りました。受信箱のリンクを開いて登録を完了してください。';
+        } catch {
+          status.textContent = '送信できませんでした。通信状態を確認し、bot確認をやり直してください。';
+          if (window.turnstile) window.turnstile.reset();
+        } finally {
+          button.disabled = false;
+          button.textContent = '登録確認メールを受け取る';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
