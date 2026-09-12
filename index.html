@@ -223,6 +223,17 @@
     .card .plate { letter-spacing: 0.3em; }
   }
 
+  /* ---- スマホの折り返し(2026-09-13) ----
+     手動の改行(br)はPC幅の見た目のため。狭い幅ではその手前で自動改行が先に起きて
+     「翼樹。」「がいる。」だけの行ができるので、狭い幅ではbrを無効にして文を自然に流す。
+     玄関の「世界は白黒。/感情だけが」と歌の題名の改行は意図なので残す。 ---- */
+  .lead, .mv-caption { text-wrap: pretty; }
+  .cast .card p, footer p { text-wrap: balance; }
+  @media (max-width: 600px) {
+    .lead br, .cast .card p br, footer p br { display: none; }  /* 翼樹の札(幅広)は3行割りのまま */
+    .lead { max-width: 24em; margin-left: auto; margin-right: auto; }
+  }
+
   /* ---- 歌 ---- */
   .mv-wrap { margin-top: 2.6rem; }
   .mv-frame {

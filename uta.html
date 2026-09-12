@@ -160,6 +160,13 @@
     margin: 0 auto 1.4rem;
   }
   footer a { border-bottom: 1px solid #55503f; padding-bottom: 1px; }
+
+  /* ---- スマホの折り返し(2026-09-13): 狭い幅では手動改行を無効にして文を自然に流す(題名の後の改行は残す) ---- */
+  .lead, .mv-caption, footer p { text-wrap: pretty; }
+  @media (max-width: 600px) {
+    footer p br { display: none; }
+    .lead { max-width: 24em; margin-left: auto; margin-right: auto; }
+  }
 </style>
 </head>
 <body>
