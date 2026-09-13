@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>色灯し — 白黒の町に、色を灯す</title>
+<meta name="description" content="白黒の町を、押して少しずつ色づけていく小さなゲーム。灯った場所から、声と絵と歌が漏れます。">
+<!-- 9/13 公開準備: OGP(公式サイト配下 tubaki-arcana.com/irotomoshi/ に置く前提) -->
+<meta property="og:title" content="色灯し — 白黒の町に、色を灯す">
+<meta property="og:description" content="押すたびに、白黒の町に紅が灯る。灯った場所から、声と絵と歌が漏れます。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tubaki-arcana.com/irotomoshi/">
+<meta property="og:image" content="https://tubaki-arcana.com/irotomoshi/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='%23B0413E'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#ECE7DC; --ink:#1C1A17; --sumi:#3A362F; --soft:#6B665C; --line:#B5AE9E; --beni:#B0413E; --beni2:#D4655C; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height:100%; }
+  body { background:var(--paper); color:var(--sumi); font-family:'Zen Old Mincho', serif; line-height:1.8; overflow-x:hidden; touch-action: manipulation; }
+  header { text-align:center; padding:1.2rem 1rem 0.3rem; }
+  header h1 { font-size:1.45rem; letter-spacing:.42em; text-indent:.42em; color:var(--ink); font-weight:700; }
+  header p { font-size:.74rem; letter-spacing:.2em; color:var(--soft); margin-top:.2rem; }
+  .dot { width:7px; height:7px; border-radius:50%; background:var(--beni); margin:0 auto .45rem; }
+  .hdcam { display:block; margin:0 auto .35rem; }
+  .wrap { max-width:720px; margin:0 auto; padding:0 .8rem 3rem; }
+
+  /* 町 */
+  .town { position:relative; width:100%; aspect-ratio: 3/2; background:var(--paper); border:1px solid var(--line); box-shadow: 0 8px 22px rgba(28,26,23,.08); user-select:none; margin-top:.4rem; }
+  .town svg { width:100%; height:100%; display:block; }
+  .blk { cursor:pointer; }
+  .blk rect { fill:#DED8CB; stroke:var(--sumi); stroke-width:1.2; transition: fill 1.2s ease; }
+  .blk text { font-family:'Zen Old Mincho', serif; font-size:13px; fill:var(--soft); letter-spacing:2px; pointer-events:none; }
+  .blk .who { font-size:10px; fill:#8f897c; letter-spacing:1px; }
+  .blk.l1 rect { fill:#EBD3CD; } .blk.l2 rect { fill:#E3B8AE; } .blk.l3 rect { fill:#D99A8E; }
+  .blk.l1 text { fill:var(--ink); }
+  .blk .mark { opacity:0; transition: opacity 1.2s ease; }
+  .blk.l1 .mark { opacity:1; }
+  .blk .cam { opacity:0; transition: opacity 1.2s ease; }
+  .blk.l3 .cam { opacity:1; }
+  .blk.locked { cursor:default; }
+  /* 町の化粧(第四段 9/13): 建物は線画(img/town)。四角の枠は「地面の灯り」の楕円に。灯る前は薄く、灯ると絵が出る */
+  .blk rect.hit { fill:transparent; stroke:none; }
+  .blk .ground { fill:#DED8CB; opacity:.85; transition: fill 1.2s ease, opacity 1.2s ease; }
+  .blk.l1 .ground { fill:#EBD3CD; } .blk.l2 .ground { fill:#E3B8AE; } .blk.l3 .ground { fill:#D99A8E; }
+  .blk image { opacity:.38; transition: opacity 1.2s ease; }
+  .blk.l1 image { opacity:1; }
+  .blk .acc .a1, .blk .acc .a2 { opacity:0; transition: opacity 1.6s ease; pointer-events:none; }
+  .blk.l1 .acc .a1 { opacity:1; } .blk.l2 .acc .a2 { opacity:1; }
+  .blk .acc .lamp { animation: flicker 3.2s ease-in-out infinite; }
+  @keyframes flicker { 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.12) } }
+  .plaza.pulse .ground { animation: pulse2 1.8s ease-in-out infinite; }
+  @keyframes pulse2 { 0%,100%{ opacity:.55 } 50%{ opacity:1 } }
+  .plaza.pulse rect { animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{ stroke-width:1.2 } 50%{ stroke-width:2.6 } }
+  .fig { pointer-events:none; }
+  .fig .bd { transform-origin: 0 2px; }
+  .fig.walk .bd { animation: bob .48s ease-in-out infinite alternate; }
+  @keyframes bob { from{ transform: translateY(0) rotate(-2deg) } to{ transform: translateY(-1.6px) rotate(2deg) } }
+  .fig.flip image { transform: scaleX(-1); transform-box: fill-box; transform-origin: center; }   /* 9/13: 反転は絵に掛ける(揺れの動きが .bd の変形を上書きしていた) */
+  .fig text { font-family:'Zen Old Mincho', serif; }
+  /* 眺めモード: 町だけを大きく。数字も棚も消える */
+  body.nagame header p, body.nagame .hud, body.nagame h2, body.nagame .lead, body.nagame .knights, body.nagame .tabs, body.nagame .panel, body.nagame .foot { display:none; }
+  body.nagame .wrap { max-width:none; padding:0 .4rem 1rem; }
+  body.nagame .wrap { position:relative; }
+  body.nagame .town { aspect-ratio:auto; height: calc(100vh - 8rem); box-shadow:none; }
+  body.nagame .voice { position:absolute; top:1rem; left:0; right:0; font-size:1.05rem; pointer-events:none; z-index:2; }
+  /* 時間帯の色(眺めモードだけ・9/13): 紙の色味が動く程度。夜は藍に沈んで灯りだけが残る */
+  .tint { position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply; opacity:0; background:#fff; transition: background 2.4s ease, opacity 2.4s ease; }
+  body.t-asa .tint { background:#FFF1CC; opacity:.55; }
+  body.t-yuu .tint { background:#F0B48E; opacity:.62; }
+  body.t-yoru .tint { background:#7A86B2; opacity:.9; }
+  .moon { position:absolute; top:5%; right:6%; width:6%; aspect-ratio:1; border-radius:50%; background:#F3EFE6; box-shadow:0 0 22px 8px rgba(243,239,230,.45); opacity:0; transition: opacity 2.4s ease; pointer-events:none; }
+  body.t-yoru .moon { opacity:.95; }
+  body.nagame.t-asa .acc .lamp, body.nagame.t-hiru .acc .lamp { opacity:.22; }   /* 昼間は灯りを落とす(花は残る) */
+  body.nagame.t-yoru .acc .a1, body.nagame.t-yoru .acc .a2 { filter: drop-shadow(0 0 4px #D4655C); }
+  .clock-btn { position:fixed; left:50%; transform:translateX(-50%); bottom:.6rem; z-index:5; font-family:inherit; background:var(--paper); border:1px solid var(--line); color:var(--soft); padding:.25rem .7rem; font-size:.66rem; letter-spacing:.15em; cursor:pointer; opacity:.9; }
+  .moonnote { position:fixed; left:50%; transform:translateX(-50%); bottom:2.6rem; z-index:5; background:rgba(28,26,23,.82); color:#EFEADE; border:1px dashed #8f897c; padding:.45rem 1rem; font-size:.7rem; letter-spacing:.2em; text-align:center; pointer-events:none; }
+  .moonnote small { display:block; color:#D4655C; letter-spacing:.3em; font-size:.62rem; margin-top:.2rem; }
+  .nagame-btn { position:fixed; left:.6rem; bottom:.6rem; z-index:5; font-family:inherit; background:var(--paper); border:1px solid var(--line); color:var(--soft); padding:.25rem .6rem; font-size:.66rem; letter-spacing:.15em; cursor:pointer; opacity:.9; }
+
+  .particle { position:absolute; width:8px; height:8px; border-radius:50%; background:var(--beni2); pointer-events:none; animation: fly .9s ease-out forwards; }
+  @keyframes fly { 0%{ transform:translate(0,0) scale(1); opacity:1 } 100%{ transform:translate(var(--dx),var(--dy)) scale(.2); opacity:0 } }
+  .float { position:absolute; font-size:.8rem; color:var(--beni); pointer-events:none; animation: up 1s ease-out forwards; letter-spacing:.1em; }
+  @keyframes up { 0%{ transform:translateY(0); opacity:1 } 100%{ transform:translateY(-36px); opacity:0 } }
+  .bloom { position:absolute; width:180px; height:180px; border-radius:50%; background: radial-gradient(circle, rgba(212,101,92,.55) 0%, rgba(212,101,92,0) 70%); pointer-events:none; transform:translate(-50%,-50%) scale(.2); animation: bloom 1.6s ease-out forwards; }
+  @keyframes bloom { 0%{ transform:translate(-50%,-50%) scale(.2); opacity:1 } 100%{ transform:translate(-50%,-50%) scale(1.6); opacity:0 } }
+
+  /* 声 */
+  .voice { min-height:2.8rem; text-align:center; padding:.8rem .5rem .1rem; font-size:.92rem; color:var(--beni); letter-spacing:.12em; opacity:0; transition: opacity 1.2s ease; }
+  .voice.show { opacity:1; }
+  .voice small { display:block; color:var(--soft); font-size:.68rem; letter-spacing:.2em; margin-top:.15rem; }
+
+  /* HUD(脇役) */
+  .hud { display:flex; justify-content:space-between; align-items:baseline; padding:.2rem .3rem; font-size:.72rem; color:var(--soft); letter-spacing:.1em; }
+  .hud b { font-size:1rem; color:var(--sumi); font-weight:400; }
+
+  h2 { font-size:.88rem; letter-spacing:.35em; text-align:center; margin:1.3rem 0 .5rem; color:var(--ink); }
+  h2::after { content:""; display:block; width:28px; height:1px; background:var(--soft); margin:.5rem auto 0; }
+  .lead { text-align:center; font-size:.74rem; color:var(--soft); letter-spacing:.12em; margin-bottom:.5rem; }
+
+  /* 町の人 */
+  .knights { display:grid; grid-template-columns: repeat(2, 1fr); gap:.55rem; }
+  @media (max-width:480px){ .knights { grid-template-columns:1fr; } }
+  .kn { border:1px solid var(--line); background:#F3EFE6; padding:.6rem .75rem; cursor:pointer; transition: border-color .3s, transform .1s; }
+  .kn:active { transform: scale(.985); }
+  .kn.can { border-color:var(--sumi); }
+  .kn.no { opacity:.5; cursor:default; }
+  .kn .t { font-size:.92rem; color:var(--ink); letter-spacing:.12em; }
+  .kn .t .nm { color:var(--beni); }
+  .kn .d { font-size:.72rem; color:var(--soft); margin-top:.1rem; letter-spacing:.04em; }
+  .kn .c { font-size:.74rem; color:var(--sumi); margin-top:.3rem; letter-spacing:.08em; display:flex; justify-content:space-between; }
+  .kn .lv { color:var(--soft); }
+
+  /* 集めたもの */
+  .tabs { display:flex; justify-content:center; gap:.4rem; margin-bottom:.6rem; }
+  .tab { font-family:inherit; background:none; border:1px solid var(--line); color:var(--soft); padding:.25rem .8rem; font-size:.72rem; letter-spacing:.15em; cursor:pointer; }
+  .tab.on { border-color:var(--sumi); color:var(--ink); }
+  .panel { display:none; } .panel.on { display:block; }
+  .koe { font-size:.82rem; color:var(--sumi); padding:.3rem .2rem; border-bottom:1px dashed var(--line); letter-spacing:.06em; }
+  .koe small { color:var(--soft); font-size:.66rem; margin-left:.5rem; letter-spacing:.15em; }
+  .koe.hidden { color:#b5ae9e; }
+  /* 声の札(言の札・第三段 9/13): 集めた声が札になって並ぶ。押すと大きく開く */
+  .fudaWho { display:grid; grid-template-columns: repeat(5, 1fr); gap:.35rem; margin-bottom:.7rem; }
+  .fw { position:relative; font-family:inherit; background:var(--paper); border:1px solid var(--line); padding:.4rem .1rem .3rem; cursor:pointer; text-align:center; color:var(--soft); }
+  .fw img { height:3.2rem; width:auto; display:block; margin:0 auto; }
+  .fw .n { display:block; font-size:.66rem; letter-spacing:.12em; color:var(--sumi); margin-top:.15rem; }
+  .fw .c { display:block; font-size:.6rem; letter-spacing:.1em; color:var(--soft); }
+  .fw.on { border-color:var(--sumi); background:#F3EFE6; }
+  .fw.none img { opacity:.28; filter:grayscale(1); }
+  .fw .nb { position:absolute; top:-.4rem; right:-.25rem; background:var(--beni); color:#fff; font-size:.56rem; letter-spacing:.05em; padding:.02rem .35rem; }
+  .fudas { display:grid; grid-template-columns: repeat(2, 1fr); gap:.55rem; }
+  .fuda img.flip, .fuda-big .card2 img.flip { transform:scaleX(-1); }
+  @media (min-width:560px){ .fudas { grid-template-columns: repeat(3, 1fr); } }
+  .fuda { position:relative; display:flex; align-items:center; gap:.45rem; background:var(--paper); border:1px solid var(--line); padding:.45rem .5rem .7rem; cursor:pointer; box-shadow:0 4px 12px rgba(28,26,23,.10); min-height:5.4rem; }
+  .fuda:active { transform:scale(.985); }
+  .fuda img { height:4.4rem; width:auto; flex:none; }
+  .fuda .tx { min-width:0; flex:1; }
+  .fuda .no { font-size:.62rem; color:var(--soft); letter-spacing:.15em; display:flex; align-items:center; gap:.3rem; }
+  .fuda .no i { width:5px; height:5px; border-radius:50%; background:var(--beni); display:inline-block; flex:none; }
+  .fuda .ln { font-size:.72rem; color:var(--sumi); letter-spacing:.04em; line-height:1.55; margin-top:.15rem; }
+  .fuda .rule { position:absolute; left:.5rem; right:.5rem; bottom:.32rem; height:1px; background:var(--line); opacity:.7; }
+  .fuda.locked { background:#e9e4d9; box-shadow:none; cursor:default; }
+  .fuda.locked .ln { color:#b5ae9e; }
+  .fuda.locked .no i { background:#c9c2b2; }
+  .fuda.new::after { content:"新"; position:absolute; top:-.45rem; right:-.3rem; background:var(--beni); color:#fff; font-size:.58rem; letter-spacing:.1em; padding:.05rem .4rem; }
+  .fuda.special { grid-column:1 / -1; justify-content:center; gap:.15rem; min-height:6rem; background:#F3EFE6; }
+  .fuda.special img { height:3.6rem; }
+  .fuda.special .tx { flex:none; text-align:center; margin-left:.7rem; }
+  .fuda-big { z-index:12; }
+  .fuda-big .in { max-width:none; display:flex; flex-direction:column; align-items:center; }   /* 9/13 特別札(幅720)が枠520からはみ出て右にずれていた→枠を絵に合わせて中央に */
+  .fuda-big .card2 { width:min(520px, 92vw); background:var(--paper); color:var(--sumi); padding:1.6rem 1.4rem 1.4rem; display:flex; align-items:center; gap:1.2rem; text-align:left; box-shadow:0 20px 50px rgba(0,0,0,.45); position:relative; }
+  .fuda-big .card2 img { height:12rem; width:auto; flex:none; }
+  .fuda-big .card2 .no { font-size:.72rem; color:var(--soft); letter-spacing:.2em; display:flex; align-items:center; gap:.35rem; }
+  .fuda-big .card2 .no i { width:6px; height:6px; border-radius:50%; background:var(--beni); display:inline-block; }
+  .fuda-big .card2 .ln { font-size:1.05rem; color:var(--sumi); letter-spacing:.06em; line-height:1.9; margin-top:.5rem; }
+  .fuda-big .card2 .rule { position:absolute; left:1.4rem; right:1.4rem; bottom:.8rem; height:1px; background:var(--line); }
+  .fuda-big .card2.sp { flex-direction:column; text-align:center; gap:.6rem; }
+  .fuda-big .card2.sp .five { display:flex; justify-content:center; gap:.2rem; }
+  .fuda-big .card2.sp .five img { height:6.2rem; }
+  .fuda-big .card2.sp { width:min(720px, 94vw); padding:1rem 1rem 1.3rem; }
+  .fuda-big .card2.sp img.wide { width:100%; height:auto; display:block; border:1px solid var(--line); }
+  .fuda-big .card2.sp .no { justify-content:center; }
+  .fuda-big .close { margin-top:1rem; font-size:.68rem; color:#8f897c; letter-spacing:.25em; }
+  /* 9/13 本人: 狭い幅でも横並び(キャラ左・文字右)を保つ。絵を少し小さくして文字の余白を取る */
+  .fuda-big .card2 { justify-content:center; }   /* 9/13 本人: 絵と文字の組を札の真ん中に */
+  .fuda-big .card2 .tx { flex:0 1 auto; min-width:0; max-width:62%; padding-right:.2rem; }
+  @media (max-width:480px){ .fuda-big .card2 { padding:1.2rem 1rem 1.5rem; gap:.9rem; } .fuda-big .card2 img { height:8.5rem; } .fuda-big .card2 .ln { font-size:.95rem; line-height:1.8; } .fuda-big .card2 .rule { left:1rem; right:1rem; } }
+  .cards { display:flex; flex-wrap:wrap; gap:.7rem; justify-content:center; }
+  /* 9/13 本人赤入れ: 白い台紙が紙色の地から浮く→台紙を紙色+細い線に、絵は紙に刷った風(白を紙色に沈める)、5枚を3:4で揃える。傾きは残す(写真の気分) */
+  .card { width:120px; background:#F3EFE6; border:1px solid var(--line); padding:6px 6px 22px; box-shadow:0 6px 16px rgba(28,26,23,.14); transform:rotate(-1.5deg); position:relative; }
+  .card:nth-child(even){ transform:rotate(1.2deg); }
+  .card img { width:100%; aspect-ratio:3/4; object-fit:cover; object-position:50% 0; display:block; filter:grayscale(1) contrast(1.05); mix-blend-mode:multiply; }
+  .card .nm { position:absolute; bottom:4px; left:0; right:0; text-align:center; font-size:.66rem; letter-spacing:.2em; color:var(--sumi); }
+  .card.locked { background:#e9e4d9; box-shadow:none; }
+  .card.locked .ph { height:180px; display:flex; align-items:center; justify-content:center; color:#b5ae9e; font-size:.7rem; letter-spacing:.2em; }
+  .songs .song { border:1px solid var(--line); padding:.5rem .7rem; margin-bottom:.5rem; display:flex; justify-content:space-between; align-items:center; font-size:.82rem; }
+  .songs .song.locked { color:#b5ae9e; }
+  .songs .song button { font-family:inherit; background:none; border:1px solid var(--sumi); color:var(--sumi); padding:.15rem .6rem; font-size:.7rem; letter-spacing:.15em; cursor:pointer; }
+  .songs .song.locked button { display:none; }
+  .player { margin:.5rem 0; }
+  .player iframe { width:100%; aspect-ratio:16/9; border:0; }
+
+  .foot { text-align:center; margin-top:1.6rem; font-size:.7rem; color:var(--soft); letter-spacing:.15em; }
+  .foot a { color:var(--sumi); border-bottom:1px solid var(--line); text-decoration:none; }
+  .foot button { font-family:inherit; background:none; border:1px solid var(--line); color:var(--soft); padding:.2rem .7rem; font-size:.68rem; letter-spacing:.15em; cursor:pointer; margin:.5rem .2rem 0; }
+
+  /* 幕 */
+  .cover { position:fixed; inset:0; background:rgba(28,26,23,.94); color:#EFEADE; display:none; align-items:center; justify-content:center; text-align:center; padding:2rem; z-index:9; }
+  .cover.show { display:flex; }
+  .cover .in { max-width:520px; }
+  .cover p { font-size:.95rem; letter-spacing:.16em; line-height:2.3; }
+  .cover .red { color:var(--beni2); }
+  .cover .btn { display:inline-block; margin-top:1.4rem; color:#EFEADE; border:1px solid #8f897c; padding:.45rem 1.2rem; text-decoration:none; letter-spacing:.3em; font-size:.82rem; background:none; font-family:inherit; cursor:pointer; }
+  .cover .sub { margin-top:.9rem; font-size:.68rem; color:#8f897c; cursor:pointer; letter-spacing:.2em; }
+  .nav-dots { margin-top:1rem; letter-spacing:.6em; color:#8f897c; font-size:.7rem; }
+  /* オープニング */
+  .op { position:fixed; inset:0; background:#1C1A17; color:#EFEADE; display:none; align-items:center; justify-content:center; text-align:center; z-index:20; cursor:pointer; overflow:hidden; }
+  .op.show { display:flex; }
+  .op .l { font-size:1.05rem; letter-spacing:.3em; line-height:2.6; opacity:0; transition: opacity 1.4s ease; }
+  .op .l.on { opacity:1; }
+  .op .l .red { color:#D4655C; }
+  .op .odot { width:8px; height:8px; border-radius:50%; background:#B0413E; margin:1rem auto 0; opacity:0; transform:scale(.3); transition: opacity 1s ease, transform 1s ease; }
+  .op .odot.on { opacity:1; transform:scale(1); }
+  .op .title { font-size:2rem; letter-spacing:.5em; text-indent:.5em; margin-top:.8rem; opacity:0; transition: opacity 1.6s ease; font-weight:700; }
+  .op .title.on { opacity:1; }
+  .op .go { margin-top:2rem; font-size:.75rem; letter-spacing:.35em; color:#8f897c; opacity:0; transition: opacity 1s ease; }
+  .op .go.on { opacity:1; animation: blink 2.4s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{ opacity:.35 } 50%{ opacity:1 } }
+  .petal { position:absolute; top:-20px; width:14px; height:10px; animation: fall linear forwards; pointer-events:none; }
+  .petal .pt { display:block; width:100%; height:100%; border-radius:60% 60% 60% 60% / 80% 80% 40% 40%; background:#B0413E; opacity:.9; animation: sway ease-in-out infinite alternate; }
+  .petal.p2 { width:11px; height:8px; } .petal.p2 .pt { background:#D4655C; }
+  @keyframes sway { 0%{ transform: translateX(-9px) rotate(-28deg) scaleY(1) } 50%{ transform: translateX(2px) rotate(6deg) scaleY(.7) } 100%{ transform: translateX(10px) rotate(30deg) scaleY(1) } }
+  @keyframes fall { 0%{ transform: translate(0,0) rotate(0deg); opacity:0 } 10%{ opacity:.95 } 100%{ transform: translate(var(--sx), 110vh) rotate(var(--rot)); opacity:.6 } }
+  .op.wind .petal { top:auto; left:100vw; animation-name: wind; }
+  .op.diag .petal { animation-name: diag; }
+  @keyframes diag { 0%{ transform: translate(0, 0) rotate(0deg); opacity:0 } 8%{ opacity:.95 } 50%{ transform: translate(-55vw, calc(45vh + var(--dy1))) rotate(calc(var(--rot) / 2)) } 100%{ transform: translate(-115vw, calc(95vh + var(--dy2))) rotate(var(--rot)); opacity:.7 } }
+  @keyframes wind { 0%{ transform: translate(0, 0) rotate(0deg); opacity:0 } 8%{ opacity:.95 } 50%{ transform: translate(-60vw, var(--dy1)) rotate(calc(var(--rot) / 2)) } 100%{ transform: translate(-125vw, var(--dy2)) rotate(var(--rot)); opacity:.7 } }
+  .bgm { position:fixed; right:.6rem; bottom:.6rem; z-index:5; font-family:inherit; background:var(--paper); border:1px solid var(--line); color:var(--soft); padding:.25rem .6rem; font-size:.66rem; letter-spacing:.15em; cursor:pointer; opacity:.9; }
+</style>
+</head>
+<body>
+<header>
+  <!-- 9/13 本人: 題の上の紅い点を椿(五弁)に。町の区画に咲く椿と同じ形 -->
+  <svg class="hdcam" viewBox="-10 -10 20 20" width="20" height="20" aria-hidden="true"><use href="#camellia" x="-10" y="-10" width="20" height="20"/></svg>
+  <h1>色灯し</h1>
+  <p>白黒の町に、色を灯す</p>
+</header>
+
+<div class="wrap">
+  <div class="town" id="town">
+    <svg viewBox="0 0 720 480" id="map">
+      <defs>
+        <!-- 紅の印: 花びら一枚(9/13 本人決定。五弁の花から差替。付け根だけほんのり白い) -->
+        <linearGradient id="petalG" x1="-6" y1="9" x2="7" y2="-7" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#F7E7E2"/><stop offset=".14" stop-color="#E9948C"/><stop offset=".42" stop-color="#D4655C"/><stop offset="1" stop-color="#B0413E"/>
+        </linearGradient>
+        <symbol id="camellia" viewBox="-12 -12 24 24">
+          <path d="M-6,9 C-10.5,3 -9.5,-5.5 -3.5,-9 C-1,-10.5 1.5,-10.2 3.2,-9.2 C4.2,-8.6 5.4,-8.8 6.2,-7.6 C7.2,-6.4 8.6,-6 8.8,-4.2 C9,-2.6 8.2,-1 8.4,.6 C8.6,3 6.4,6.2 2.6,8 C0,9.2 -3.6,9.8 -6,9 Z" fill="url(#petalG)" stroke="#8E2F2C" stroke-width=".5" stroke-linejoin="round"/>
+          <g fill="none" stroke="#FFFFFF" stroke-width=".32" opacity=".38" stroke-linecap="round">
+            <path d="M-5.6,8.4 C-3,3 0,-3 4,-7"/><path d="M-5.6,8.4 C-2,4 2,0 7,-3.5"/><path d="M-5.6,8.4 C-1,5 3.5,3.5 7.4,1"/><path d="M-5.6,8.4 C-4.5,2 -4,-4 -1.5,-8.4"/><path d="M-5.6,8.4 C-6.5,3 -7,-2 -5.5,-6"/>
+          </g>
+        </symbol>
+        <!-- 灯り(段1・段2で絵の中にともる紅) 9/13 -->
+        <radialGradient id="glow"><stop offset="0" stop-color="#D4655C" stop-opacity=".95"/><stop offset=".45" stop-color="#D4655C" stop-opacity=".45"/><stop offset="1" stop-color="#D4655C" stop-opacity="0"/></radialGradient>
+      </defs>
+      <path d="M120 200 C 260 230, 460 230, 600 200" stroke="#C9C2B2" stroke-width="1" fill="none" stroke-dasharray="4 5"/>
+      <path d="M360 240 L 360 380" stroke="#C9C2B2" stroke-width="1" fill="none" stroke-dasharray="4 5"/>
+      <!-- 町の化粧(9/13): 建物の線画+地面の灯り(楕円)+当たり判定の透明枠。名札は絵の下 -->
+      <g class="blk" data-k="ie"><ellipse class="ground" cx="135" cy="190" rx="100" ry="20"/><image href="img/town/ie.webp" x="35" y="55" width="200" height="140" preserveAspectRatio="xMidYMax meet"/><rect class="hit" x="35" y="55" width="200" height="150"/><text x="135" y="220" text-anchor="middle">翼樹の家</text><text class="who" x="135" y="234" text-anchor="middle"></text><g class="cam" transform="translate(48,190)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
+      <g class="blk plaza pulse" data-k="hiroba"><ellipse class="ground" cx="360" cy="310" rx="115" ry="24"/><image href="img/town/hiroba.webp" x="245" y="150" width="230" height="170" preserveAspectRatio="xMidYMax meet"/><rect class="hit" x="245" y="150" width="230" height="180"/><text x="360" y="342" text-anchor="middle">広場</text><text class="who" x="360" y="356" text-anchor="middle"></text><g class="cam" transform="translate(258,308)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
+      <g class="blk" data-k="ichiba"><ellipse class="ground" cx="135" cy="430" rx="100" ry="20"/><image href="img/town/ichiba.webp" x="35" y="295" width="200" height="140" preserveAspectRatio="xMidYMax meet"/><rect class="hit" x="35" y="295" width="200" height="150"/><text x="135" y="460" text-anchor="middle">市場</text><text class="who" x="135" y="474" text-anchor="middle"></text><g class="cam" transform="translate(48,430)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
+      <g class="blk" data-k="oka"><ellipse class="ground" cx="585" cy="430" rx="100" ry="20"/><image href="img/town/oka.webp" x="485" y="295" width="200" height="140" preserveAspectRatio="xMidYMax meet"/><rect class="hit" x="485" y="295" width="200" height="150"/><text x="585" y="460" text-anchor="middle">丘</text><text class="who" x="585" y="474" text-anchor="middle"></text><g class="cam" transform="translate(498,430)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
+      <g class="blk" data-k="tsumesho"><ellipse class="ground" cx="585" cy="190" rx="100" ry="20"/><image href="img/town/tsumesho.webp" x="485" y="55" width="200" height="140" preserveAspectRatio="xMidYMax meet"/><rect class="hit" x="485" y="55" width="200" height="150"/><text x="585" y="220" text-anchor="middle">騎士団詰所</text><text class="who" x="585" y="234" text-anchor="middle"></text><g class="cam" transform="translate(498,190)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
+      <!-- 町の人影 -->
+      <g id="figs"></g>
+    </svg>
+    <div class="tint" id="tint"></div>
+    <!-- 夜の月: 藍の膜の上に置く(膜の下だと染まって見えない・9/13) -->
+    <div class="moon" id="moon"></div>
+  </div>
+  <div class="voice" id="voice"></div>
+  <div class="hud"><div>かけら <b id="cnt">0</b></div><div>毎秒 <span id="ps">0</span> ／ ひと押し <span id="pt">1</span></div></div>
+
+  <h2>町の人</h2>
+  <div class="lead">かけらを渡して、頼みごとをする</div>
+  <div class="knights" id="knights"></div>
+
+  <h2>集めたもの</h2>
+  <div class="tabs">
+    <button class="tab on" data-p="koe">声の札</button>
+    <button class="tab" data-p="e">絵</button>
+    <button class="tab" data-p="uta">歌の間</button>
+  </div>
+  <div class="panel on" id="p-koe"></div>
+  <div class="panel" id="p-e"><div class="cards" id="cards"></div></div>
+  <div class="panel" id="p-uta"><div class="player" id="player"></div><div class="songs" id="songs"></div></div>
+
+  <div class="foot">
+    <div>この町は、白黒です。感情だけが、色を持つ。</div>
+    <div style="margin-top:.4rem"><a href="https://tubaki-arcana.com" target="_blank" rel="noopener">翼樹〜Arcana〜</a></div>
+    <div><button id="help">あそびかた</button><button id="reset">最初から</button></div>
+  </div>
+</div>
+
+<button class="bgm" id="bgmBtn" hidden>♪ 町の音: 入</button>
+<button class="nagame-btn" id="nagameBtn" hidden>町を、眺める</button>
+<button class="clock-btn" id="clockBtn" hidden>◐ 自動</button>
+<div class="moonnote" id="moonNote" hidden>夜の町の歌『月』<small>いま、歌になろうとしています</small></div>
+<audio id="bgm" src="audio/bgm_hiru.mp3" loop preload="none"></audio>
+
+<div class="op" id="op">
+  <div class="in">
+    <div class="l" id="op1">世界は白黒</div>
+    <div class="l" id="op2">感情だけが、<span class="red">色</span>を持つ</div>
+    <div class="odot" id="opDot"></div>
+    <div class="title" id="opTitle">色灯し</div>
+    <div class="go" id="opGo">押して、はじめる</div>
+  </div>
+</div>
+<div class="cover" id="nav">
+  <div class="in">
+    <p id="navText"></p>
+    <div class="nav-dots" id="navDots"></div>
+    <button class="btn" id="navNext">つぎへ</button>
+    <div class="sub" id="navSkip">とばす</div>
+  </div>
+</div>
+
+<div class="cover" id="ending">
+  <div class="in">
+    <p>町に、色が灯りました</p>
+    <!-- 9/13 本人の言葉(句点なし・「やがて」)。箱庭は制作中なので「続きは、箱庭で」をやめ、観測記録(note)へ。扉の言葉は仮 -->
+    <p class="red">やがて彼らが暮らし始めます<br>新しい住人とともに</p>
+    <a class="btn" href="https://note.com/huge_eagle3122" target="_blank" rel="noopener">観測記録を読む</a>
+    <div class="sub"><a href="https://tubaki-arcana.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">翼樹〜Arcana〜</a></div>
+    <div class="sub" id="toNagame">町を、眺める(住人が歩きます)</div>
+    <div class="sub" id="closeEnd">町に戻る(色は消えません)</div>
+  </div>
+</div>
+<div class="cover fuda-big" id="fudaBig">
+  <div class="in">
+    <div class="card2" id="fudaCard"></div>
+    <div class="close">押して、閉じる</div>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ───── 憲法 ─────
+  // 最初の一灯=広場 / タップ=紅が灯る / 最初の声=翼樹(無自覚の一言) / 数字より絵と声 / 「買う」でなく「頼む」
+  const KEY = 'irotomoshi_v1';
+  const S = { n:0, total:0, up:{ignis:0, atlas:0, raven:0, echo:0}, lit:{}, got:{}, koe:{}, seenKoe:{}, navDone:false, ended:false, bgm:false, lastRaven:0, opDone:false };
+
+  // 区画: 住人・しきい値(累計かけら)・段階ごとのご褒美
+  const D = {
+    hiroba:   { name:'広場',     who:'翼樹',   img:'img/tsubaki.webp', at:10,   song:{ title:'翼樹', file:'audio/tsubaki.mp3' } },   // 9/13 本人の新画像(ベストの翼樹)に差替。旧=img/tsubaki_v1_20260906.jpg
+    ie:       { name:'翼樹の家', who:'イグニス', img:'img/ignis.webp',   at:120,  song:{ title:'節制', file:'audio/sessei.mp3' } },
+    ichiba:   { name:'市場',     who:'エコー', img:'img/echo.webp',    at:600,  song:{ title:'魔術師', file:'audio/majutsushi.mp3' } },   // 9/13 腰から上に切り直し(旧=echo_v1_20260906.jpg)
+    oka:      { name:'丘',       who:'アトラス', img:'img/atlas.webp',   at:2500, song:{ title:'隠者', yt:null } },   // 9/13 腰から上に切り直し(旧=atlas_v1_20260906.jpg)
+    tsumesho: { name:'騎士団詰所', who:'レイヴン', img:'img/raven.webp', at:7000, song:{ title:'皇帝', yt:null } },
+  };
+  const ORDER = ['hiroba','ie','ichiba','oka','tsumesho'];
+  const STAGE_MUL = [0, 1, 2, 4];     // 段1=at×1, 段2=at×2, 段3=at×4(クリア後の後半戦が遠すぎないように・9/6調整)
+  const ALL_AT = 16000;
+  const BONUS_SONG = { title:'大器晩成の虹', yt:'U6I6k4Iu83s' };   // 『月』はv2「夜の町」のご褒美に取り置き
+
+  // 心の声(段階の声+ランダムに漏れる声)
+  const V = {
+    翼樹:   { s1:'(、、、あたたかい?)', s2:'(色、ついてる、、、?)', s3:'(ここ、うるさくない。でも、ひとりじゃない)', r:['(誰か、いる?)','(なんだろう、これ)','(ん?)','(、、、いい匂い)'] },
+    イグニス: { s1:'(お茶が、冷めないうちに)', s2:'(結び目が、少し左でございます)', s3:'(お側におります。それだけは)', r:['(本日も、召し上がり残しなし)','(氷は、二つ)','(お帰りなさいませ)','(、、、失礼いたしました)'] },
+    エコー:  { s1:'(保存できないものだけが、美しい)', s2:'(今日も、写真フォルダが増えている)', s3:'(構図は完璧なのに、撮れない)', r:['(シャッターを、切れない)','(残念です)','(この光は、保存できない)','(僕ではありません)'] },
+    アトラス: { s1:'(今日の記録には、感情が混入している)', s2:'(誤差、0.3)', s3:'(観測対象、変化なし。、、、なし、と書く)', r:['(記録を、続ける)','(筆圧が、強い)','(糸の色を、三日悩んだ)','(訂正。訂正なし)'] },
+    レイヴン: { s1:'(巡回経路の最適化だ。他意はない)', s2:'(規則の範囲内だ)', s3:'(三秒。歩調が緩んだ記録は無い)', r:['(異常なし。、、、異常は、なし)','(監査は、公平だ)','(あの方にだけ、というわけではない)','(他意はない)'] },
+  };
+  const FINAL = { who:'翼樹', line:'(誰かが、いる)' };
+  // 声の札(第三段 9/13): 一人8枚・全40枚。最初の一言(頼んだ時)も札に数える
+  const ALLWHO = ['翼樹','イグニス','エコー','アトラス','レイヴン'];
+  const FIRST = { イグニス:'(かしこまりました)', アトラス:'(記録、開始)', レイヴン:'(巡回を、始める)', エコー:'(いい光ですね)' };
+  // 9/13: 札帳の絵は高解像度版(img/chibi/hd/・ESRGAN 4倍→透過・高さ440)。町の中の小さな人影は別物
+  const CHIBI = { 翼樹:'img/chibi/hd/tsubaki.webp', イグニス:'img/chibi/hd/ignis.webp', エコー:'img/chibi/hd/echo.webp', アトラス:'img/chibi/hd/atlas.webp', レイヴン:'img/chibi/hd/raven.webp' };
+  const KANJI = ['一','二','三','四','五','六','七','八','九','十'];
+  function fudaList(who){ const l=[]; if(FIRST[who]) l.push(FIRST[who]); l.push(V[who].s1, V[who].s2, V[who].s3, ...V[who].r); if(who==='翼樹') l.push(FINAL.line); return l; }
+  // 札の絵: 箱庭の四面(正面・横・歩き・後ろ)を札ごとに使い分け、五枚目からは向きを反転(差分の絵ができるまでの暫定)
+  const POSE = ['', '_side', '_walk', '_back'];
+  // 札ごとの専用ポーズ(img/chibi/pose/{id}_01..08.png)がある人はそれを使う(9/13 翼樹から)。無い人は四面+反転の暫定
+  const POSE_READY = { 翼樹: 8, イグニス: 8, レイヴン: 8, エコー: 8, アトラス: 8 };   // 9/13 五人そろった(40枚)
+  function chibiImg(who, i){ const id = CHIBI[who].slice('img/chibi/hd/'.length, -5);
+    if((POSE_READY[who]||0) > i) return `<img src="img/chibi/pose/${id}_${String(i+1).padStart(2,'0')}.webp" alt="">`;
+    return `<img src="img/chibi/hd/${id}${POSE[i % 4]}.webp" alt=""${i>=4 ? ' class="flip"' : ''}>`; }
+  let fudaWho = '翼樹';   // 札帳で開いている人
+
+  const K = [
+    { id:'ignis', role:'執事',   name:'イグニス', act:'お茶を頼む',   desc:'頼まなくても、かけらが集まる(毎秒+0.5)', base:15,  r:1.6 },
+    { id:'atlas', role:'記録係', name:'アトラス', act:'記録を頼む',   desc:'ひと押しで集まる量が増える(+1)', base:40,  r:1.7 },
+    { id:'raven', role:'監査官', name:'レイヴン', act:'見回りを頼む', desc:'巡回のたび、まとめて落ちる(不定期・大口)', base:200, r:1.7 },
+    { id:'echo',  role:'写真家', name:'エコー',   act:'写真を頼む',   desc:'すべての収集が少し増える(×1.25)', base:800, r:2.2 },
+  ];
+
+  const $ = s => document.querySelector(s);
+  const Q = new URLSearchParams(location.search);
+  const town = $('#town'), voice = $('#voice');
+  const load = () => { try{ const j = JSON.parse(localStorage.getItem(KEY)); if(j) Object.assign(S, j); }catch(e){} };
+  const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} };
+  const mul = () => 1 + S.up.echo * 0.25;
+  const perSec = () => (S.up.ignis * 0.5) * mul();
+  const perTap = () => (1 + S.up.atlas) * mul();
+  const cost = k => Math.floor(k.base * Math.pow(k.r, S.up[k.id]));
+  const fmt = v => v >= 1000 ? Math.floor(v).toLocaleString('ja-JP') : (Math.round(v*10)/10).toString();
+  const gain = v => { S.n += v; S.total += v; };
+  const stageOf = k => { const at = D[k].at; let s=0; for(let i=1;i<=3;i++) if(S.total >= at*STAGE_MUL[i]) s=i; return s; };
+
+  function burst(x, y, txt){
+    for(let i=0;i<6;i++){ const p=document.createElement('div'); p.className='particle'; const a=Math.random()*Math.PI*2, d=30+Math.random()*40;
+      p.style.left=x+'px'; p.style.top=y+'px'; p.style.setProperty('--dx', Math.cos(a)*d+'px'); p.style.setProperty('--dy', Math.sin(a)*d-20+'px'); town.appendChild(p); setTimeout(()=>p.remove(),900); }
+    if(txt){ const f=document.createElement('div'); f.className='float'; f.textContent='+'+txt; f.style.left=(x+8)+'px'; f.style.top=(y-10)+'px'; town.appendChild(f); setTimeout(()=>f.remove(),1000); }
+  }
+  function bloomAt(k){ const g=document.querySelector(`.blk[data-k="${k}"] rect`); if(!g) return; const r=g.getBoundingClientRect(), t=town.getBoundingClientRect();
+    const b=document.createElement('div'); b.className='bloom'; b.style.left=(r.left-t.left+r.width/2)+'px'; b.style.top=(r.top-t.top+r.height/2)+'px'; town.appendChild(b); setTimeout(()=>b.remove(),1700); }
+  let voiceTimer=null, justNew=false;
+  function showVoice(who, line, keep){
+    const isNew = justNew; justNew = false;   // 直前の addKoe で新しい札になったか
+    voice.classList.remove('show'); clearTimeout(voiceTimer);
+    setTimeout(()=>{ voice.innerHTML = line + (who? '<small>'+who+(isNew? ' ✦ 声の札を、受け取った' : '')+'</small>':''); voice.classList.add('show'); }, 180);
+    if(!keep) voiceTimer = setTimeout(()=>voice.classList.remove('show'), 6000);
+  }
+  function addKoe(who, line){ S.koe[who] = S.koe[who] || []; if(!S.koe[who].includes(line)){ S.koe[who].push(line); justNew = true; } }
+  function markSeen(who, line){ S.seenKoe[who] = S.seenKoe[who] || []; if(!S.seenKoe[who].includes(line)){ S.seenKoe[who].push(line); save(); } }
+
+  function checkStages(){
+    for(const k of ORDER){
+      const st = stageOf(k), prev = S.lit[k]||0;
+      if(st > prev){
+        const who = D[k].who, v = V[who];
+        for(let s=prev+1; s<=st; s++){   // 途中の段階を飛ばさない(ご褒美は必ず順に)
+          S.lit[k] = s;
+          if(s===1){ addKoe(who, v.s1); showVoice(who, v.s1, true); bloomAt(k); if(k==='hiroba') startBgm(); }
+          if(s===2){ addKoe(who, v.s2); showVoice(who, v.s2, true); bloomAt(k); S.got['e_'+k]=true; }
+          if(s===3){ addKoe(who, v.s3); showVoice(who, v.s3, true); bloomAt(k); S.got['s_'+k]=true; }
+        }
+        save();
+      }
+    }
+    if(S.total >= ALL_AT && !S.got.all){ S.got.all = true; addKoe(FINAL.who, FINAL.line); showVoice(FINAL.who, FINAL.line, true); S.got.s_bonus = true;
+      if(!S.ended){ S.ended=true; setTimeout(()=>$('#ending').classList.add('show'), 2200); } save(); }
+  }
+
+  // レイヴン: 不定期に大口が落ちる
+  function ravenTick(now){
+    if(S.up.raven<=0) return;
+    if(!S.lastRaven) S.lastRaven = now;
+    const gap = 8000 + Math.random()*12000;
+    if(now - S.lastRaven > gap){
+      S.lastRaven = now; const v = (3 + Math.floor(Math.random()*6)) * S.up.raven * mul(); gain(v);
+      const g=document.querySelector('.blk[data-k="tsumesho"] rect'); const r=g.getBoundingClientRect(), t=town.getBoundingClientRect();
+      burst(r.left-t.left+r.width/2, r.top-t.top+r.height/2, fmt(v)+'(巡回)');
+      checkStages(); render();
+    }
+  }
+
+  // BGM
+  const bgm = $('#bgm'), bgmBtn = $('#bgmBtn');
+  function startBgm(){ if(S.bgm===false && !S.got.bgmAsked){ S.got.bgmAsked=true; S.bgm=true; }
+    bgmBtn.hidden = false; applyBgm(); }
+  function applyBgm(){ if(S.bgm){ bgm.volume=0.35; bgm.play().catch(()=>{}); bgmBtn.textContent='♪ 町の音: 入'; } else { bgm.pause(); bgmBtn.textContent='♪ 町の音: 切'; } }
+  bgmBtn.addEventListener('click', ()=>{ S.bgm=!S.bgm; applyBgm(); save(); });
+
+  // 描画
+  function renderTown(){
+    for(const g of document.querySelectorAll('.blk')){ const k=g.dataset.k, lv=S.lit[k]||0;
+      g.classList.toggle('l1', lv>=1); g.classList.toggle('l2', lv>=2); g.classList.toggle('l3', lv>=3);
+      g.classList.toggle('locked', k!=='hiroba' && !lv);
+      g.querySelector('.who').textContent = lv>=1 ? D[k].who : '';
+    }
+    document.querySelector('.plaza').classList.toggle('pulse', !S.lit.hiroba);
+    syncFigs();
+  }
+
+  // ───── 住人が歩く(第二段・9/6) ─────
+  // 頼んだ人(と、広場が灯ったあとの翼樹)が町を歩く。灯った区画の間だけを行き来する
+  // 建物の前の通り(区画の中の名札には乗らない)
+  // 9/13 町の化粧に合わせて歩ける所を「建物の前の通り」に限定(建物の絵の上を通らない)
+  const CENTER = { ie:[135,212], hiroba:[360,340], ichiba:[135,452], oka:[585,452], tsumesho:[585,212] };
+  const ROAD = [[232,245],[488,245],[60,245],[660,245],[300,350],[420,350],[240,440],[480,440],[360,445],[600,245],[120,245]];
+  // 通りづたいの道筋: 上の通り(y245・広場の左右で切れる)/下の通り(y445)/左右の路地(x240・x480)。広場は下側を回り込む
+  const streetOf = p => p[1] < 300 ? 'top' : 'bot';
+  const laneX = x => x < 360 ? 240 : 480;
+  const inPlazaX = x => x > 232 && x < 488;
+  function planPath(from, to){
+    const path = []; const sF = streetOf(from), sT = streetOf(to);
+    if(sF === 'top' && sT === 'top'){
+      const sameSide = (from[0] < 360) === (to[0] < 360);
+      if(sameSide && !inPlazaX(from[0]) && !inPlazaX(to[0])) path.push([from[0],245],[to[0],245]);
+      else { const a = laneX(from[0]), b = laneX(to[0]); path.push([from[0],245],[a,245],[a,445],[b,445],[b,245],[to[0],245]); }
+    } else if(sF === 'top'){ const a = laneX(from[0]); path.push([from[0],245],[a,245],[a,445],[to[0],445]); }
+    else if(sT === 'top'){ const b = laneX(to[0]); path.push([from[0],445],[b,445],[b,245],[to[0],245]); }
+    else path.push([from[0],445],[to[0],445]);
+    path.push(to); return path;
+  }
+  const BOXES = [[35,55,235,195],[485,55,685,195],[245,150,475,320],[35,295,235,435],[485,295,685,435]];   // 建物の絵の範囲(x0,y0,x1,y1)
+  function offBuilding(p){ let [x,y]=p; for(const [x0,y0,x1,y1] of BOXES){ if(x>x0-8 && x<x1+8 && y>y0 && y<y1+6){ y = y1 + 14 + Math.random()*10; } } return [x, Math.min(y, 466)]; }
+  const HOME = { tsubaki:'hiroba', ignis:'ie', atlas:'oka', raven:'tsumesho', echo:'ichiba' };
+  const FIG_FILL = { tsubaki:'#4A453C' };   // 翼樹だけ、ひと呼吸淡い墨
+  const figs = {};   // id → {el, x,y, tx,ty, wait, speed}
+  const litBlocks = () => ORDER.filter(k => S.lit[k]);
+  function pickTarget(f){
+    const lit = litBlocks(); const home = HOME[f.id];
+    let k;
+    if(lit.length<=1 || Math.random()<0.45) k = S.lit[home] ? home : 'hiroba';
+    else k = lit[Math.floor(Math.random()*lit.length)];
+    if(Math.random()<0.3){ const r = ROAD[Math.floor(Math.random()*ROAD.length)]; return offBuilding([r[0]+(Math.random()*30-15), r[1]+(Math.random()*16-8)]); }
+    const c = CENTER[k]; return offBuilding([c[0]+(Math.random()*90-45), c[1]+(Math.random()*20-6)]);
+  }
+  function makeFig(id, name){
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','fig');
+    // 9/13 町の化粧: 人影を箱庭のミニキャラ(高解像度版)に。横向きを基本に、歩くと足違い、縦移動は前・後ろ姿
+    g.innerHTML = `<g class="bd"><image class="sp" href="img/chibi/hd/${id}_side.webp" x="-12" y="-30" width="24" height="30" preserveAspectRatio="xMidYMax meet"/></g><text x="0" y="12" text-anchor="middle" font-size="8" fill="#6B665C" letter-spacing="1">${name}</text>`;
+    $('#figs').appendChild(g);
+    const home = CENTER[HOME[id]];
+    const f = { id, el:g, x:home[0]+(Math.random()*60-30), y:home[1]+(Math.random()*30-15), wait: 1+Math.random()*3, speed: 14+Math.random()*8 };
+    f.tx=f.x; f.ty=f.y; f.el.setAttribute('transform', `translate(${f.x},${f.y})`); return f;
+  }
+  function syncFigs(){
+    const want = [];
+    if(S.lit.hiroba) want.push(['tsubaki','翼樹']);
+    for(const k of K) if(S.up[k.id]>0) want.push([k.id, k.name]);
+    for(const [id,name] of want) if(!figs[id]) figs[id] = makeFig(id, name);
+  }
+  let lastT = Date.now();
+  function walk(){
+    const now = Date.now(); const dt = Math.min(0.1, (now-lastT)/1000); lastT = now;
+    if(!document.hidden) for(const f of Object.values(figs)){
+      const dx=f.tx-f.x, dy=f.ty-f.y, d=Math.hypot(dx,dy);
+      const sp = f.el.querySelector('.sp');
+      if(d < 1.5){
+        if(f.q && f.q.length){ const n = f.q.shift(); f.tx=n[0]; f.ty=n[1]; if(Math.abs(f.tx-f.x) > 2) f.el.classList.toggle('flip', f.tx > f.x); continue; }   // 道筋の次の角へ(立ち止まらない)
+        if(f.el.classList.contains('walk')){ f.el.classList.remove('walk'); sp.setAttribute('href', `img/chibi/hd/${f.id}_side.webp`); }
+        f.wait -= dt; if(f.wait<=0){ const tg = pickTarget(f); f.q = planPath([f.x,f.y], tg); const n = f.q.shift(); f.tx=n[0]; f.ty=n[1]; f.wait = 2+Math.random()*5; if(Math.abs(f.tx-f.x) > 2) f.el.classList.toggle('flip', f.tx > f.x); f.el.classList.add('walk'); f.step=0; }   // 横向きの絵は左向き→右へ歩く時だけ反転(9/13)
+      } else {
+        const st = Math.min(d, f.speed*dt); f.x += dx/d*st; f.y += dy/d*st;
+        f.el.setAttribute('transform', `translate(${f.x.toFixed(1)},${f.y.toFixed(1)})`);
+        // 絵の切り替え: 縦移動は前/後ろ姿、横移動は横向きと足違いを0.25秒ごとに
+        f.step = (f.step||0) + dt; const vertical = Math.abs(dy) > Math.abs(dx)*1.6;
+        const want = vertical ? (dy < 0 ? `img/chibi/hd/${f.id}_back.webp` : `img/chibi/hd/${f.id}.webp`) : (Math.floor(f.step*4)%2 ? `img/chibi/hd/${f.id}_walk.webp` : `img/chibi/hd/${f.id}_side.webp`);
+        if(sp.getAttribute('href') !== want) sp.setAttribute('href', want);
+      }
+    }
+  }
+  setInterval(walk, 40);
+
+  // ───── 眺めモード(全灯のあと・住人が歩き、時々声が漏れる) ─────
+  const nagameBtn = $('#nagameBtn'); let nagameTimer = null;
+  function leakAny(){
+    const lit = litBlocks(); if(!lit.length) return;
+    const k = lit[Math.floor(Math.random()*lit.length)]; const who = D[k].who, pool = V[who].r;
+    const have = S.koe[who]||[]; const rest = pool.filter(x=>!have.includes(x)); const src = rest.length? rest : pool;
+    const l = src[Math.floor(Math.random()*src.length)]; addKoe(who,l); showVoice(who,l); save();
+  }
+  // 時間帯の色(9/13): 眺めモードだけ。既定=遊ぶ人の時計(朝5-10/昼10-16/夕16-19/夜19-5)。隅の時計で手動切替(自動→朝→昼→夕→夜)
+  const clockBtn = $('#clockBtn'), moonNote = $('#moonNote');
+  const TIMES = ['auto','asa','hiru','yuu','yoru'], TLABEL = { auto:'自動', asa:'朝', hiru:'昼', yuu:'夕', yoru:'夜' };
+  function timeOfDay(){ const m = S.timeMode || 'auto'; if(m !== 'auto') return m; const h = new Date().getHours(); return (h>=5 && h<10) ? 'asa' : h<16 ? 'hiru' : h<19 ? 'yuu' : 'yoru'; }
+  function applyTime(){
+    const on = document.body.classList.contains('nagame'); const t = on ? timeOfDay() : 'hiru';
+    for(const k of ['asa','hiru','yuu','yoru']) document.body.classList.toggle('t-'+k, on && t===k);
+    clockBtn.hidden = !on; const m = S.timeMode || 'auto'; clockBtn.textContent = '◐ ' + (m==='auto' ? `自動(${TLABEL[t]})` : TLABEL[m]);
+    moonNote.hidden = !(on && t==='yoru');
+  }
+  clockBtn.addEventListener('click', ()=>{ const i = TIMES.indexOf(S.timeMode || 'auto'); S.timeMode = TIMES[(i+1) % TIMES.length]; save(); applyTime(); });
+  setInterval(applyTime, 60000);
+  function setNagame(on){
+    document.body.classList.toggle('nagame', on);
+    nagameBtn.textContent = on ? '町に、戻る' : '町を、眺める';
+    clearInterval(nagameTimer); nagameTimer = null;
+    if(on){ nagameTimer = setInterval(()=>{ if(Math.random()<0.7) leakAny(); }, 9000); setTimeout(leakAny, 1200); }
+    applyTime();
+    window.scrollTo(0,0);
+  }
+  nagameBtn.addEventListener('click', ()=> setNagame(!document.body.classList.contains('nagame')));
+  $('#toNagame').addEventListener('click', ()=>{ $('#ending').classList.remove('show'); setNagame(true); });
+  function nagameUnlocked(){ return !!S.got.all || Q.get('nagame')==='1'; }
+  // 町の人: 枠は一度だけ作り、以後は中身だけ更新(作り直すと押下が消える)
+  let knightsBuilt = false;
+  function buildKnights(){
+    const box=$('#knights'); box.innerHTML='';
+    for(const k of K){ const el=document.createElement('div'); el.className='kn'; el.dataset.id=k.id;
+      el.innerHTML = `<div class="t"></div><div class="d">${k.desc}</div><div class="c"><span class="cost"></span><span class="lv"></span></div>`; box.appendChild(el); }
+    box.addEventListener('pointerdown', e => {
+      const el = e.target.closest('.kn'); if(!el) return; e.preventDefault();
+      const k = K.find(x=>x.id===el.dataset.id); const lv=S.up[k.id], c=cost(k);
+      if(S.n < c) return;
+      S.n -= c; S.up[k.id]++;
+      if(lv===0){ const first = FIRST[k.name]; addKoe(k.name, first); showVoice(k.name, first); }
+      const r=el.getBoundingClientRect(), t=town.getBoundingClientRect(); 
+      render(); save();
+    });
+    knightsBuilt = true;
+  }
+  function renderKnights(){
+    if(!knightsBuilt) buildKnights();
+    for(const el of document.querySelectorAll('#knights .kn')){ const k=K.find(x=>x.id===el.dataset.id); const lv=S.up[k.id], c=cost(k), can=S.n>=c;
+      el.classList.toggle('can', can); el.classList.toggle('no', !can);
+      const nm = lv>0 ? `<span class="nm">${k.name}</span>` : `<span>${k.role}</span>`;
+      const t = `${nm}に ${k.act}`; if(el.querySelector('.t').innerHTML !== t) el.querySelector('.t').innerHTML = t;
+      el.querySelector('.cost').textContent = `かけら ${fmt(c)} を渡す`; el.querySelector('.lv').textContent = lv? '×'+lv : '';
+    }
+  }
+  function renderCollect(){
+    // 声の札(第三段): 集めた声は札に、まだの声は空札に。押すと大きく開く
+    const p=$('#p-koe'); p.innerHTML='';
+    let total=0, have=0; const stat={};
+    for(const who of ALLWHO){ const ls=fudaList(who); const got=ls.filter(l=>(S.koe[who]||[]).includes(l)); const neu=got.filter(l=>!(S.seenKoe[who]||[]).includes(l));
+      stat[who]={all:ls.length, got:got.length, neu:neu.length}; total+=ls.length; have+=got.length; }
+    // 人ごとの棚(顔の札): 押すとその人の8枚が下に開く
+    const row=document.createElement('div'); row.className='fudaWho';
+    for(const who of ALLWHO){ const st=stat[who]; const b=document.createElement('button'); b.className='fw'+(who===fudaWho?' on':'')+(st.got?'':' none'); b.dataset.who=who;
+      b.innerHTML = `<img src="${CHIBI[who]}" alt=""><span class="n">${st.got? who : '?'}</span><span class="c">${st.got} / ${st.all}</span>` + (st.neu? `<span class="nb">新${st.neu}</span>` : ''); row.appendChild(b); }
+    const grid=document.createElement('div'); grid.className='fudas';
+    fudaList(fudaWho).forEach((l,i)=>{ const who=fudaWho; const got=(S.koe[who]||[]).includes(l); const seen=(S.seenKoe[who]||[]).includes(l);
+      const d=document.createElement('div'); d.className='fuda'+(got?' got':' locked')+(got&&!seen?' new':''); d.dataset.who=who; d.dataset.i=i;
+      d.innerHTML = (got? chibiImg(who,i) : '') + `<div class="tx"><div class="no"><i></i>${got? who : '?'}・${KANJI[i]}</div><div class="ln">${got? l : '、、、'}</div></div><div class="rule"></div>`;
+      grid.appendChild(d); });
+    if(have>=total){ const d=document.createElement('div'); d.className='fuda got special'; d.dataset.who='all';
+      d.innerHTML = ALLWHO.map(w=>`<img src="${CHIBI[w]}" alt="">`).join('') + `<div class="tx"><div class="no"><i></i>特別</div><div class="ln">すべての声が、そろった</div></div>`; grid.prepend(d); }
+    const h=document.createElement('div'); h.className='lead'; h.textContent=`声の札 ${have} / ${total}(灯った場所を押すと、時々漏れます。顔を押すと、その人の札が開きます)`; p.appendChild(h); p.appendChild(row); p.appendChild(grid);
+    // 絵
+    const c=$('#cards'); c.innerHTML='';
+    for(const k of ORDER){ const got=S.got['e_'+k]; const d=document.createElement('div'); d.className='card'+(got?'':' locked');
+      d.innerHTML = got ? `<img src="${D[k].img}" alt="${D[k].who}"><div class="nm">${D[k].who}</div>` : `<div class="ph">${D[k].name}が<br>濃くなると</div><div class="nm">?</div>`; c.appendChild(d); }
+    // 歌
+    const s=$('#songs'); s.innerHTML='';
+    const list = ORDER.map(k=>({k, ...D[k].song, got:S.got['s_'+k], place:D[k].name})); list.push({k:'bonus', ...BONUS_SONG, got:S.got.s_bonus, place:'町ぜんぶ', all:true});
+    for(const it of list){ const d=document.createElement('div'); d.className='song'+(it.got?'':' locked');
+      const title = it.got ? `『${it.title}』` : (it.all ? '町ぜんぶが灯ると' : `${it.place}が最も濃くなると`);
+      const note = it.got && !it.yt && !it.file ? '<small>(まだ歌になっていません)</small>' : '';
+      const btn = it.got ? (it.yt ? `<button data-yt="${it.yt}">きく</button>` : (it.file ? `<button data-file="${it.file}">きく</button>` : '')) : '';
+      d.innerHTML = `<span>${title} ${note}</span>` + btn; s.appendChild(d); }
+    const stopBgm = ()=>{ if(S.bgm){ S.bgm=false; applyBgm(); } };
+    s.querySelectorAll('button[data-yt]').forEach(b=>b.addEventListener('click', ()=>{ $('#player').innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${b.dataset.yt}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`; stopBgm(); }));
+    s.querySelectorAll('button[data-file]').forEach(b=>b.addEventListener('click', ()=>{ $('#player').innerHTML = `<audio controls autoplay src="${b.dataset.file}" style="width:100%"></audio>`; stopBgm(); }));
+  }
+  let collectSig = '';
+  function render(){ nagameBtn.hidden = !nagameUnlocked(); $('#cnt').textContent=fmt(S.n); $('#ps').textContent=fmt(perSec()); $('#pt').textContent=fmt(perTap()); renderTown(); renderKnights();
+    const sig = JSON.stringify([S.got, S.koe, S.lit, S.seenKoe]); if(sig !== collectSig){ collectSig = sig; renderCollect(); } }
+  // 札を開く(大きな一枚)
+  function openFuda(who, i){
+    const card=$('#fudaCard');
+    if(who==='all'){ card.className='card2 sp'; card.innerHTML = `<img class="wide" src="img/chibi/sp/tokubetsu.webp" alt=""><div class="tx"><div class="no"><i></i>特別</div><div class="ln">すべての声が、そろった</div></div>`; }   // 9/13 特別札=広場のベンチの午後(五人)
+    else { const l=fudaList(who)[i]; card.className='card2'; card.innerHTML = chibiImg(who,i) + `<div class="tx"><div class="no"><i></i>${who}・${KANJI[i]}</div><div class="ln">${l}</div></div><div class="rule"></div>`; markSeen(who, l); }
+    $('#fudaBig').classList.add('show');
+  }
+  $('#p-koe').addEventListener('click', e=>{
+    const w=e.target.closest('.fw'); if(w){ fudaWho=w.dataset.who; collectSig=''; render(); return; }
+    const d=e.target.closest('.fuda.got'); if(!d) return; openFuda(d.dataset.who, Number(d.dataset.i)); });
+  $('#fudaBig').addEventListener('click', ()=>{ $('#fudaBig').classList.remove('show'); render(); });
+
+  // タップ
+  let lastLeak=0;
+  $('#map').addEventListener('pointerdown', e => {
+    const g=e.target.closest('.blk'); if(!g) return; const k=g.dataset.k;
+    if(k!=='hiroba' && !S.lit[k]) return;
+    const v=perTap(); gain(v); const r=town.getBoundingClientRect(); burst(e.clientX-r.left, e.clientY-r.top, fmt(v));
+    // 灯った区画から、時々声が漏れる
+    // 灯った区画から、時々声が漏れる(クリア後は漏れやすく・未収集の声を優先)
+    const leakP = S.ended ? 0.35 : 0.18, leakGap = S.ended ? 1500 : 2500;
+    if(S.lit[k] && Date.now()-lastLeak>leakGap && Math.random()<leakP){ lastLeak=Date.now(); const who=D[k].who, pool=V[who].r;
+      const have=S.koe[who]||[]; const rest=pool.filter(x=>!have.includes(x)); const src = rest.length? rest : pool;
+      const l=src[Math.floor(Math.random()*src.length)]; addKoe(who,l); showVoice(who,l); }
+    checkStages(); render(); if(Math.random()<0.2) save();
+  });
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x===t)); document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on', p.id==='p-'+t.dataset.p)); }));
+  $('#reset').addEventListener('click', ()=>{ if(confirm('町を白黒に戻しますか?(集めたものも消えます)')){ localStorage.removeItem(KEY); location.reload(); } });
+  $('#closeEnd').addEventListener('click', ()=> $('#ending').classList.remove('show'));
+
+  // オープニング(初回だけ・いつでも押して飛ばせる)
+  const op = $('#op'); let opTimers=[]; let opRunning=false;
+  const OP_MODE = ['wind','fall','diag'].includes(Q.get('op')) ? Q.get('op') : 'diag';   // 既定=diag(右上→左下・本人決定9/6) / ?op=wind / ?op=fall
+  function petals(n){ for(let i=0;i<n;i++){ const p=document.createElement('div'); p.className='petal'+(Math.random()<.5?' p2':''); const inner=document.createElement('span'); inner.className='pt'; inner.style.animationDuration=(0.9+Math.random()*1.3)+'s'; inner.style.animationDelay=(-Math.random()*2)+'s'; p.appendChild(inner);
+    if(OP_MODE==='wind'){ p.style.top=(5+Math.random()*80)+'vh'; p.style.setProperty('--dy1', (Math.random()*80-40)+'px'); p.style.setProperty('--dy2', (Math.random()*160-40)+'px'); }
+    else if(OP_MODE==='diag'){ // 右上の縁(上辺の右半分+右辺の上半分)から出発
+      if(Math.random()<.6){ p.style.top='-20px'; p.style.left=(45+Math.random()*70)+'vw'; } else { p.style.top=(Math.random()*45)+'vh'; p.style.left='102vw'; }
+      p.style.setProperty('--dy1', (Math.random()*60-30)+'px'); p.style.setProperty('--dy2', (Math.random()*80-40)+'px'); }
+    else { p.style.left=(Math.random()*100)+'vw'; }
+    p.style.setProperty('--sx', (Math.random()*160-80)+'px'); p.style.setProperty('--rot', (Math.random()*720-360)+'deg');
+    p.style.animationDuration=(OP_MODE==='fall' ? 4+Math.random()*4 : 3.5+Math.random()*3.5)+'s'; p.style.animationDelay=(Math.random()*(OP_MODE==='fall'?1.8:2.4))+'s'; op.appendChild(p); setTimeout(()=>p.remove(), 10000); } }
+  function runOpening(){
+    op.classList.add('show'); op.classList.toggle('wind', OP_MODE==='wind'); op.classList.toggle('diag', OP_MODE==='diag'); opRunning=true;
+    const at=(ms,fn)=>opTimers.push(setTimeout(fn,ms));
+    at(600, ()=>$('#op1').classList.add('on'));
+    at(2400, ()=>$('#op2').classList.add('on'));
+    at(4300, ()=>$('#opDot').classList.add('on'));
+    at(5000, ()=>petals(28));
+    at(5600, ()=>$('#opTitle').classList.add('on'));
+    at(7000, ()=>$('#opGo').classList.add('on'));
+  }
+  function endOpening(){ opTimers.forEach(clearTimeout); opTimers=[]; op.classList.remove('show'); opRunning=false; S.opDone=true; save(); if(!S.navDone) showNav(0); }
+  op.addEventListener('pointerdown', ()=>{ if(opRunning) endOpening(); });
+  // 導入ナビ
+  const NAV = ['この町は、白黒です。\nまん中の「広場」を、押してみてください。', '押すと「感情のかけら」が集まります。\nかけらが集まると、町に色が灯ります。', 'かけらを「町の人」に渡すと、\n頼まなくても集まるようになります。\n\n灯った場所からは、声と絵と歌が漏れます。'];
+  let navI=0;
+  function showNav(i){ navI=i; $('#navText').innerHTML = NAV[i].replace(/\n/g,'<br>'); $('#navDots').textContent = NAV.map((_,j)=> j===i?'●':'○').join(' '); $('#navNext').textContent = i===NAV.length-1 ? 'はじめる' : 'つぎへ'; $('#nav').classList.add('show'); }
+  $('#navNext').addEventListener('click', ()=>{ if(navI<NAV.length-1) showNav(navI+1); else { $('#nav').classList.remove('show'); S.navDone=true; save(); } });
+  $('#navSkip').addEventListener('click', ()=>{ $('#nav').classList.remove('show'); S.navDone=true; save(); });
+  $('#help').addEventListener('click', ()=> showNav(0));
+
+  // ループ
+  setInterval(()=>{ const v=perSec(); if(v>0){ gain(v/4); checkStages(); render(); } ravenTick(Date.now()); }, 250);
+  setInterval(save, 5000);
+
+  // ───── 灯り方(第四段 9/13): 段が上がると、絵の中の灯りや花が紅にともる ─────
+  // 座標は建物の絵(png)の画素で書く。画面座標への換算は下で自動(xMidYMax meet と同じ計算)
+  // [箱x,箱y,箱w,箱h, 絵の幅(本番high), 絵の高さ, 座標を読んだ時の幅(low)] 9/13 本番品質に差替(幅がわずかに変わったので換算)
+  const IMGBOX = { ie:[35,55,200,140,695,520,679], hiroba:[245,150,230,170,665,520,664], ichiba:[35,295,200,140,736,520,724], oka:[485,295,200,140,730,520,750], tsumesho:[485,55,200,140,683,520,673] };
+  const ACC = {   // [段, 種類, x, y, 大きさ]  glow=灯り / flower=椿 / poly=面(点列)
+    ie:       [[1,'glow',430,240,7],[2,'glow',285,115,9],[2,'flower',150,285,9],[2,'flower',215,330,8]],
+    hiroba:   [[1,'glow',92,172,8],[2,'flower',300,100,10],[2,'flower',430,135,9],[2,'flower',230,140,8]],
+    ichiba:   [[1,'glow',75,195,9],[2,'flower',110,325,9],[2,'glow',185,265,5],[2,'glow',300,262,5]],
+    oka:      [[1,'flower',230,335,9],[2,'flower',450,350,8],[2,'flower',650,335,8],[2,'flower',330,300,7]],
+    tsumesho: [[1,'glow',235,235,7],[2,'poly',[[145,80],[92,120],[100,135],[145,150]]],[2,'glow',335,150,5]],
+  };
+  (function buildAccents(){
+    const NS='http://www.w3.org/2000/svg';
+    for(const k in ACC){
+      const [bx,by,bw,bh,W,H,W0] = IMGBOX[k]; const s = Math.min(bw/W, bh/H); const ox = bx + (bw - W*s)/2, oy = by + bh - H*s; const kx = W/(W0||W);
+      const M = (x,y) => [ox + x*kx*s, oy + y*s];
+      const g = document.createElementNS(NS,'g'); g.setAttribute('class','acc');
+      for(const a of ACC[k]){ const [st, type] = a; const cls = 'a'+st;
+        if(type==='glow'){ const [cx,cy] = M(a[2],a[3]); const r = a[4]*s*2.2;
+          const gg = document.createElementNS(NS,'g'); gg.setAttribute('class', cls+' lamp'); gg.style.transformOrigin = `${cx}px ${cy}px`;
+          gg.innerHTML = `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="url(#glow)"/><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(a[4]*s*0.45).toFixed(1)}" fill="#F3B3A8"/>`; g.appendChild(gg); }
+        else if(type==='flower'){ const [cx,cy] = M(a[2],a[3]); const d = a[4]*s*2.6;
+          const u = document.createElementNS(NS,'use'); u.setAttribute('href','#camellia'); u.setAttribute('class', cls); u.setAttribute('x',(cx-d/2).toFixed(1)); u.setAttribute('y',(cy-d/2).toFixed(1)); u.setAttribute('width',d.toFixed(1)); u.setAttribute('height',d.toFixed(1)); g.appendChild(u); }
+        else if(type==='poly'){ const pts = a[2].map(p=>M(p[0],p[1]).map(v=>v.toFixed(1)).join(',')).join(' ');
+          const pg = document.createElementNS(NS,'polygon'); pg.setAttribute('class', cls); pg.setAttribute('points', pts); pg.setAttribute('fill','#B0413E'); pg.setAttribute('fill-opacity','.7'); g.appendChild(pg); }
+      }
+      document.querySelector(`.blk[data-k="${k}"]`).appendChild(g);
+    }
+  })();
+
+  load(); render();
+  if(S.lit.hiroba){ bgmBtn.hidden=false; bgmBtn.textContent = S.bgm ? '♪ 町の音: 入' : '♪ 町の音: 切'; /* 自動再生はタップ後に */ if(S.bgm) document.addEventListener('pointerdown', ()=>applyBgm(), {once:true}); }
+  if(!S.opDone || Q.get('replay')==='1') runOpening(); else if(!S.navDone) showNav(0);   // ?replay=1 で何度でも
+})();
+</script>
+</body>
+</html>
