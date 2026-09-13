@@ -124,6 +124,10 @@
   .koe.hidden { color:#b5ae9e; }
   /* 声の札(言の札・第三段 9/13): 集めた声が札になって並ぶ。押すと大きく開く */
   .fudaWho { display:grid; grid-template-columns: repeat(5, 1fr); gap:.35rem; margin-bottom:.7rem; }
+  /* 今日の札(v2第一弾 9/14): 一日一枚 */
+  .daily { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:.5rem .8rem; margin:-.1rem 0 .75rem; font-size:.7rem; color:var(--soft); letter-spacing:.12em; }
+  .daily button { font-family:inherit; background:var(--paper); border:1px solid var(--beni); color:var(--beni); padding:.32rem .9rem; font-size:.68rem; letter-spacing:.18em; cursor:pointer; }
+  .daily button.again { border-color:var(--line); color:var(--soft); }
   .fw { position:relative; font-family:inherit; background:var(--paper); border:1px solid var(--line); padding:.4rem .1rem .3rem; cursor:pointer; text-align:center; color:var(--soft); }
   .fw img { height:3.2rem; width:auto; display:block; margin:0 auto; }
   .fw .n { display:block; font-size:.66rem; letter-spacing:.12em; color:var(--sumi); margin-top:.15rem; }
@@ -288,7 +292,7 @@
 <button class="bgm" id="bgmBtn" hidden>♪ 町の音: 入</button>
 <button class="nagame-btn" id="nagameBtn" hidden>町を、眺める</button>
 <button class="clock-btn" id="clockBtn" hidden>◐ 自動</button>
-<div class="moonnote" id="moonNote" hidden>夜の町の歌『月』<small>いま、歌になろうとしています</small></div>
+<div class="moonnote" id="moonNote" hidden>夜の町の歌『月』<small id="moonSub"></small></div>
 <audio id="bgm" src="audio/bgm_hiru.mp3" loop preload="none"></audio>
 
 <div class="op" id="op">
@@ -345,7 +349,8 @@
   const ORDER = ['hiroba','ie','ichiba','oka','tsumesho'];
   const STAGE_MUL = [0, 1, 2, 4];     // 段1=at×1, 段2=at×2, 段3=at×4(クリア後の後半戦が遠すぎないように・9/6調整)
   const ALL_AT = 16000;
-  const BONUS_SONG = { title:'大器晩成の虹', yt:'U6I6k4Iu83s' };   // 『月』はv2「夜の町」のご褒美に取り置き
+  const BONUS_SONG = { title:'大器晩成の虹', yt:'U6I6k4Iu83s' };
+  const NIGHT_SONG = { title:'月', file:null };   // v2第一弾(9/13): 夜の町の歌の枠。**翼樹の『月』はまだ歌になっていない**(2nd-Brainの『月』6本は翼樹以前の別人の曲=使わない・9/13本人)。届いたら audio フォルダに tsuki.mp3 として置いて file を入れる
 
   // 心の声(段階の声+ランダムに漏れる声)
   const V = {
@@ -446,6 +451,16 @@
     bgmBtn.hidden = false; applyBgm(); }
   function applyBgm(){ if(S.bgm){ bgm.volume=0.35; bgm.play().catch(()=>{}); bgmBtn.textContent='♪ 町の音: 入'; } else { bgm.pause(); bgmBtn.textContent='♪ 町の音: 切'; } }
   bgmBtn.addEventListener('click', ()=>{ S.bgm=!S.bgm; applyBgm(); save(); });
+  // 町の音の曲替え(v2第一弾 9/14): 眺めモードの夜だけ『月』、それ以外は昼の町の音。替えるときは1秒で音を落としてから
+  const DAY_TRACK = 'audio/bgm_hiru.mp3';
+  let switching = null;
+  function syncBgmTrack(){
+    const want = (NIGHT_SONG.file && document.body.classList.contains('nagame') && timeOfDay()==='yoru') ? NIGHT_SONG.file : DAY_TRACK;
+    if(bgm.getAttribute('src') === want || switching === want) return;
+    switching = want; const v0 = bgm.volume; let i = 0;
+    const t = setInterval(()=>{ i++; bgm.volume = Math.max(0, v0 * (1 - i/10));
+      if(i >= 10){ clearInterval(t); bgm.setAttribute('src', want); bgm.load(); bgm.volume = 0.35; switching = null; if(S.bgm) bgm.play().catch(()=>{}); } }, 100);
+  }
 
   // 描画
   function renderTown(){
@@ -546,8 +561,14 @@
     const on = document.body.classList.contains('nagame'); const t = on ? timeOfDay() : 'hiru';
     for(const k of ['asa','hiru','yuu','yoru']) document.body.classList.toggle('t-'+k, on && t===k);
     clockBtn.hidden = !on; const m = S.timeMode || 'auto'; clockBtn.textContent = '◐ ' + (m==='auto' ? `自動(${TLABEL[t]})` : TLABEL[m]);
-    moonNote.hidden = !(on && t==='yoru');
+    // 夜の町(v2第一弾 9/14): 『月』が流れ、歌の間にも解禁される。札は夜に入った時だけ9秒見せる
+    const night = on && t==='yoru';
+    if(night && !S.got.s_tsuki){ S.got.s_tsuki = true; save(); }
+    if(night && !moonOn){ moonOn = true; $('#moonSub').textContent = !NIGHT_SONG.file ? 'いま、歌になろうとしています' : S.bgm ? '♪ 町の音で、流れています' : '♪ 町の音を「入」にすると、流れます'; moonNote.hidden = false; clearTimeout(moonTimer); moonTimer = setTimeout(()=>{ moonNote.hidden = true; }, 9000); }
+    if(!night){ moonOn = false; moonNote.hidden = true; }
+    syncBgmTrack();
   }
+  let moonOn = false, moonTimer = null;
   clockBtn.addEventListener('click', ()=>{ const i = TIMES.indexOf(S.timeMode || 'auto'); S.timeMode = TIMES[(i+1) % TIMES.length]; save(); applyTime(); });
   setInterval(applyTime, 60000);
   function setNagame(on){
@@ -604,7 +625,13 @@
       grid.appendChild(d); });
     if(have>=total){ const d=document.createElement('div'); d.className='fuda got special'; d.dataset.who='all';
       d.innerHTML = ALLWHO.map(w=>`<img src="${CHIBI[w]}" alt="">`).join('') + `<div class="tx"><div class="no"><i></i>特別</div><div class="ln">すべての声が、そろった</div></div>`; grid.prepend(d); }
-    const h=document.createElement('div'); h.className='lead'; h.textContent=`声の札 ${have} / ${total}(灯った場所を押すと、時々漏れます。顔を押すと、その人の札が開きます)`; p.appendChild(h); p.appendChild(row); p.appendChild(grid);
+    const h=document.createElement('div'); h.className='lead'; h.textContent=`声の札 ${have} / ${total}(灯った場所を押すと、時々漏れます。顔を押すと、その人の札が開きます)`; p.appendChild(h);
+    // 今日の札(v2第一弾 9/14): 広場が灯ったら、一日一枚めくれる
+    if(S.lit.hiroba){ const dl=document.createElement('div'); dl.className='daily'; const done = S.daily && S.daily.date===today();
+      dl.innerHTML = done ? `<span>今日の札は、${S.daily.who}・${KANJI[S.daily.i]}${S.daily.neu ? '(新しい声)' : ''}</span><button id="dailyBtn" class="again">もう一度、見る</button>`
+                          : `<span>一日一枚、声が届きます</span><button id="dailyBtn">今日の札を、めくる</button>`;
+      p.appendChild(dl); }
+    p.appendChild(row); p.appendChild(grid);
     // 絵
     const c=$('#cards'); c.innerHTML='';
     for(const k of ORDER){ const got=S.got['e_'+k]; const d=document.createElement('div'); d.className='card'+(got?'':' locked');
@@ -612,8 +639,9 @@
     // 歌
     const s=$('#songs'); s.innerHTML='';
     const list = ORDER.map(k=>({k, ...D[k].song, got:S.got['s_'+k], place:D[k].name})); list.push({k:'bonus', ...BONUS_SONG, got:S.got.s_bonus, place:'町ぜんぶ', all:true});
+    list.push({k:'tsuki', ...NIGHT_SONG, got:S.got.s_tsuki, place:'夜の町', lock:'夜の町を、眺めると'});   // v2第一弾(9/14)
     for(const it of list){ const d=document.createElement('div'); d.className='song'+(it.got?'':' locked');
-      const title = it.got ? `『${it.title}』` : (it.all ? '町ぜんぶが灯ると' : `${it.place}が最も濃くなると`);
+      const title = it.got ? `『${it.title}』` : (it.lock || (it.all ? '町ぜんぶが灯ると' : `${it.place}が最も濃くなると`));
       const note = it.got && !it.yt && !it.file ? '<small>(まだ歌になっていません)</small>' : '';
       const btn = it.got ? (it.yt ? `<button data-yt="${it.yt}">きく</button>` : (it.file ? `<button data-file="${it.file}">きく</button>` : '')) : '';
       d.innerHTML = `<span>${title} ${note}</span>` + btn; s.appendChild(d); }
@@ -631,7 +659,21 @@
     else { const l=fudaList(who)[i]; card.className='card2'; card.innerHTML = chibiImg(who,i) + `<div class="tx"><div class="no"><i></i>${who}・${KANJI[i]}</div><div class="ln">${l}</div></div><div class="rule"></div>`; markSeen(who, l); }
     $('#fudaBig').classList.add('show');
   }
+  // 今日の札(v2第一弾 9/14): 頼んだ人の「時々漏れる声」のうち未収集から一枚(なければ集めた札から一枚を今日の一枚として)
+  const today = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+  function drawDaily(){
+    if(S.daily && S.daily.date===today()){ openFuda(S.daily.who, S.daily.i); return; }
+    const cand=[], all=[];
+    for(const who of ALLWHO){ const have=S.koe[who]||[]; if(!have.length) continue;
+      fudaList(who).forEach((l,i)=>{ if(have.includes(l)) all.push({who,i,l}); else if(V[who].r.includes(l)) cand.push({who,i,l}); }); }
+    const src = cand.length ? cand : all; if(!src.length) return;
+    const pick = src[Math.floor(Math.random()*src.length)], neu = cand.length>0;
+    S.daily = { date:today(), who:pick.who, i:pick.i, neu };
+    if(neu){ addKoe(pick.who, pick.l); justNew = false; }
+    save(); openFuda(pick.who, pick.i);
+  }
   $('#p-koe').addEventListener('click', e=>{
+    if(e.target.closest('#dailyBtn')){ drawDaily(); collectSig=''; render(); return; }
     const w=e.target.closest('.fw'); if(w){ fudaWho=w.dataset.who; collectSig=''; render(); return; }
     const d=e.target.closest('.fuda.got'); if(!d) return; openFuda(d.dataset.who, Number(d.dataset.i)); });
   $('#fudaBig').addEventListener('click', ()=>{ $('#fudaBig').classList.remove('show'); render(); });
