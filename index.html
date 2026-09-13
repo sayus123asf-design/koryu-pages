@@ -230,9 +230,13 @@
   .lead, .mv-caption { text-wrap: pretty; }
   .cast .card p, footer p { text-wrap: balance; }
   @media (max-width: 600px) {
-    .lead br, .cast .card p br, footer p br { display: none; }  /* 翼樹の札(幅広)は3行割りのまま */
+    .lead:not(.lead-poem) br, .cast .card p br, footer p br { display: none; }  /* 翼樹の札(幅広)は3行割りのまま */
     .lead { max-width: 24em; margin-left: auto; margin-right: auto; }
   }
+  /* 「この世界について」は句読点なしの短い行(2026-09-13 本人)。行が意味の切れ目なので改行は全幅で生かす。
+     1行の最長は19字。狭い端末で折れないよう、360px以下だけ少し小さく */
+  .lead-poem { line-height: 2.1; }
+  @media (max-width: 360px) { .lead-poem { font-size: 0.78rem; letter-spacing: 0; } }
 
   /* ---- 歌 ---- */
   .mv-wrap { margin-top: 2.6rem; }
@@ -347,11 +351,14 @@
 
 <section>
   <h2>この世界について</h2>
-  <p class="lead">
-    タロットの声を代弁する、誰のものにもならない器・翼樹。<br>
-    彼のそばには、狂おしいほど愛してしまった騎士たちがいる。<br>
-    その日々は物語になり、歌になり、いま、小さな町で動き始めた。<br>
-    これは、その世界の観測記録。
+  <p class="lead lead-poem">
+    タロットの声を代弁する<br>
+    誰のものにもならない器・翼樹<br>
+    彼のそばには<br>
+    狂おしいほど愛してしまった騎士たちがいる<br>
+    その日々は物語になり　歌になり<br>
+    いま　小さな町で動き始めた<br>
+    これは　その世界の観測記録
   </p>
 </section>
 
@@ -370,7 +377,7 @@
       </div>
       <h3>翼樹</h3>
       <div class="role">星の器</div>
-      <p>タロットの声を代弁する特異点。<br>四人の騎士に、狂おしいほど愛されている。<br>——本人だけが、まだ観測していない。</p>
+      <p>タロットの声を代弁する特異点。<br>四人の騎士に、狂おしいほど愛されている。<br>本人だけが、まだ観測していない。</p>
     </div>
   </div>
 
