@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
 <title>色灯し — 白黒の町に、色を灯す</title>
 <meta name="description" content="白黒の町を、押して少しずつ色づけていく小さなゲーム。灯った場所から、声と絵と歌が漏れます。">
 <!-- 9/13 公開準備: OGP(公式サイト配下 tubaki-arcana.com/irotomoshi/ に置く前提) -->
@@ -69,9 +69,9 @@
   body.nagame .voice { position:absolute; top:1rem; left:0; right:0; font-size:1.05rem; pointer-events:none; z-index:2; }
   /* 時間帯の色(眺めモードだけ・9/13): 紙の色味が動く程度。夜は藍に沈んで灯りだけが残る */
   .tint { position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply; opacity:0; background:#fff; transition: background 2.4s ease, opacity 2.4s ease; }
-  body.t-asa .tint { background:#FFF1CC; opacity:.55; }
-  body.t-yuu .tint { background:#F0B48E; opacity:.62; }
-  body.t-yoru .tint { background:#7A86B2; opacity:.9; }
+  body.t-asa .tint { background:#F3EFE6; opacity:.55; }
+  body.t-yuu .tint { background:#B5AE9E; opacity:.62; }
+  body.t-yoru .tint { background:#34312D; opacity:.9; }
   .moon { position:absolute; top:5%; right:6%; width:6%; aspect-ratio:1; border-radius:50%; background:#F3EFE6; box-shadow:0 0 22px 8px rgba(243,239,230,.45); opacity:0; transition: opacity 2.4s ease; pointer-events:none; }
   body.t-yoru .moon { opacity:.95; }
   body.nagame.t-asa .acc .lamp, body.nagame.t-hiru .acc .lamp { opacity:.22; }   /* 昼間は灯りを落とす(花は残る) */
@@ -223,6 +223,226 @@
   @keyframes diag { 0%{ transform: translate(0, 0) rotate(0deg); opacity:0 } 8%{ opacity:.95 } 50%{ transform: translate(-55vw, calc(45vh + var(--dy1))) rotate(calc(var(--rot) / 2)) } 100%{ transform: translate(-115vw, calc(95vh + var(--dy2))) rotate(var(--rot)); opacity:.7 } }
   @keyframes wind { 0%{ transform: translate(0, 0) rotate(0deg); opacity:0 } 8%{ opacity:.95 } 50%{ transform: translate(-60vw, var(--dy1)) rotate(calc(var(--rot) / 2)) } 100%{ transform: translate(-125vw, var(--dy2)) rotate(var(--rot)); opacity:.7 } }
   .bgm { position:fixed; right:.6rem; bottom:.6rem; z-index:5; font-family:inherit; background:var(--paper); border:1px solid var(--line); color:var(--soft); padding:.25rem .6rem; font-size:.66rem; letter-spacing:.15em; cursor:pointer; opacity:.9; }
+
+  /* Astra: first visit, readable progress, and a persistent post-ending garden. */
+  [hidden] { display:none !important; }
+  button, [role="button"] { touch-action:manipulation; }
+  button:focus-visible, [role="button"]:focus-visible, summary:focus-visible { outline:2px solid var(--beni); outline-offset:4px; }
+  .journey { margin:1rem 0 .8rem; padding:1rem 1.15rem; border:1px solid var(--line); background:linear-gradient(125deg,#F6F2E9,var(--paper)); box-shadow:0 5px 20px #1C1A1708; }
+  .journey-head { display:flex; justify-content:space-between; gap:.6rem; font-size:.7rem; color:var(--soft); letter-spacing:.08em; }
+  .journey-head b { font-size:1rem; color:var(--ink); font-weight:400; }
+  .journey-goal { display:flex; align-items:center; gap:1rem; margin:.65rem 0; }
+  .journey-goal strong { font-size:1rem; font-weight:400; color:var(--ink); }
+  .journey-goal p { font-size:.74rem; color:var(--soft); }
+  .seed { flex:none; position:relative; display:inline-block; width:27px; height:38px; border:1px solid var(--line); border-radius:70% 35% 65% 40%; overflow:hidden; transform:rotate(18deg); background:#DED8CB; }
+  .seed i { position:absolute; bottom:0; left:0; right:0; height:0; background:linear-gradient(0deg,var(--beni),#D4655C); transition:height .35s ease; }
+  .coach { display:flex; align-items:center; flex-wrap:wrap; gap:.6rem; border-top:1px solid #B5AE9E88; padding-top:.65rem; font-size:.78rem; }
+  .coach span { flex:1 1 220px; }
+  .coach button, .garden-panel button { font:inherit; color:var(--ink); background:#F6F2E9; border:1px solid var(--line); padding:.5rem .8rem; cursor:pointer; min-height:44px; }
+  #coachSkip { font-size:.67rem; color:var(--soft); background:none; border:0; }
+  .ledger { font-size:.68rem; color:var(--soft); margin-top:.5rem; }
+  .ledger summary { cursor:pointer; padding:.25rem 0; }
+  .ledger p { margin:.35rem 0; }
+  .districts { display:grid; grid-template-columns:repeat(5,1fr); gap:.35rem; margin:.8rem 0; }
+  .district { background:none; border:1px solid #B5AE9E88; color:var(--soft); padding:.5rem .2rem; font:inherit; cursor:pointer; text-align:center; }
+  .district .seed { width:12px; height:18px; vertical-align:middle; margin-bottom:.2rem; }
+  .district strong, .district small { display:block; font-size:.65rem; font-weight:400; }
+  .district small { font-size:.6rem; }
+  .district.selected { border-color:var(--beni); background:#B0413E08; }
+  .district-note { text-align:center; font-size:.75rem; min-height:1.8em; color:var(--soft); }
+  .garden-panel { margin:1.6rem 0; padding:1.1rem; border:1px solid var(--line); background:linear-gradient(155deg,#F6F2E9,#E4DED0); }
+  .garden-title { display:flex; justify-content:space-between; align-items:center; }
+  .garden-title h2 { text-align:left; margin:.2rem 0; font-size:1.1rem; }
+  .garden-title h2:after { display:none; }
+  .eyebrow, #gardenCount { font-size:.68rem; color:var(--soft); }
+  .garden-intro, #gardenNext, #gardenMessage { font-size:.78rem; margin:.6rem 0; }
+  .garden-choices { display:grid; grid-template-columns:repeat(5,1fr); gap:.3rem; margin:.8rem 0; }
+  .garden-choices button { padding:.4rem .1rem; font-size:.7rem; }
+  .garden-choices button.selected { border-color:var(--beni); background:#B0413E0C; }
+  .garden-choices small { display:block; color:var(--soft); }
+  #gardenGrow { width:100%; }
+  #gardenDetail { display:block; margin:.3rem auto; max-width:100%; }
+  #gardenGrow:disabled { opacity:.6; cursor:default; }
+  #gardenMessage { color:var(--beni); min-height:1.8em; }
+  .garden-decoration { pointer-events:none; }
+  .tap-ripple { position:absolute; pointer-events:none; width:70px; height:70px; border-radius:50%; background:radial-gradient(ellipse,#B0413E44,transparent 65%); animation:tap-ink .65s ease-out forwards; }
+  @keyframes tap-ink { from { transform:translate(-50%,-50%) scale(.3); opacity:1; } to { transform:translate(-50%,-50%) scale(1.5); opacity:0; } }
+  .town { border-color:#B5AE9E99; background:radial-gradient(ellipse at 50% 45%,#F5F1E7,var(--paper) 78%); }
+  .blk.guide-target .ground { stroke:var(--beni); stroke-width:1.3; stroke-dasharray:3 5; }
+  .kn.guide-target { outline:1px solid var(--beni); outline-offset:3px; }
+  body.learning .knights .kn:not([data-id="ignis"]), body.learning .tabs, body.learning .panel { display:none; }
+  body.learning h2:has(+ .tabs) { display:none; }
+  body.nagame .journey, body.nagame .districts, body.nagame .district-note, body.nagame .garden-panel { display:none; }
+  @media(max-width:480px) { header { padding-top:.7rem; } .journey { padding:.75rem; margin-top:.5rem; } .journey-goal strong { font-size:.9rem; } .journey-head { font-size:.64rem; } .district strong { font-size:.59rem; } .garden-choices { grid-template-columns:repeat(3,1fr); } }
+  @media(prefers-reduced-motion:reduce) { *, *:before, *:after { animation:none !important; transition:none !important; } }
+
+
+  .town-level { margin-top:.65rem; padding:.6rem .75rem; border:1px solid #B5AE9E70; background:#F6F2E980; }
+  .level-line,.level-caption { display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; font-size:.7rem; color:var(--soft); }
+  .level-line b { color:var(--beni); font-size:1.35rem; font-weight:700; margin-left:.3rem; font-variant-numeric:tabular-nums; }
+  #levelBonus { font-size:.65rem; }
+  #levelMeter { display:block; appearance:none; -webkit-appearance:none; width:100%; height:7px; margin:.45rem 0; border:0; border-radius:6px; overflow:hidden; background:#DCD5C7; color:var(--beni); }
+  #levelMeter::-webkit-progress-bar { background:#DCD5C7; border-radius:6px; }
+  #levelMeter::-webkit-progress-value { background:linear-gradient(90deg,var(--beni),var(--beni2)); border-radius:6px; transition:width .18s ease; }
+  #levelMeter::-moz-progress-bar { background:var(--beni); border-radius:6px; }
+  .level-caption { font-size:.62rem; font-variant-numeric:tabular-nums; }
+  #levelNotice { color:var(--beni); font-size:.75rem; margin-top:.45rem; padding-top:.35rem; border-top:1px solid #B0413E33; }
+  @media(prefers-reduced-motion:reduce) { #levelMeter::-webkit-progress-value { transition:none; } }
+
+  .level-gifts { display:flex; gap:.65rem; align-items:center; justify-content:space-between; border-top:1px solid #B5AE9E80; margin-top:.6rem; padding-top:.55rem; }
+  .level-gifts small { font-size:.62rem; color:var(--soft); }
+  .level-gifts p { font-size:.76rem; }
+  .level-gifts button,#giftDialog button { font:inherit; font-size:.74rem; min-height:44px; padding:.45rem .65rem; border:1px solid var(--line); color:var(--ink); background:#F6F2E9; cursor:pointer; }
+  #giftOpen { flex-shrink:0; border-color:var(--beni); color:var(--beni); }
+  #giftDialog { margin:auto; width:min(440px,calc(100% - 32px)); max-height:90dvh; overflow:auto; border:1px solid var(--line); padding:2.2rem 1.4rem 1.4rem; background:var(--paper); color:var(--sumi); text-align:center; font:inherit; box-shadow:0 20px 80px #1C1A1760; }
+  #giftDialog::backdrop { background:#1C1A1799; }
+  #giftDialog .gift-close { position:absolute; top:.3rem; right:.3rem; border:none; background:none; font-size:1.3rem; }
+  #giftDialog h2 { font-size:1.15rem; margin:.4rem 0; }
+  .gift-eyebrow { color:var(--soft); font-size:.7rem; letter-spacing:.12em; }
+  #giftDescription,#giftResult { font-size:.8rem; margin:.6rem 0; }
+  #giftResult { color:var(--beni); }
+  .gift-art { display:grid; place-items:center; min-height:155px; }
+  .paper-parcel { width:115px; height:90px; position:relative; display:grid; place-items:center; background:linear-gradient(145deg,#F6F2E9,#DCD5C7); border:1px solid var(--line); box-shadow:3px 5px 0 #1C1A170B; }
+  .paper-parcel:before { content:''; position:absolute; inset:0 49%; background:var(--beni); opacity:.55; }
+  .paper-parcel:after { content:''; position:absolute; inset:48% 0; background:var(--beni); opacity:.55; }
+  .paper-parcel span { z-index:1; background:var(--paper); border:1px solid var(--beni); border-radius:50%; width:30px; height:30px; color:var(--beni); }
+  .gift-shards { color:var(--beni); font-size:1.3rem; }.gift-shards b { display:block; font-size:2.7rem; font-weight:400; line-height:1.2; }.gift-shards span { font-size:.7rem; }
+  #giftDialog.unwrapped .gift-art { animation:gift-arrives .5s ease-out; }
+  @keyframes gift-arrives { from { opacity:0;transform:translateY(8px) scale(.9); } to { opacity:1;transform:none; } }
+  #giftDialog .gift-done { margin-top:.5rem; }
+  @media(max-width:480px) { .level-gifts { flex-wrap:wrap; } }
+  @media(prefers-reduced-motion:reduce) { #giftDialog.unwrapped .gift-art { animation:none; } }
+
+  /* One-screen play surface: meters + town + menu use the available viewport. */
+  html,body { height:100%; overflow:hidden; }
+  body { display:flex; flex-direction:column; height:100dvh; }
+  header { flex:none; height:43px; padding:5px 8px 0; }
+  header h1 { font-size:1rem; letter-spacing:.3em; }
+  header .hdcam,header p { display:none; }
+  #playScene { width:100%; max-width:980px; flex:1; min-height:0; display:grid; grid-template-rows:auto minmax(0,1fr) auto; padding:0 10px max(6px,env(safe-area-inset-bottom)); gap:7px; }
+  .journey { margin:0; padding:8px 12px; box-shadow:none; }
+  .journey-head { font-size:.68rem; align-items:center; }
+  .journey-head b { font-size:1.2rem; font-variant-numeric:tabular-nums; }
+  .town-level { border:0; background:none; padding:0; margin:0; }
+  .level-line { font-size:.65rem; line-height:1.3; }.level-line b { font-size:1rem; }
+  .level-caption { line-height:1.2; font-size:.6rem; }
+  #levelMeter { margin:3px 0; height:6px; }
+  #levelNotice { position:fixed; left:50%; top:45%; transform:translateX(-50%); z-index:7; width:max-content; max-width:90vw; padding:8px 12px; border:1px solid var(--line); background:var(--paper); pointer-events:none; }
+  .journey-goal { margin:5px 0 0; gap:7px; padding-top:5px; border-top:1px solid #B5AE9E60; }
+  .journey-goal>.seed { width:16px; height:24px; }
+  .journey-goal>div { flex:1; min-width:0; }
+  .journey-goal strong { display:block; font-size:.72rem; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; line-height:1.4; }
+  #townRemaining { display:block; font-size:.6rem; color:var(--soft); line-height:1.2; }
+  #townMeter { display:block; appearance:none; -webkit-appearance:none; width:100%; height:6px; border:0; background:#DCD5C7; border-radius:6px; overflow:hidden; margin:3px 0; }
+  #townMeter::-webkit-progress-bar { background:#DCD5C7; }#townMeter::-webkit-progress-value { background:linear-gradient(90deg,var(--beni),var(--beni2)); }#townMeter::-moz-progress-bar { background:var(--beni); }
+  .coach { font-size:.68rem; gap:3px; padding-top:4px; margin-top:5px; }
+  .coach span { flex:1 1 170px; }.coach button { min-height:30px; padding:3px 5px; font-size:.65rem; }
+  #playScene .town { min-height:0; height:100%; width:100%; aspect-ratio:auto; margin:0; overflow:hidden; border:1px solid #B5AE9E88; }
+  #map { width:100%; height:100%; }
+  .play-dock { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; }
+  .play-dock button,#playSheet button { font:inherit; font-size:.73rem; min-height:44px; background:#F3EFE6; border:1px solid var(--line); color:var(--ink); padding:5px; cursor:pointer; }
+  #dockGifts { color:var(--beni); }
+  #playScene .voice { position:absolute; top:auto; bottom:32px; left:5%; right:5%; min-height:0; padding:4px 8px; font-size:.76rem; line-height:1.5; background:#ECE7DCEB; pointer-events:none; z-index:2; }
+  #playScene .voice small { font-size:.59rem; }
+  .town-controls { position:absolute; bottom:3px; right:4px; left:4px; display:flex; justify-content:flex-end; gap:4px; z-index:3; }
+  .town-controls button { position:static; transform:none; font-size:.58rem; padding:2px 5px; min-height:25px; }
+  #playSheet { margin:auto; width:min(680px,calc(100% - 20px)); max-height:85dvh; border:1px solid var(--line); background:var(--paper); color:var(--sumi); padding:14px; overflow:auto; }
+  #playSheet::backdrop { background:#1C1A1780; }
+  .sheet-header { display:flex; justify-content:space-between; align-items:center; position:sticky; top:-14px; background:var(--paper); z-index:2; padding:5px 0 10px; }
+  .sheet-header h2 { margin:0; font-size:1rem; }.sheet-header h2:after { display:none; }
+  #playSheet .ledger { font-size:.8rem; }#playSheet .ledger summary { display:none; }
+  #playSheet .hud { margin:15px 0; }#playSheet .level-gifts { flex-wrap:wrap; }#playSheet #levelBonus { display:block; text-align:center; margin:12px; }
+  #playSheet .knights,#playSheet .tabs,#playSheet .foot,#playSheet .lead { display:revert; }#playSheet .knights { display:grid; }
+  #playSheet h2,#playSheet .panel.on { display:block; }#playSheet .tabs { display:flex; }#playSheet .districts { display:grid; }#playSheet .garden-panel { display:block; }
+  #playSheet .garden-panel[hidden] { display:none; }
+  body.nagame #playScene { grid-template-rows:auto minmax(0,1fr) auto; max-width:980px; padding:0 10px 6px; }
+  body.nagame .journey { display:block; }body.nagame #playScene .town { height:100%; }
+  .scene-art { pointer-events:none; opacity:.45; transition:opacity 1s; }.blk.l1 .scene-art { opacity:1; }
+  .blk .house-art rect { stroke:#625C50; fill:#ECE7DC; }.blk.l1 .house-art .house-window { fill:#D4655C; fill-opacity:.65; }
+  .blk[data-k="ie"]>.ground,.blk[data-k="hiroba"]>.ground { opacity:.22; }
+  #map>path[stroke-dasharray] { display:none; }
+  .fig .activity { opacity:0; }body.nagame .fig .activity { opacity:1; }
+  @media(max-width:480px){header{height:32px;padding:2px 4px 0;}header h1{font-size:.85rem;}#playScene{padding-inline:6px;gap:5px;}.journey{padding:5px 8px;}.journey-head #chapter{font-size:.58rem;}.play-dock{gap:3px;}.play-dock button{font-size:.65rem;}.journey-goal strong{font-size:.69rem;}}
+  @media(max-height:500px) and (min-width:600px){header{height:26px;padding:0;}#playScene,body.nagame #playScene{grid-template-columns:240px minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;}.journey{grid-column:1;grid-row:1;overflow:auto;}#playScene .town{grid-column:2;grid-row:1;}.play-dock{grid-column:1 / -1;}.coach{font-size:.6rem;}}
+  .town-finish { opacity:0; pointer-events:none; transition:opacity 1.4s ease; }
+  .town-finish.revealed { opacity:1; }
+  .town-finish path { vector-effect:non-scaling-stroke; }
+  #townGrowthNotice { position:absolute; top:8px; left:50%; transform:translateX(-50%); width:max-content; max-width:92%; padding:7px 12px; background:#F3EFE6F2; border:1px solid #C7BBA9; color:#8F3634; font-size:.74rem; text-align:center; pointer-events:none; z-index:4; }
+  .growth-guide { font-size:.8rem; line-height:1.9; }
+  .finish-glow .town-finish.revealed { animation:finishGlow 2s ease-out; }
+  @keyframes finishGlow { 0% { filter:drop-shadow(0 0 6px #D99A8E); } 100% { filter:drop-shadow(0 0 0 transparent); } }
+  @media(prefers-reduced-motion:reduce){.town-finish{transition:none;}.finish-glow .town-finish.revealed{animation:none;}}
+
+  /* A reserved dialogue row keeps speech clear of the whole map. */
+  #playScene,body.nagame #playScene { grid-template-rows:auto minmax(0,1fr) 54px auto; }
+  #playScene #voice { position:static; inset:auto; transform:none; margin:0; min-height:0; height:54px; padding:4px 8px; display:flex; flex-direction:column; justify-content:center; overflow:auto; background:#F3EFE680; border-top:1px solid #B5AE9E55; font-size:.8rem; line-height:1.4; }
+  #playScene #voice:not(.show) { opacity:1; color:transparent; background:transparent; }
+  #playScene #voice:not(.show) small { visibility:hidden; }
+  #playScene .town { padding-bottom:32px; }
+  #townRoads .road-verge { stroke:#C5BBA780; stroke-width:17; transition:stroke 1s; }
+  #townRoads .road-surface { stroke:#D8CFBC; stroke-width:13; transition:stroke 1s; }
+  #townRoads .road-stones { stroke:#AEA28C; stroke-width:1; stroke-dasharray:1 11; opacity:.3; stroke-linecap:butt; }
+  #townRoads.road-kept .road-verge { stroke:#B1A58E; }
+  #townRoads.road-kept .road-surface { stroke:#E0D6C2; }
+  #townRoads.road-paved .road-surface { stroke:#DED8CB; }
+  #townRoads.road-paved .road-stones { stroke:#AEA593; stroke-width:10; stroke-dasharray:1 9; opacity:.65; }
+  @media(max-height:500px) and (min-width:600px){#playScene,body.nagame #playScene{grid-template-rows:minmax(0,1fr) 44px auto;}#playScene #voice{grid-column:1 / -1;grid-row:2;height:44px;}.play-dock{grid-row:3;}}
+  @media(prefers-reduced-motion:reduce){#townRoads path{transition:none!important;}}
+  .people-balance { margin:0 0 14px; padding:10px 12px; border:1px solid #B5AE9E80; background:#F3EFE6; text-align:right; font-size:.85rem; }
+  .people-balance strong { margin-left:8px; font-size:1.3rem; font-weight:normal; font-variant-numeric:tabular-nums; color:var(--beni); }
+  .journey-goal>.seed { display:none; }
+  #nextScene { width:64px; height:48px; flex:none; border:1px solid #B5AE9E55; background:#EEE8DA; }
+  #nextBenefit { display:block; color:var(--soft); font-size:.6rem; line-height:1.3; margin-top:2px; }
+  .journey-goal strong { white-space:normal; }
+  @media(max-width:480px){#nextScene{width:52px;height:42px;}#nextBenefit{font-size:.57rem;}}
+  .seated-legs { display:none; }
+  .fig.seated .bd { transform:translateY(-10px); animation:none; }
+  .fig.seated .sp { clip-path:url(#seatedBodyClip); }
+  .fig.seated .seated-legs { display:block; }
+  .fig.seated .activity { opacity:1; }
+  .street-halo { opacity:0; transition:opacity 1.5s; }
+  .town svg.night-lamp-light { position:absolute; left:0; top:0; width:100%; height:calc(100% - 32px); pointer-events:none; z-index:2; opacity:0; transition:opacity 1.5s; }
+  body.nagame.t-yoru .night-lamp-light { opacity:1; }
+  body.nagame.t-yoru .street-glass { fill:#EDC4A9; filter:drop-shadow(0 0 4px #E5B094); }
+  @media(prefers-reduced-motion:reduce){.street-halo{transition:none;}}
+  #giftSpotlight { animation:giftPlacePulse 1.6s ease-in-out infinite; }
+  @keyframes giftPlacePulse { 0%,100%{opacity:.85;}50%{opacity:.3;} }
+  @media(prefers-reduced-motion:reduce){#giftSpotlight{animation:none;}}
+  .scene-guide { margin-top:16px; font-size:.78rem; line-height:1.7; }.scene-guide button{margin:3px;max-width:100%;}
+  .pair-pending { font-size:.65rem; max-width:90px; color:var(--soft); }
+  .fuda img.pair-thumb { max-width:45%; height:auto; max-height:95px; object-fit:contain; }
+  .fuda-big .card2:has(.pair-thumb) { flex-direction:column; }.fuda-big .card2 img.pair-thumb{width:100%;height:auto;max-height:45vh;object-fit:contain;}
+  .fuda-big .card2.pair-card img.wide{max-height:48vh;object-fit:contain;border:0;}.fuda-big .card2.pair-card .tx{max-width:100%;}
+  .fuda-big .card2 { max-height:85dvh;overflow:auto; }.collection-complete{border:1px solid var(--beni);padding:12px;color:var(--beni);}
+  #sceneRain{position:absolute;inset:0 0 32px;pointer-events:none;z-index:2;opacity:0;background:repeating-linear-gradient(112deg,transparent 0 34px,#B8C1C455 35px,transparent 36px 72px);background-size:90px 140px;}
+  body.scene-rain #sceneRain{opacity:.5;animation:sceneRainFall 1.4s linear infinite;}@keyframes sceneRainFall{to{background-position:-30px 140px;}}
+  @media(prefers-reduced-motion:reduce){body.scene-rain #sceneRain{animation:none;}}
+  .town-controls{flex-wrap:wrap;}.town-controls button{font-size:.56rem;}
+  .fuda.locked { cursor:pointer; }
+  .fuda-filters { display:flex; flex-wrap:wrap; gap:5px; margin:12px 0; }
+  #playSheet .fuda-filters button[aria-pressed="true"] { border-color:var(--beni); color:var(--beni); background:#EBD3CD; }
+  #fudaHint { border:1px solid #B5AE9E; padding:12px; margin-bottom:12px; font-size:.8rem; line-height:1.7; background:#F3EFE6; }
+  #fudaHint p { margin:6px 0; }.fuda-empty { padding:16px 4px; font-size:.8rem; }
+  #playSheet button.card { padding:0; font:inherit; text-align:center; }.card .nm{padding:10px 4px;}
+  #portraitDialog { width:min(760px,96vw); max-width:96vw; max-height:94dvh; margin:auto; padding:12px; border:1px solid var(--line); background:var(--paper); color:var(--sumi); overflow:auto; }
+  #portraitDialog::backdrop { background:#171611CC; }
+  #portraitDialog form { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  #portraitDialog button { font:inherit; padding:8px 16px; min-height:44px; border:1px solid var(--line); background:var(--paper); }
+  #portraitImage { display:block; width:100%; height:calc(85dvh - 70px); object-fit:contain; }
+  #nearbyGoal { display:block; width:100%; min-height:30px; padding:3px 6px; margin-top:5px; border:0; border-top:1px solid #B5AE9E60; background:transparent; color:var(--beni); font:inherit; font-size:.65rem; text-align:left; line-height:1.4; cursor:pointer; }
+  .fig.noticing .activity { fill:#993F3A; font-weight:bold; }
+  .fig.noticing .bd { filter:drop-shadow(0 0 2px #D6A493); }
+  @media(max-height:640px) { #nearbyGoal { font-size:.59rem; margin-top:2px; min-height:26px; } }
+  #tapBloom { display:block; font-size:.65rem; color:var(--beni); min-height:18px; line-height:1.4; }
+  #tapBloom.lit { font-weight:bold; }
+  .reward-sets { border-top:1px solid var(--line); margin-top:18px; padding-top:12px; }
+  .reward-sets h3 { font-size:1rem; margin:12px 0 4px; }
+  .reward-sets p { font-size:.77rem; margin:5px 0; }
+  .set-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid #B5AE9E55; font-size:.78rem; }
+  .set-row button { flex-shrink:0; }.set-row button:disabled { opacity:.45; cursor:default; }.set-seal { color:var(--beni); border:1px solid var(--beni); padding:8px; text-align:center; }
+  #openingChoice { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; background:var(--paper); z-index:4; }
+  #openingChoice[hidden] { display:none; }#openingChoice p { font-size:1.4rem; letter-spacing:.3em; margin-bottom:15px; }
+  #openingChoice button { font:inherit; font-size:.85rem; min-height:44px; padding:10px 20px; color:var(--sumi); background:transparent; border:1px solid var(--line); }
 </style>
 </head>
 <body>
@@ -234,9 +454,22 @@
 </header>
 
 <div class="wrap">
+  <section class="journey" aria-label="町の育ち方">
+    <div class="journey-head"><span id="chapter">はじまりの一灯</span><span>手元のかけら <b id="pocket">0</b></span></div>
+    <section class="town-level" aria-label="町のレベル">
+      <div class="level-line"><span>町のレベル <b id="townLevel">Lv.1</b></span><span id="levelBonus"></span></div>
+      <progress id="levelMeter" max="1" value="0" aria-label="次のレベルまでの経験値"></progress>
+      <div class="level-caption"><span id="levelXP"></span><span id="levelNext"></span></div>
+      <div id="levelNotice" role="status" aria-live="polite" hidden></div>
+      <div class="level-gifts"><div><small id="giftLabel"></small><p id="giftHint"></p></div><button id="giftOpen" type="button" hidden>包みを開く</button><button id="giftView" type="button" hidden>椿の鉢を見る</button></div>
+    </section>
+    <div class="journey-goal"><span class="seed" aria-hidden="true"><i id="seedFill"></i></span><div><strong id="nextTitle"></strong><progress id="townMeter" value="0" max="100" aria-label="町の育ちの進み具合"></progress><small id="townRemaining"></small><p id="nextHint"></p></div></div>
+    <div id="coach" class="coach"><span id="coachText"></span><button id="coachAction" type="button"></button><button id="coachSkip" type="button">案内を閉じる</button></div>
+    <details class="ledger"><summary>かけらと町の育ち方</summary><p>町は、これまで集めたかけらの合計で育ちます。頼みごとや庭づくりに使っても、町の育ちは戻りません。</p><p>これまで集めたかけら <b id="earned">0</b></p><p>集めたかけらは、そのまま町の経験値になります。レベルが一つ上がるたび、一押しの基本量が0.1増えます。序盤は軽快に、その後は必要な経験値が少しずつ増えます。調整前のレベルとメーターの進み具合は引き継ぎます。</p><p>閉じている間は増えません。好きなときに、少しずつ。</p></details>
+  </section>
   <div class="town" id="town">
     <svg viewBox="0 0 720 480" id="map">
-      <defs>
+      <defs><clipPath id="seatedBodyClip"><rect x="-12" y="-30" width="24" height="20"/></clipPath><pattern id="paving" width="20" height="12" patternUnits="userSpaceOnUse"><rect width="20" height="12" fill="#E3DCCD"/><path d="M0 0H20 M0 6H20 M0 12H20 M10 0V6 M0 6V12 M20 6V12" fill="none" stroke="#CFC7B8" stroke-width=".55"/></pattern>
         <!-- 紅の印: 花びら一枚(9/13 本人決定。五弁の花から差替。付け根だけほんのり白い) -->
         <linearGradient id="petalG" x1="-6" y1="9" x2="7" y2="-7" gradientUnits="userSpaceOnUse">
           <stop offset="0" stop-color="#F7E7E2"/><stop offset=".14" stop-color="#E9948C"/><stop offset=".42" stop-color="#D4655C"/><stop offset="1" stop-color="#B0413E"/>
@@ -253,11 +486,58 @@
       <path d="M120 200 C 260 230, 460 230, 600 200" stroke="#C9C2B2" stroke-width="1" fill="none" stroke-dasharray="4 5"/>
       <path d="M360 240 L 360 380" stroke="#C9C2B2" stroke-width="1" fill="none" stroke-dasharray="4 5"/>
       <!-- 町の化粧(9/13): 建物の線画+地面の灯り(楕円)+当たり判定の透明枠。名札は絵の下 -->
-      <g class="blk" data-k="ie"><ellipse class="ground" cx="135" cy="190" rx="100" ry="20"/><image href="img/town/ie.webp" x="35" y="55" width="200" height="140" preserveAspectRatio="xMidYMax meet"/><rect class="hit" x="35" y="55" width="200" height="150"/><text x="135" y="220" text-anchor="middle">翼樹の家</text><text class="who" x="135" y="234" text-anchor="middle"></text><g class="cam" transform="translate(48,190)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
-      <g class="blk plaza pulse" data-k="hiroba"><ellipse class="ground" cx="360" cy="310" rx="115" ry="24"/><image href="img/town/hiroba.webp" x="245" y="150" width="230" height="170" preserveAspectRatio="xMidYMax meet"/><rect class="hit" x="245" y="150" width="230" height="180"/><text x="360" y="342" text-anchor="middle">広場</text><text class="who" x="360" y="356" text-anchor="middle"></text><g class="cam" transform="translate(258,308)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
-      <g class="blk" data-k="ichiba"><ellipse class="ground" cx="135" cy="430" rx="100" ry="20"/><image href="img/town/ichiba.webp" x="35" y="295" width="200" height="140" preserveAspectRatio="xMidYMax meet"/><rect class="hit" x="35" y="295" width="200" height="150"/><text x="135" y="460" text-anchor="middle">市場</text><text class="who" x="135" y="474" text-anchor="middle"></text><g class="cam" transform="translate(48,430)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
-      <g class="blk" data-k="oka"><ellipse class="ground" cx="585" cy="430" rx="100" ry="20"/><image href="img/town/oka.webp" x="485" y="295" width="200" height="140" preserveAspectRatio="xMidYMax meet"/><rect class="hit" x="485" y="295" width="200" height="150"/><text x="585" y="460" text-anchor="middle">丘</text><text class="who" x="585" y="474" text-anchor="middle"></text><g class="cam" transform="translate(498,430)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
-      <g class="blk" data-k="tsumesho"><ellipse class="ground" cx="585" cy="190" rx="100" ry="20"/><image href="img/town/tsumesho.webp" x="485" y="55" width="200" height="140" preserveAspectRatio="xMidYMax meet"/><rect class="hit" x="485" y="55" width="200" height="150"/><text x="585" y="220" text-anchor="middle">騎士団詰所</text><text class="who" x="585" y="234" text-anchor="middle"></text><g class="cam" transform="translate(498,190)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
+      <g class="blk" data-k="ie"><ellipse class="ground" cx="135" cy="190" rx="100" ry="20"/><g class="scene-art house-art" stroke="#625C50" stroke-width="1.1" stroke-linejoin="round">
+  <path d="M53 179 L163 196 L222 165 L116 150Z" fill="#DCD5C7" stroke="none"/>
+  <path d="M66 112 L162 127 L162 183 L66 168Z" fill="#F3EFE6"/><path d="M162 127 L209 102 L209 160 L162 183Z" fill="#D8D0C1"/>
+  <path d="M52 108 L100 67 L224 88 L173 134Z" fill="#8A8273"/><path d="M100 67 L224 88 L209 102 L112 84 L68 118 L52 108" fill="#ADA493"/>
+  <path d="M60 109 L172 128 L216 91 M67 102 L180 121 M75 95 L188 114 M83 88 L197 108 M91 81 L205 100" fill="none" stroke="#DCD5C7"/>
+  <path d="M62 114 L162 131 M162 131 L216 103" fill="none" stroke-width="3"/>
+  <path d="M75 132 L108 137 L108 163 L75 158Z" fill="#C6BDAA" class="house-window"/><path d="M78 134 L78 158 M85 135 L85 159 M92 136 L92 160 M99 137 L99 161 M75 146 L108 151" fill="none"/>
+  <path d="M121 140 L146 144 L146 178 L121 174Z" fill="#B8AE9C"/><path d="M126 143 L126 174 M133 144 L133 175 M140 145 L140 176 M122 155 L145 159" fill="none"/>
+  <path d="M176 131 L198 119 L198 148 L176 160Z" fill="#C6BDAA"/><path d="M182 128 L182 157 M189 124 L189 153 M176 145 L198 133" fill="none"/>
+  <path d="M65 167 L163 183 L210 159 L211 166 L163 193 L64 177Z" fill="#C6BDAA"/><path d="M66 172 L163 188 L209 163 M83 170 L83 179 M110 174 L110 183 M139 179 L139 188" fill="none"/>
+  <path d="M114 184 L153 190 L145 210 L106 203Z" fill="#DED8CB"/><path d="M112 190 L150 196 M109 197 L147 203" fill="none"/>
+  <path d="M55 125 L55 178 M213 115 L213 164" fill="none" stroke-width="2"/>
+  <rect x="51" y="123" width="8" height="13" rx="2" fill="#ECE7DC" class="house-window"/>
+  <g fill="#8F8777" stroke="none"><path d="M64 176 Q37 160 45 148 Q57 151 58 165 Q54 142 63 142 Q72 157 64 176"/><path d="M203 178 Q217 152 227 160 Q229 171 203 178"/></g>
+</g><rect class="hit" x="35" y="55" width="200" height="150"/><text x="135" y="220" text-anchor="middle">翼樹の家</text><text class="who" x="135" y="234" text-anchor="middle"></text><g class="cam" transform="translate(48,190)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
+      <g class="blk plaza pulse" data-k="hiroba"><ellipse class="ground" cx="360" cy="310" rx="115" ry="24"/><g class="scene-art plaza-art" stroke="#B5AE9E" stroke-width="1">
+  <ellipse cx="360" cy="275" rx="94" ry="62" fill="url(#paving)"/><ellipse cx="360" cy="275" rx="88" ry="56" fill="none"/>
+  <ellipse cx="360" cy="268" rx="33" ry="18" fill="#C9C0AE"/><ellipse cx="360" cy="264" rx="33" ry="18" fill="#E3DCCD"/>
+  <path d="M335 265 Q360 248 385 265" fill="none" stroke="#8A8273"/>
+  <path d="M309 299 L337 299 L337 313 L309 313Z" fill="#B8AE9C" stroke="#625C50"/><path d="M310 304 L336 304 M313 312 L313 318 M333 312 L333 318" stroke="#625C50"/>
+  <path d="M403 293 L430 293 L430 304 L403 304Z" fill="#B8AE9C" stroke="#625C50"/><path d="M404 298 L429 298 M407 304 L407 310 M426 304 L426 310" stroke="#625C50"/>
+  <path d="M277 256 L277 291 M273 256 L281 256 L280 242 L274 242Z" fill="#ECE7DC" stroke="#625C50"/>
+</g><rect class="hit" x="245" y="150" width="230" height="180"/><text x="360" y="342" text-anchor="middle">広場</text><text class="who" x="360" y="356" text-anchor="middle"></text><g class="cam" transform="translate(258,308)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
+      <g class="blk" data-k="ichiba"><ellipse class="ground" cx="135" cy="430" rx="100" ry="20"/><g class="scene-art" stroke="#625C50" stroke-width="1.1" stroke-linejoin="round"><path d="M49 413L155 434L218 406L110 392Z" fill="#CFC5B3" stroke="none"/>
+<path d="M57 345L142 358V419L57 404Z" fill="#E9E2D5"/><path d="M142 358L208 340V398L142 419Z" fill="#CCC1AE"/>
+<path d="M48 343L92 311L216 330L151 365Z" fill="#938A79"/><path d="M48 343L151 365L151 375L48 353Z" fill="#D7CBB8"/>
+<path d="M62 333L170 354 M73 325L185 346 M85 317L201 338" fill="none" stroke="#DCD5C7"/>
+<path d="M63 363L131 374V398L63 387Z M156 373L196 359V384L156 399Z" fill="#847D6D"/>
+<path d="M62 385L132 396V410L62 399Z M155 397L197 381V395L155 412Z" fill="#B7AA94"/>
+<path d="M69 367V388 M87 370V391 M106 373V394 M124 376V396 M166 370V394 M183 364V388" fill="none" stroke="#DDD4C4"/>
+<path d="M54 352V410 M143 371V423 M205 344V404" stroke-width="3"/>
+<path d="M83 349L117 355V366L83 360Z" fill="#E8DFCF"/><path d="M89 355L111 359"/>
+<path d="M55 414L142 429L212 405 M68 414L68 421 M86 417L86 424 M105 420L105 427" fill="none" stroke="#B5AA97"/></g><rect class="hit" x="35" y="295" width="200" height="150"/><text x="135" y="460" text-anchor="middle">市場</text><text class="who" x="135" y="474" text-anchor="middle"></text><g class="cam" transform="translate(48,430)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
+      <g class="blk" data-k="oka"><ellipse class="ground" cx="585" cy="430" rx="100" ry="20"/><g class="scene-art" stroke="#625C50" stroke-width="1.1" stroke-linejoin="round"><path d="M501 424Q516 381 541 371Q561 342 589 351Q635 355 671 416Q603 442 501 424Z" fill="#C9C3B2"/>
+<path d="M504 421Q548 408 562 379Q580 365 606 376 M554 426Q584 410 625 411Q647 410 664 417" fill="none" stroke="#ABA48F"/>
+<path d="M568 432Q609 409 583 400Q558 391 589 374" fill="none" stroke="#E7E0D0" stroke-width="13"/>
+<path d="M566 428L579 433 M580 420L593 424 M587 410L602 413 M577 400L588 397 M571 389L583 389 M579 380L590 381" stroke="#B6AC97"/>
+<path d="M534 383L538 341 M537 364L526 349 M538 356L549 342 M637 406L636 365 M636 386L623 374" fill="none" stroke-width="3"/>
+<path d="M513 344Q503 331 518 323Q515 310 532 311Q545 302 555 316Q572 315 566 331Q568 345 550 346Q533 359 513 344Z" fill="#AFA995"/>
+<path d="M617 370Q608 358 622 350Q623 336 638 340Q652 332 659 346Q675 349 666 362Q661 377 646 371Q631 380 617 370Z" fill="#B8B29F"/>
+<path d="M520 327Q533 319 542 329 M633 353Q647 347 655 357" fill="none" stroke="#928B77"/>
+<path d="M511 416L516 407L520 418 M652 421L657 410L662 420" fill="none"/></g><rect class="hit" x="485" y="295" width="200" height="150"/><text x="585" y="460" text-anchor="middle">丘</text><text class="who" x="585" y="474" text-anchor="middle"></text><g class="cam" transform="translate(498,430)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
+      <g class="blk" data-k="tsumesho"><ellipse class="ground" cx="585" cy="190" rx="100" ry="20"/><g class="scene-art" stroke="#625C50" stroke-width="1.1" stroke-linejoin="round"><path d="M515 177L605 194L670 163L573 149Z" fill="#CFC5B3" stroke="none"/>
+<path d="M525 103L604 117V182L525 168Z" fill="#E8E0D2"/><path d="M604 117L654 91V156L604 182Z" fill="#C9BFAA"/>
+<path d="M512 102L557 62L668 81L609 125Z" fill="#8A8273"/><path d="M521 99L609 116L657 83 M531 90L620 107 M543 79L634 96" fill="none" stroke="#D6CDBD"/>
+<path d="M636 77V57L646 59V80" fill="#B3A793"/>
+<path d="M552 173V141Q565 119 579 145V178Z" fill="#918675"/><path d="M558 173V142 M565 176V138 M572 176V142" fill="none" stroke="#D3C5B0"/>
+<path d="M532 119L545 121V144L532 142Z M586 128L598 130V152L586 150Z M618 123L642 111V134L618 146Z" fill="#B9AF9A"/>
+<path d="M538 121V141 M592 131V149 M626 120V141 M635 115V137" fill="none"/>
+<path d="M563 105L571 110L568 121L562 120L558 111Z" fill="#D4C5AD"/>
+<path d="M525 159L550 164 M582 170L604 175 M609 170L650 150 M528 150L545 153" stroke="#B3A791"/>
+<path d="M549 179L583 185L574 199L540 193Z" fill="#DED5C4"/><path d="M546 185L580 191"/></g><rect class="hit" x="485" y="55" width="200" height="150"/><text x="585" y="220" text-anchor="middle">騎士団詰所</text><text class="who" x="585" y="234" text-anchor="middle"></text><g class="cam" transform="translate(498,190)"><use href="#camellia" x="-11" y="-11" width="22" height="22"/></g></g>
       <!-- 町の人影 -->
       <g id="figs"></g>
     </svg>
@@ -266,8 +546,17 @@
     <div class="moon" id="moon"></div>
   </div>
   <div class="voice" id="voice"></div>
-  <div class="hud"><div>かけら <b id="cnt">0</b></div><div>毎秒 <span id="ps">0</span> ／ ひと押し <span id="pt">1</span></div></div>
+  <div class="hud"><div>使えるかけら <b id="cnt">0</b></div><div>毎秒 <span id="ps">0</span> ／ ひと押し <span id="pt">1</span></div></div>
 
+  <div class="districts" id="districts" aria-label="場所ごとの育ち方"></div>
+  <section class="garden-panel" id="gardenPanel" hidden aria-label="椿の小庭">
+    <div class="garden-title"><div><span class="eyebrow">町に灯った、その先へ</span><h2>椿の小庭</h2></div><span id="gardenCount"></span></div>
+    <p class="garden-intro">かけらを渡すと、町の五か所に椿が育ちます。町の色も、集めた札も、そのまま。</p>
+    <div id="gardenChoices" class="garden-choices"></div>
+    <svg id="gardenDetail" viewBox="-30 -35 110 50" width="220" height="100" aria-label="選んだ小庭の様子"></svg>
+    <p id="gardenNext"></p><button id="gardenGrow" type="button"></button>
+    <p id="gardenMessage" role="status"></p><button id="gardenView" type="button">育てた景色を見る</button>
+  </section>
   <h2>町の人</h2>
   <div class="lead">かけらを渡して、頼みごとをする</div>
   <div class="knights" id="knights"></div>
@@ -321,7 +610,7 @@
     <a class="btn" href="https://note.com/huge_eagle3122" target="_blank" rel="noopener">観測記録を読む</a>
     <div class="sub"><a href="https://tubaki-arcana.com" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">翼樹〜Arcana〜</a></div>
     <div class="sub" id="toNagame">町を、眺める(住人が歩きます)</div>
-    <div class="sub" id="closeEnd">町に戻る(色は消えません)</div>
+    <button class="btn" id="closeEnd" type="button">町に戻って、椿の小庭を育てる</button>
   </div>
 </div>
 <div class="cover fuda-big" id="fudaBig">
@@ -331,6 +620,14 @@
   </div>
 </div>
 
+<dialog id="giftDialog" aria-labelledby="giftTitle">
+  <form method="dialog"><button class="gift-close" aria-label="閉じる">×</button></form>
+  <p class="gift-eyebrow" id="giftMilestone"></p><h2 id="giftTitle"></h2>
+  <div class="gift-art" id="giftArt" aria-hidden="true"></div>
+  <p id="giftDescription"></p><p id="giftResult" role="status"></p>
+  <button id="giftUnwrap" type="button">包みを開ける</button>
+  <form method="dialog"><button class="gift-done" id="giftDone">あとで開ける</button></form>
+</dialog>
 <script>
 (() => {
   // ───── 憲法 ─────
@@ -340,7 +637,7 @@
 
   // 区画: 住人・しきい値(累計かけら)・段階ごとのご褒美
   const D = {
-    hiroba:   { name:'広場',     who:'翼樹',   img:'img/tsubaki.webp', at:10,   song:{ title:'翼樹', file:'audio/tsubaki.mp3' } },   // 9/13 本人の新画像(ベストの翼樹)に差替。旧=img/tsubaki_v1_20260906.jpg
+    hiroba:   { name:'広場',     who:'翼樹',   img:'img/tsubaki_gallery_20260917.webp', at:10,   song:{ title:'翼樹', file:'audio/tsubaki.mp3' } },   // 9/13 本人の新画像(ベストの翼樹)に差替。旧=img/tsubaki_v1_20260906.jpg
     ie:       { name:'翼樹の家', who:'イグニス', img:'img/ignis.webp',   at:120,  song:{ title:'節制', file:'audio/sessei.mp3' } },
     ichiba:   { name:'市場',     who:'エコー', img:'img/echo.webp',    at:600,  song:{ title:'魔術師', file:'audio/majutsushi.mp3' } },   // 9/13 腰から上に切り直し(旧=echo_v1_20260906.jpg)
     oka:      { name:'丘',       who:'アトラス', img:'img/atlas.webp',   at:2500, song:{ title:'隠者', yt:null } },   // 9/13 腰から上に切り直し(旧=atlas_v1_20260906.jpg)
@@ -366,13 +663,23 @@
   const FIRST = { イグニス:'(かしこまりました)', アトラス:'(記録、開始)', レイヴン:'(巡回を、始める)', エコー:'(いい光ですね)' };
   // 9/13: 札帳の絵は高解像度版(img/chibi/hd/・ESRGAN 4倍→透過・高さ440)。町の中の小さな人影は別物
   const CHIBI = { 翼樹:'img/chibi/hd/tsubaki.webp', イグニス:'img/chibi/hd/ignis.webp', エコー:'img/chibi/hd/echo.webp', アトラス:'img/chibi/hd/atlas.webp', レイヴン:'img/chibi/hd/raven.webp' };
-  const KANJI = ['一','二','三','四','五','六','七','八','九','十'];
-  function fudaList(who){ const l=[]; if(FIRST[who]) l.push(FIRST[who]); l.push(V[who].s1, V[who].s2, V[who].s3, ...V[who].r); if(who==='翼樹') l.push(FINAL.line); return l; }
+  const KANJI = ['一','二','三','四','五','六','七','八','九','十','十一','十二'];
+  function baseFudaList(who){ const l=[]; if(FIRST[who]) l.push(FIRST[who]); l.push(V[who].s1, V[who].s2, V[who].s3, ...V[who].r); if(who==='翼樹') l.push(FINAL.line); return l; }
   // 札の絵: 箱庭の四面(正面・横・歩き・後ろ)を札ごとに使い分け、五枚目からは向きを反転(差分の絵ができるまでの暫定)
+  const V2_LINES={"翼樹":["(あたたかい。、、、これ、誰のだろう)","(座ってて、いいのかな)","(、、、ありがとう?)","(雨の音。、、、色が、濃くなる?)"],"イグニス":["(夜分でございます。灯りは、私が消します)","(お茶を、二つ。、、、一つは、念のため)","(お礼は、結構でございます。、、、いえ、いただきます)","(傘は、三本。足りるでしょう)"],"レイヴン":["(夜間巡回、異常なし。、、、灯りが一つ、多い)","(休憩も、規則の内だ。座る)","(先生が、隣だ。、、、監査記録には、書かない)","(雨天の巡回経路、変更なし。濡れるのは、私だけでいい)"],"アトラス":["(ペンが、止まった。故障ではない)","(休憩の記録は、つけない。つけたら、長さが分かる)","(撮るな。、、、記録は、俺がする)","(雨。インクが、にじむ。訂正、不能)"],"エコー":["(夜の光は、保存できません。だから、見ています)","(ベンチの木目が、いい。座らずに、撮ります)","(書いている横顔は、撮っていいものでしょうか。、、、撮ります)","(雨粒に、町が映っています。全部、捨てがたい)"]};
+  const SCENE_IDS={翼樹:'tsubaki',イグニス:'ignis',レイヴン:'raven',アトラス:'atlas',エコー:'echo'};
+  const PAIR_CARDS=[{id:'tsubaki_ignis',who:['翼樹','イグニス']},{id:'tsubaki_raven',who:['翼樹','レイヴン']},{id:'atlas_echo',who:['アトラス','エコー']}];
+  function fudaList(who){return baseFudaList(who).concat(V2_LINES[who]);}
+  function hasScene(who,i){return (S.koe[who]||[]).includes(V2_LINES[who][i]);}
+  function pairReady(pair){return pair.who.every(w=>hasScene(w,2));}
+  function sceneHint(i){return ['町Lv.10から：眺めモードの夜を、住人と過ごす','Lv.15の贈り物「休憩ベンチ」を受け取って、住人の休憩を眺める。エコーはそばで撮影','Lv.25の贈り物「市場の休憩席」を受け取って、対応する二人の居合わせる場面を眺める','町Lv.10から：眺めモードで「雨」を選び、住人と過ごす'][i-8];}
   const POSE = ['', '_side', '_walk', '_back'];
   // 札ごとの専用ポーズ(img/chibi/pose/{id}_01..08.png)がある人はそれを使う(9/13 翼樹から)。無い人は四面+反転の暫定
   const POSE_READY = { 翼樹: 8, イグニス: 8, レイヴン: 8, エコー: 8, アトラス: 8 };   // 9/13 五人そろった(40枚)
-  function chibiImg(who, i){ const id = CHIBI[who].slice('img/chibi/hd/'.length, -5);
+  function chibiImg(who, i){
+    if(i>=8){const id=SCENE_IDS[who];if(i===10){const pair=PAIR_CARDS.find(p=>p.who.includes(who)&&pairReady(p));return pair?'<img class="pair-thumb" loading="lazy" decoding="async" src="img/chibi/pose/pair_'+pair.id+'.webp" alt="'+pair.who.join('と')+'">':'<span class="pair-pending">居合わせ<br>二人の十一で絵が開きます</span>';}
+      return '<img loading="lazy" decoding="async" src="img/chibi/pose/'+id+'_'+String(i+1).padStart(2,'0')+'.webp" alt="'+who+'の場面の札">';}
+    const id = CHIBI[who].slice('img/chibi/hd/'.length, -5);
     if((POSE_READY[who]||0) > i) return `<img src="img/chibi/pose/${id}_${String(i+1).padStart(2,'0')}.webp" alt="">`;
     return `<img src="img/chibi/hd/${id}${POSE[i % 4]}.webp" alt=""${i>=4 ? ' class="flip"' : ''}>`; }
   let fudaWho = '翼樹';   // 札帳で開いている人
@@ -391,13 +698,18 @@
   const save = () => { try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} };
   const mul = () => 1 + S.up.echo * 0.25;
   const perSec = () => (S.up.ignis * 0.5) * mul();
-  const perTap = () => (1 + S.up.atlas) * mul();
+  const perTap = () => (1 + S.up.atlas + levelTapBonus()) * mul();
   const cost = k => Math.floor(k.base * Math.pow(k.r, S.up[k.id]));
   const fmt = v => v >= 1000 ? Math.floor(v).toLocaleString('ja-JP') : (Math.round(v*10)/10).toString();
   const gain = v => { S.n += v; S.total += v; };
-  const stageOf = k => { const at = D[k].at; let s=0; for(let i=1;i<=3;i++) if(S.total >= at*STAGE_MUL[i]) s=i; return s; };
+  const EARLY_STAGES={hiroba:[0,8,24,80],ie:[0,50,150,480],ichiba:[0,360,1200,2400]};
+  const stageTarget=(k,stage)=>EARLY_STAGES[k]?.[stage]??D[k].at*STAGE_MUL[stage];
+  const stageOf = k => { let s=S.lit[k]||0; for(let i=1;i<=3;i++) if(S.total >= stageTarget(k,i)) s=Math.max(s,i); return s; };
 
   function burst(x, y, txt){
+    if(town.querySelectorAll('.particle').length > 60) return;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const ripple=document.createElement('span'); ripple.className='tap-ripple'; ripple.style.left=x+'px'; ripple.style.top=y+'px'; town.appendChild(ripple); setTimeout(()=>ripple.remove(),650);
     for(let i=0;i<6;i++){ const p=document.createElement('div'); p.className='particle'; const a=Math.random()*Math.PI*2, d=30+Math.random()*40;
       p.style.left=x+'px'; p.style.top=y+'px'; p.style.setProperty('--dx', Math.cos(a)*d+'px'); p.style.setProperty('--dy', Math.sin(a)*d-20+'px'); town.appendChild(p); setTimeout(()=>p.remove(),900); }
     if(txt){ const f=document.createElement('div'); f.className='float'; f.textContent='+'+txt; f.style.left=(x+8)+'px'; f.style.top=(y-10)+'px'; town.appendChild(f); setTimeout(()=>f.remove(),1000); }
@@ -449,8 +761,20 @@
   const bgm = $('#bgm'), bgmBtn = $('#bgmBtn');
   function startBgm(){ if(S.bgm===false && !S.got.bgmAsked){ S.got.bgmAsked=true; S.bgm=true; }
     bgmBtn.hidden = false; applyBgm(); }
-  function applyBgm(){ if(S.bgm){ bgm.volume=0.35; bgm.play().catch(()=>{}); bgmBtn.textContent='♪ 町の音: 入'; } else { bgm.pause(); bgmBtn.textContent='♪ 町の音: 切'; } }
-  bgmBtn.addEventListener('click', ()=>{ S.bgm=!S.bgm; applyBgm(); save(); });
+  let bgmAttempt=0,bgmStarting=false;
+  function updateBgmButton(){
+    bgmBtn.textContent=!S.bgm?'♪ 町の音: 切':bgmStarting?'♪ 町の音: 読込中':bgm.error?'♪ 町の音: 再試行':bgm.paused?'♪ 町の音: 再生':'♪ 町の音: 入';
+  }
+  function applyBgm(){
+    const attempt=++bgmAttempt;
+    if(!S.bgm){bgmStarting=false;bgm.pause();updateBgmButton();return;}
+    if(opRunning)return;
+    if(bgm.error)bgm.load();bgm.volume=.35;bgmStarting=true;updateBgmButton();
+    bgm.play().then(()=>{if(attempt!==bgmAttempt)return;bgmStarting=false;updateBgmButton();}).catch(error=>{if(attempt!==bgmAttempt)return;bgmStarting=false;bgmBtn.dataset.playError=error.name;updateBgmButton();});
+  }
+  for(const event of ['playing','pause','error'])bgm.addEventListener(event,()=>{if(event==='playing'){bgmStarting=false;delete bgmBtn.dataset.playError;}if(event==='error')bgmStarting=false;updateBgmButton();});
+  document.addEventListener('click',e=>{if(e.target.closest('#bgmBtn,#op'))return;if(S.bgm&&!opRunning&&bgm.paused&&!bgmStarting)applyBgm();});
+  bgmBtn.addEventListener('click', ()=>{if(S.bgm&&bgm.paused&&!bgmStarting){applyBgm();return;}S.bgm=!S.bgm;if(!S.bgm)stopOpeningSound();applyBgm();save();});
   // 町の音の曲替え(v2第一弾 9/14): 眺めモードの夜だけ『月』、それ以外は昼の町の音。替えるときは1秒で音を落としてから
   const DAY_TRACK = 'audio/bgm_hiru.mp3';
   let switching = null;
@@ -459,7 +783,7 @@
     if(bgm.getAttribute('src') === want || switching === want) return;
     switching = want; const v0 = bgm.volume; let i = 0;
     const t = setInterval(()=>{ i++; bgm.volume = Math.max(0, v0 * (1 - i/10));
-      if(i >= 10){ clearInterval(t); bgm.setAttribute('src', want); bgm.load(); bgm.volume = 0.35; switching = null; if(S.bgm) bgm.play().catch(()=>{}); } }, 100);
+      if(i >= 10){ clearInterval(t); bgm.setAttribute('src', want); bgm.load(); bgm.volume = 0.35; switching = null; if(S.bgm)applyBgm(); } }, 100);
   }
 
   // 描画
@@ -470,51 +794,73 @@
       g.querySelector('.who').textContent = lv>=1 ? D[k].who : '';
     }
     document.querySelector('.plaza').classList.toggle('pulse', !S.lit.hiroba);
+    const crown=$('#plazaTree');if(crown)crown.style.opacity=S.lit.hiroba?'1':'.45';
     syncFigs();
+    renderTownGrowth();
   }
 
   // ───── 住人が歩く(第二段・9/6) ─────
   // 頼んだ人(と、広場が灯ったあとの翼樹)が町を歩く。灯った区画の間だけを行き来する
   // 建物の前の通り(区画の中の名札には乗らない)
   // 9/13 町の化粧に合わせて歩ける所を「建物の前の通り」に限定(建物の絵の上を通らない)
-  const CENTER = { ie:[135,212], hiroba:[360,340], ichiba:[135,452], oka:[585,452], tsumesho:[585,212] };
-  const ROAD = [[232,245],[488,245],[60,245],[660,245],[300,350],[420,350],[240,440],[480,440],[360,445],[600,245],[120,245]];
-  // 通りづたいの道筋: 上の通り(y245・広場の左右で切れる)/下の通り(y445)/左右の路地(x240・x480)。広場は下側を回り込む
-  const streetOf = p => p[1] < 300 ? 'top' : 'bot';
-  const laneX = x => x < 360 ? 240 : 480;
-  const inPlazaX = x => x > 232 && x < 488;
-  function planPath(from, to){
-    const path = []; const sF = streetOf(from), sT = streetOf(to);
-    if(sF === 'top' && sT === 'top'){
-      const sameSide = (from[0] < 360) === (to[0] < 360);
-      if(sameSide && !inPlazaX(from[0]) && !inPlazaX(to[0])) path.push([from[0],245],[to[0],245]);
-      else { const a = laneX(from[0]), b = laneX(to[0]); path.push([from[0],245],[a,245],[a,445],[b,445],[b,245],[to[0],245]); }
-    } else if(sF === 'top'){ const a = laneX(from[0]); path.push([from[0],245],[a,245],[a,445],[to[0],445]); }
-    else if(sT === 'top'){ const b = laneX(to[0]); path.push([from[0],445],[b,445],[b,245],[to[0],245]); }
-    else path.push([from[0],445],[to[0],445]);
-    path.push(to); return path;
+  const CENTER = {ie:[145,214],hiroba:[322,330],ichiba:[145,450],oka:[575,450],tsumesho:[575,214]};
+  const PATH_NODES={home:[145,214],west:[240,245],northwest:[305,220],north:[360,208],northeast:[415,220],east:[480,245],station:[575,214],southwest:[290,325],bench:[322,330],south:[360,347],southeast:[430,325],westlow:[240,450],market:[145,450],marketLeft:[128,450],marketRight:[162,450],eastlow:[480,450],hill:[575,450],quay:[360,450]};
+  const PATH_EDGES=[['market','marketLeft'],['market','marketRight'],['home','west'],['west','northwest'],['northwest','north'],['north','northeast'],['northeast','east'],['east','station'],['west','southwest'],['southwest','bench'],['bench','south'],['south','southeast'],['southeast','east'],['west','westlow'],['westlow','market'],['westlow','quay'],['quay','eastlow'],['eastlow','hill'],['eastlow','east'],['south','quay']];
+  const STOPS={ie:['home'],hiroba:['bench','northwest','southeast'],ichiba:['market'],oka:['hill'],tsumesho:['station']};
+  const STOP_LABEL={home:'玄関先でひと休み',bench:'ベンチのそばでひと休み',northwest:'木陰を眺める',southeast:'広場を眺める',market:'店先を眺める',hill:'丘から町を眺める',station:'詰所の前で立ち止まる'};
+  const BLOCKED_AREAS=[[35,55,235,195],[485,55,685,195],[35,295,220,432],[500,295,685,432],[335,242,385,283],[307,292,338,314]];
+  function nearestNode(p){return Object.keys(PATH_NODES).reduce((best,id)=>Math.hypot(p[0]-PATH_NODES[id][0],p[1]-PATH_NODES[id][1])<Math.hypot(p[0]-PATH_NODES[best][0],p[1]-PATH_NODES[best][1])?id:best,'home');}
+  function routeNodes(from,to){
+    const dist={},prev={},pending=new Set(Object.keys(PATH_NODES));for(const id of pending)dist[id]=Infinity;dist[from]=0;
+    while(pending.size){const u=[...pending].reduce((a,b)=>dist[a]<dist[b]?a:b);pending.delete(u);if(u===to)break;
+      for(const [a,b]of PATH_EDGES){const v=a===u?b:b===u?a:null;if(!v||!pending.has(v))continue;const d=dist[u]+Math.hypot(PATH_NODES[u][0]-PATH_NODES[v][0],PATH_NODES[u][1]-PATH_NODES[v][1]);if(d<dist[v]){dist[v]=d;prev[v]=u;}}
+    }
+    const route=[to];while(route[0]!==from){if(!prev[route[0]])return[from];route.unshift(prev[route[0]]);}return route;
   }
-  const BOXES = [[35,55,235,195],[485,55,685,195],[245,150,475,320],[35,295,235,435],[485,295,685,435]];   // 建物の絵の範囲(x0,y0,x1,y1)
-  function offBuilding(p){ let [x,y]=p; for(const [x0,y0,x1,y1] of BOXES){ if(x>x0-8 && x<x1+8 && y>y0 && y<y1+6){ y = y1 + 14 + Math.random()*10; } } return [x, Math.min(y, 466)]; }
+  function planPath(from,to){const a=nearestNode(from),b=nearestNode(to);return routeNodes(a,b).slice(1).map(id=>PATH_NODES[id].slice());}
   const HOME = { tsubaki:'hiroba', ignis:'ie', atlas:'oka', raven:'tsumesho', echo:'ichiba' };
   const FIG_FILL = { tsubaki:'#4A453C' };   // 翼樹だけ、ひと呼吸淡い墨
   const figs = {};   // id → {el, x,y, tx,ty, wait, speed}
   const litBlocks = () => ORDER.filter(k => S.lit[k]);
+  const MARKET_SEATS=['marketLeft','marketRight'];
+  function marketSeatAvailable(f,id){if(sceneVisit?.kind==='pair'&&MARKET_SEATS[sceneVisit.ids.indexOf(f.id)]!==id)return false;return rewardClaimed('lv25_market')&&!Object.values(figs).some(other=>other!==f&&other.destination===id);}
+  function benchAvailable(f){if(sceneVisit?.kind==='rest'&&!sceneVisit.ids.includes(f.id))return false;return rewardClaimed('lv15_bench')&&!Object.values(figs).some(other=>other!==f&&other.destination==='bench');}
+  const GROWTH_STOPS={hiroba:'southeast',ie:'home',ichiba:'market',oka:'hill',tsumesho:'station'};
+  const GROWTH_ACTIONS={tsubaki:'新しい彩りを眺める',ignis:'整った軒先を確かめる',atlas:'町の変化を記録する',raven:'新しい道沿いを見回る',echo:'育った景色を撮影する'};
+  function queueTownVisit(k){
+    const owner=Object.keys(HOME).find(id=>HOME[id]===k),f=figs[owner]||figs.tsubaki;
+    if(!f)return;
+    f.growthPending={k,stop:GROWTH_STOPS[k]};
+    if(!f.el.classList.contains('walk')&&!sceneVisit)f.wait=Math.min(f.wait,1);
+  }
+  function growthReaction(f){
+    const visit=f.growthReaction;
+    if(!visit||f.destination!==visit.stop)return false;
+    if($('#playSheet').open){f.wait=Math.max(f.wait,2);return false;}
+    if(!visit.arrived){visit.arrived=true;f.wait=Math.max(f.wait,8);}
+    f.el.classList.add('noticing');
+    f.el.querySelector('.activity').textContent=GROWTH_ACTIONS[f.id];
+    return true;
+  }
   function pickTarget(f){
-    const lit = litBlocks(); const home = HOME[f.id];
-    let k;
-    if(lit.length<=1 || Math.random()<0.45) k = S.lit[home] ? home : 'hiroba';
-    else k = lit[Math.floor(Math.random()*lit.length)];
-    if(Math.random()<0.3){ const r = ROAD[Math.floor(Math.random()*ROAD.length)]; return offBuilding([r[0]+(Math.random()*30-15), r[1]+(Math.random()*16-8)]); }
-    const c = CENTER[k]; return offBuilding([c[0]+(Math.random()*90-45), c[1]+(Math.random()*20-6)]);
+    f.el.classList.remove('seated','noticing');f.seatStarted=false;f.growthReaction=null;
+    if(sceneVisit?.kind==='pair'&&sceneVisit.ids.includes(f.id)){const seat=MARKET_SEATS[sceneVisit.ids.indexOf(f.id)];if(nearestNode([f.x,f.y])!==seat&&marketSeatAvailable(f,seat)){f.destination=seat;return PATH_NODES[seat].slice();}}
+    if(sceneVisit?.kind==='rest'&&sceneVisit.ids.includes(f.id)&&nearestNode([f.x,f.y])!=='bench'&&benchAvailable(f)){f.destination='bench';return PATH_NODES.bench.slice();}
+    if(f.growthPending&&!sceneVisit&&!$('#playSheet').open){const visit=f.growthPending;f.growthPending=null;f.growthReaction=visit;f.destination=visit.stop;return PATH_NODES[visit.stop].slice();}
+    const freeSeats=MARKET_SEATS.filter(id=>marketSeatAvailable(f,id)&&id!==nearestNode([f.x,f.y]));
+    if(freeSeats.length&&(!f.marketVisited||Math.random()<.4)){f.destination=freeSeats[0];return PATH_NODES[f.destination].slice();}
+    if(benchAvailable(f)&&nearestNode([f.x,f.y])!=='bench'&&(!f.benchVisited||Math.random()<.3)){f.destination='bench';return PATH_NODES.bench.slice();}
+    const lit=litBlocks(),home=HOME[f.id];const k=Math.random()<.45&&S.lit[home]?home:(lit[Math.floor(Math.random()*lit.length)]||'hiroba');
+    let choices=STOPS[k].filter(id=>id!==nearestNode([f.x,f.y])&&(id!=='bench'||!rewardClaimed('lv15_bench')||benchAvailable(f)));if(!choices.length)choices=STOPS.hiroba.filter(id=>id!==nearestNode([f.x,f.y])&&(id!=='bench'||!rewardClaimed('lv15_bench')||benchAvailable(f)));
+    const id=choices[Math.floor(Math.random()*choices.length)];f.destination=id;return PATH_NODES[id].slice();
   }
   function makeFig(id, name){
     const g = document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','fig');
     // 9/13 町の化粧: 人影を箱庭のミニキャラ(高解像度版)に。横向きを基本に、歩くと足違い、縦移動は前・後ろ姿
-    g.innerHTML = `<g class="bd"><image class="sp" href="img/chibi/hd/${id}_side.webp" x="-12" y="-30" width="24" height="30" preserveAspectRatio="xMidYMax meet"/></g><text x="0" y="12" text-anchor="middle" font-size="8" fill="#6B665C" letter-spacing="1">${name}</text>`;
+    g.innerHTML = `<g class="bd"><image class="sp" href="img/chibi/hd/${id}_side.webp" x="-12" y="-30" width="24" height="30" preserveAspectRatio="xMidYMax meet"/><path class="seated-legs" d="M-3 -10L6 -8L7 0 M1 -10L10 -7L11 0" fill="none" stroke="#49453F" stroke-width="3" stroke-linecap="round"/></g><text x="0" y="12" text-anchor="middle" font-size="8" fill="#6B665C" letter-spacing="1">${name}</text><text class="activity" x="0" y="22" text-anchor="middle" font-size="7" fill="#6B665C"></text>`;
     $('#figs').appendChild(g);
-    const home = CENTER[HOME[id]];
-    const f = { id, el:g, x:home[0]+(Math.random()*60-30), y:home[1]+(Math.random()*30-15), wait: 1+Math.random()*3, speed: 14+Math.random()*8 };
+    const home = CENTER[S.lit[HOME[id]]?HOME[id]:'hiroba'];
+    const f = { id, el:g, x:home[0], y:home[1], wait: 1+Math.random()*3, speed: 14+Math.random()*8 };
     f.tx=f.x; f.ty=f.y; f.el.setAttribute('transform', `translate(${f.x},${f.y})`); return f;
   }
   function syncFigs(){
@@ -530,10 +876,23 @@
       const dx=f.tx-f.x, dy=f.ty-f.y, d=Math.hypot(dx,dy);
       const sp = f.el.querySelector('.sp');
       if(d < 1.5){
+        f.x=f.tx;f.y=f.ty;f.el.setAttribute('transform',`translate(${f.x},${f.y})`);
+        if(f.growthPending&&!sceneVisit&&!$('#playSheet').open){const target=pickTarget(f);f.q=planPath([f.x,f.y],target);}
         if(f.q && f.q.length){ const n = f.q.shift(); f.tx=n[0]; f.ty=n[1]; if(Math.abs(f.tx-f.x) > 2) f.el.classList.toggle('flip', f.tx > f.x); continue; }   // 道筋の次の角へ(立ち止まらない)
         if(f.el.classList.contains('walk')){ f.el.classList.remove('walk'); sp.setAttribute('href', `img/chibi/hd/${f.id}_side.webp`); }
-        f.wait -= dt; if(f.wait<=0){ const tg = pickTarget(f); f.q = planPath([f.x,f.y], tg); const n = f.q.shift(); f.tx=n[0]; f.ty=n[1]; f.wait = 2+Math.random()*5; if(Math.abs(f.tx-f.x) > 2) f.el.classList.toggle('flip', f.tx > f.x); f.el.classList.add('walk'); f.step=0; }   // 横向きの絵は左向き→右へ歩く時だけ反転(9/13)
+        const inMarket=MARKET_SEATS.includes(f.destination);
+        const seated=inMarket?marketSeatAvailable(f,f.destination):f.destination==='bench'&&rewardClaimed('lv15_bench')&&benchAvailable(f);
+        f.el.classList.toggle('seated',seated&&f.id!=='echo');
+        if(seated){if(!f.seatStarted){f.wait=Math.max(f.wait,inMarket?22:8);f.seatStarted=true;}if(inMarket)f.marketVisited=true;else f.benchVisited=true;f.el.classList.remove('flip');sp.setAttribute('href','img/chibi/hd/'+f.id+'.webp');}
+        f.el.querySelector('.activity').textContent=seated&&f.id==='echo'?'ベンチのそばで撮影':seated?(inMarket?(Object.values(figs).some(other=>other!==f&&MARKET_SEATS.includes(other.destination)&&other.el.classList.contains('seated'))?'隣でひと休み':'市場でひと休み'):'ベンチでひと休み'):STOP_LABEL[f.destination]||'';
+        growthReaction(f);
+        if(seated&&!inMarket)noteFirstGiftUse('lv15_bench','広場のベンチを、住人が使ってくれました');
+        if(seated&&inMarket&&Object.values(figs).some(other=>other!==f&&MARKET_SEATS.includes(other.destination)&&other.el.classList.contains('seated')))noteFirstGiftUse('lv25_market','市場の休憩席で、二人が一緒にひと休み');
+        if(seated&&sceneVisit&&sceneVisit.ids.includes(f.id)&&((inMarket&&sceneVisit.kind==='pair')||(!inMarket&&sceneVisit.kind==='rest')))f.wait=Math.max(f.wait,2);
+        f.wait -= dt; if(f.wait<=0){ const tg = pickTarget(f); f.q = planPath([f.x,f.y], tg); const n = f.q.shift()||tg; f.tx=n[0]; f.ty=n[1]; f.wait = 5+Math.random()*6; if(Math.abs(f.tx-f.x) > 2) f.el.classList.toggle('flip', f.tx > f.x); f.el.classList.add('walk'); f.step=0; }   // 横向きの絵は左向き→右へ歩く時だけ反転(9/13)
       } else {
+        f.el.classList.remove('seated');
+        f.el.querySelector('.activity').textContent='';
         const st = Math.min(d, f.speed*dt); f.x += dx/d*st; f.y += dy/d*st;
         f.el.setAttribute('transform', `translate(${f.x.toFixed(1)},${f.y.toFixed(1)})`);
         // 絵の切り替え: 縦移動は前/後ろ姿、横移動は横向きと足違いを0.25秒ごとに
@@ -543,7 +902,9 @@
       }
     }
   }
-  setInterval(walk, 40);
+  const walkingStep=walk;
+  function depthSort(){const group=$('#figs');const children=[...group.children];const sorted=children.slice().sort((a,b)=>Number(a.dataset.depth||Object.values(figs).find(f=>f.el===a)?.y||0)-Number(b.dataset.depth||Object.values(figs).find(f=>f.el===b)?.y||0));if(sorted.some((el,i)=>el!==children[i]))for(const el of sorted)group.appendChild(el);}
+  setInterval(()=>{walkingStep();depthSort();},40);
 
   // ───── 眺めモード(全灯のあと・住人が歩き、時々声が漏れる) ─────
   const nagameBtn = $('#nagameBtn'); let nagameTimer = null;
@@ -566,7 +927,7 @@
     if(night && !S.got.s_tsuki){ S.got.s_tsuki = true; save(); }
     if(night && !moonOn){ moonOn = true; $('#moonSub').textContent = !NIGHT_SONG.file ? 'いま、歌になろうとしています' : S.bgm ? '♪ 町の音で、流れています' : '♪ 町の音を「入」にすると、流れます'; moonNote.hidden = false; clearTimeout(moonTimer); moonTimer = setTimeout(()=>{ moonNote.hidden = true; }, 9000); }
     if(!night){ moonOn = false; moonNote.hidden = true; }
-    syncBgmTrack();
+    syncBgmTrack(); applySceneWeather();
   }
   let moonOn = false, moonTimer = null;
   clockBtn.addEventListener('click', ()=>{ const i = TIMES.indexOf(S.timeMode || 'auto'); S.timeMode = TIMES[(i+1) % TIMES.length]; save(); applyTime(); });
@@ -581,12 +942,12 @@
   }
   nagameBtn.addEventListener('click', ()=> setNagame(!document.body.classList.contains('nagame')));
   $('#toNagame').addEventListener('click', ()=>{ $('#ending').classList.remove('show'); setNagame(true); });
-  function nagameUnlocked(){ return !!S.got.all || Q.get('nagame')==='1'; }
+  function nagameUnlocked(){ return townLevel()>=10 || !!S.got.all || Q.get('nagame')==='1'; }
   // 町の人: 枠は一度だけ作り、以後は中身だけ更新(作り直すと押下が消える)
   let knightsBuilt = false;
   function buildKnights(){
     const box=$('#knights'); box.innerHTML='';
-    for(const k of K){ const el=document.createElement('div'); el.className='kn'; el.dataset.id=k.id;
+    for(const k of K){ const el=document.createElement('div'); el.className='kn'; el.dataset.id=k.id; el.setAttribute('role','button'); el.tabIndex=0;
       el.innerHTML = `<div class="t"></div><div class="d">${k.desc}</div><div class="c"><span class="cost"></span><span class="lv"></span></div>`; box.appendChild(el); }
     box.addEventListener('pointerdown', e => {
       const el = e.target.closest('.kn'); if(!el) return; e.preventDefault();
@@ -594,19 +955,47 @@
       if(S.n < c) return;
       S.n -= c; S.up[k.id]++;
       if(lv===0){ const first = FIRST[k.name]; addKoe(k.name, first); showVoice(k.name, first); }
+      if(lv===0 && k.id==='ignis' && coachOpen) $('#playSheet').close();
       const r=el.getBoundingClientRect(), t=town.getBoundingClientRect(); 
       render(); save();
     });
     knightsBuilt = true;
   }
   function renderKnights(){
+    if($('#peoplePocket')) $('#peoplePocket').textContent=fmt(S.n);
     if(!knightsBuilt) buildKnights();
     for(const el of document.querySelectorAll('#knights .kn')){ const k=K.find(x=>x.id===el.dataset.id); const lv=S.up[k.id], c=cost(k), can=S.n>=c;
-      el.classList.toggle('can', can); el.classList.toggle('no', !can);
+      el.classList.toggle('can', can); el.classList.toggle('no', !can); el.setAttribute('aria-disabled',String(!can));
       const nm = lv>0 ? `<span class="nm">${k.name}</span>` : `<span>${k.role}</span>`;
       const t = `${nm}に ${k.act}`; if(el.querySelector('.t').innerHTML !== t) el.querySelector('.t').innerHTML = t;
       el.querySelector('.cost').textContent = `かけら ${fmt(c)} を渡す`; el.querySelector('.lv').textContent = lv? '×'+lv : '';
     }
+  }
+  let fudaFilter='all';
+  function matchesFudaFilter(got,seen){return fudaFilter==='all'||(fudaFilter==='new'&&got&&!seen)||(fudaFilter==='missing'&&!got);}
+  function fudaRequirement(who,i){
+    const k=ORDER.find(k=>D[k].who===who),line=fudaList(who)[i];
+    if(i>=8)return {text:sceneHint(i)+'。同じ場面を累計12秒ほど過ごすと届きます。',scene:['night','rest','pair','rain'][i-8]};
+    if(line===FIRST[who])return {text:who+'に初めて頼みごとをすると届きます。',action:'people'};
+    if(line===FINAL.line)return {text:'町の全灯（累計'+fmt(ALL_AT)+'かけら）で届きます。',action:'town'};
+    const stage=[V[who].s1,V[who].s2,V[who].s3].indexOf(line)+1;
+    if(stage)return {text:D[k].name+'の'+stage+'段階目の灯り（累計'+fmt(stageTarget(k,stage))+'かけら）で届きます。',action:'town'};
+    return {text:D[k].name+'が灯ったら、その場所を押すと時々届きます。「今日の札」でも未入手の声を優先します。',action:'town'};
+  }
+  function showFudaHint(who,i){
+    const hint=$('#fudaHint'),req=fudaRequirement(who,i);hint.hidden=false;hint.replaceChildren();
+    const title=document.createElement('strong');title.textContent=who+'・'+KANJI[i]+' の集め方';hint.appendChild(title);const p=document.createElement('p');p.textContent=req.text;hint.appendChild(p);
+    const button=(text,data,value)=>{const b=document.createElement('button');b.type='button';b.textContent=text;b.dataset[data]=value;hint.appendChild(b);};
+    if(req.scene==='pair'){for(const pair of PAIR_CARDS.filter(p=>p.who.includes(who)))button(pair.who.join(' × ')+'の場面へ','pair',pair.id);}
+    else if(req.scene)button({night:'夜を眺める',rest:'この人の休憩を眺める',rain:'雨を眺める'}[req.scene],'scene',req.scene);
+    else button(req.action==='people'?'頼みごとを開く':'町に戻る','hintAction',req.action);
+    const help=document.createElement('p');help.id='hintHelp';help.setAttribute('role','status');hint.appendChild(help);hint.tabIndex=-1;hint.focus({preventScroll:true});hint.scrollIntoView({block:'nearest'});
+  }
+  function initPortraitViewer(){
+    const dialog=document.createElement('dialog');dialog.id='portraitDialog';dialog.setAttribute('aria-labelledby','portraitTitle');dialog.innerHTML='<form method="dialog"><strong id="portraitTitle"></strong><button aria-label="絵を閉じる">閉じる</button></form><img id="portraitImage" alt="">';document.body.appendChild(dialog);
+    let opener=null;$('#cards').addEventListener('click',e=>{const card=e.target.closest('[data-gallery]');if(!card||!S.got['e_'+card.dataset.gallery])return;const d=D[card.dataset.gallery];opener=card;$('#portraitTitle').textContent=d.who+'の絵';$('#portraitImage').src=d.img;$('#portraitImage').alt=d.who;dialog.showModal();});
+    dialog.addEventListener('close',()=>{if(opener?.isConnected)opener.focus();});
+    $('#p-koe').addEventListener('keydown',e=>{const card=e.target.closest('.fuda[role="button"]');if(card&&(e.key==='Enter'||e.key===' ')){e.preventDefault();card.click();}});
   }
   function renderCollect(){
     // 声の札(第三段): 集めた声は札に、まだの声は空札に。押すと大きく開く
@@ -620,10 +1009,11 @@
       b.innerHTML = `<img src="${CHIBI[who]}" alt=""><span class="n">${st.got? who : '?'}</span><span class="c">${st.got} / ${st.all}</span>` + (st.neu? `<span class="nb">新${st.neu}</span>` : ''); row.appendChild(b); }
     const grid=document.createElement('div'); grid.className='fudas';
     fudaList(fudaWho).forEach((l,i)=>{ const who=fudaWho; const got=(S.koe[who]||[]).includes(l); const seen=(S.seenKoe[who]||[]).includes(l);
-      const d=document.createElement('div'); d.className='fuda'+(got?' got':' locked')+(got&&!seen?' new':''); d.dataset.who=who; d.dataset.i=i;
-      d.innerHTML = (got? chibiImg(who,i) : '') + `<div class="tx"><div class="no"><i></i>${got? who : '?'}・${KANJI[i]}</div><div class="ln">${got? l : '、、、'}</div></div><div class="rule"></div>`;
+      if(!matchesFudaFilter(got,seen))return;
+      const d=document.createElement('div');d.setAttribute('role','button');d.tabIndex=0;d.setAttribute('aria-label',who+'・'+KANJI[i]+(got?'を開く':'の集め方')); d.className='fuda'+(got?' got':' locked')+(got&&!seen?' new':''); d.dataset.who=who; d.dataset.i=i;
+      d.innerHTML = (got? chibiImg(who,i) : '') + `<div class="tx"><div class="no"><i></i>${got? who : '?'}・${KANJI[i]}</div><div class="ln">${got? l : i>=8?sceneHint(i):'、、、'}</div></div><div class="rule"></div>`;
       grid.appendChild(d); });
-    if(have>=total){ const d=document.createElement('div'); d.className='fuda got special'; d.dataset.who='all';
+    if(fudaFilter==='all'&&ALLWHO.every(w=>baseFudaList(w).every(l=>(S.koe[w]||[]).includes(l)))){ const d=document.createElement('div'); d.className='fuda got special'; d.dataset.who='all';
       d.innerHTML = ALLWHO.map(w=>`<img src="${CHIBI[w]}" alt="">`).join('') + `<div class="tx"><div class="no"><i></i>特別</div><div class="ln">すべての声が、そろった</div></div>`; grid.prepend(d); }
     const h=document.createElement('div'); h.className='lead'; h.textContent=`声の札 ${have} / ${total}(灯った場所を押すと、時々漏れます。顔を押すと、その人の札が開きます)`; p.appendChild(h);
     // 今日の札(v2第一弾 9/14): 広場が灯ったら、一日一枚めくれる
@@ -631,10 +1021,18 @@
       dl.innerHTML = done ? `<span>今日の札は、${S.daily.who}・${KANJI[S.daily.i]}${S.daily.neu ? '(新しい声)' : ''}</span><button id="dailyBtn" class="again">もう一度、見る</button>`
                           : `<span>一日一枚、声が届きます</span><button id="dailyBtn">今日の札を、めくる</button>`;
       p.appendChild(dl); }
-    p.appendChild(row); p.appendChild(grid);
+    p.appendChild(row);
+    const filters=document.createElement('div');filters.className='fuda-filters';filters.setAttribute('aria-label','札の絞り込み');
+    for(const [id,label]of [['all','全部'],['new','新しく届いた札'],['missing','未入手']]){const b=document.createElement('button');b.dataset.fudaFilter=id;b.textContent=label;b.setAttribute('aria-pressed',String(id===fudaFilter));filters.appendChild(b);}p.appendChild(filters);
+    const hint=document.createElement('section');hint.id='fudaHint';hint.hidden=true;p.appendChild(hint);
+    if(!grid.children.length){const empty=document.createElement('p');empty.className='fuda-empty';empty.setAttribute('role','status');empty.textContent=fudaFilter==='new'?fudaWho+'の新しい札は、すべて読みました。':fudaWho+'の札は、すべて集まりました。';p.appendChild(empty);}
+    p.appendChild(grid);
+    const scenes=document.createElement('div');scenes.className='scene-guide';scenes.innerHTML='<p>場面の札：同じ場面を少し眺めると届きます。途中までの時間も保存されます。</p><button data-scene="night">夜を眺める</button> <button data-scene="rain">雨を眺める</button> <button data-scene="rest">休憩を眺める</button><p id="sceneHelp"></p>';
+    for(const pair of PAIR_CARDS){const ready=pairReady(pair),b=document.createElement('button');b.dataset.pair=pair.id;b.textContent=ready?'二人の札：'+pair.who.join(' × '):pair.who.join(' × ')+'　'+pair.who.filter(w=>hasScene(w,2)).length+'/2（十一）・会う場面へ';scenes.appendChild(b);}
+    if(have===60){const badge=document.createElement('p');badge.className='collection-complete';badge.textContent='声の札 六十枚 達成 — 五人の暮らしを見届けました';scenes.appendChild(badge);}p.appendChild(scenes);
     // 絵
     const c=$('#cards'); c.innerHTML='';
-    for(const k of ORDER){ const got=S.got['e_'+k]; const d=document.createElement('div'); d.className='card'+(got?'':' locked');
+    for(const k of ORDER){ const got=S.got['e_'+k]; const d=document.createElement(got?'button':'div');if(got){d.type='button';d.dataset.gallery=k;d.setAttribute('aria-label',D[k].who+'の絵を大きく見る');} d.className='card'+(got?'':' locked');
       d.innerHTML = got ? `<img src="${D[k].img}" alt="${D[k].who}"><div class="nm">${D[k].who}</div>` : `<div class="ph">${D[k].name}が<br>濃くなると</div><div class="nm">?</div>`; c.appendChild(d); }
     // 歌
     const s=$('#songs'); s.innerHTML='';
@@ -650,12 +1048,14 @@
     s.querySelectorAll('button[data-file]').forEach(b=>b.addEventListener('click', ()=>{ $('#player').innerHTML = `<audio controls autoplay src="${b.dataset.file}" style="width:100%"></audio>`; stopBgm(); }));
   }
   let collectSig = '';
-  function render(){ nagameBtn.hidden = !nagameUnlocked(); $('#cnt').textContent=fmt(S.n); $('#ps').textContent=fmt(perSec()); $('#pt').textContent=fmt(perTap()); renderTown(); renderKnights();
+  function render(){ nagameBtn.hidden = !nagameUnlocked(); $('#cnt').textContent=fmt(S.n); $('#ps').textContent=fmt(perSec()); $('#pt').textContent=fmt(perTap()); renderTown(); renderKnights(); renderJourney();
     const sig = JSON.stringify([S.got, S.koe, S.lit, S.seenKoe]); if(sig !== collectSig){ collectSig = sig; renderCollect(); } }
   // 札を開く(大きな一枚)
+  let returnToFudaBook=false;
   function openFuda(who, i){
     const card=$('#fudaCard');
-    if(who==='all'){ card.className='card2 sp'; card.innerHTML = `<img class="wide" src="img/chibi/sp/tokubetsu.webp" alt=""><div class="tx"><div class="no"><i></i>特別</div><div class="ln">すべての声が、そろった</div></div>`; }   // 9/13 特別札=広場のベンチの午後(五人)
+    if(who.startsWith('pair:')){const pair=PAIR_CARDS.find(p=>p.id===who.slice(5));if(!pair||!pairReady(pair))return;card.className='card2 sp pair-card';card.innerHTML='<img class="wide" src="img/chibi/pose/pair_'+pair.id+'.webp" alt="'+pair.who.join('と')+'"><div class="tx">'+pair.who.map(w=>'<div class="no">'+w+'・十一</div><div class="ln">'+V2_LINES[w][2]+'</div>').join('')+'</div>';for(const w of pair.who)markSeen(w,V2_LINES[w][2]);}
+    else if(who==='all'){ card.className='card2 sp'; card.innerHTML = `<img class="wide" src="img/chibi/sp/tokubetsu.webp" alt=""><div class="tx"><div class="no"><i></i>特別</div><div class="ln">すべての声が、そろった</div></div>`; }   // 9/13 特別札=広場のベンチの午後(五人)
     else { const l=fudaList(who)[i]; card.className='card2'; card.innerHTML = chibiImg(who,i) + `<div class="tx"><div class="no"><i></i>${who}・${KANJI[i]}</div><div class="ln">${l}</div></div><div class="rule"></div>`; markSeen(who, l); }
     $('#fudaBig').classList.add('show');
   }
@@ -673,24 +1073,117 @@
     save(); openFuda(pick.who, pick.i);
   }
   $('#p-koe').addEventListener('click', e=>{
+    const filter=e.target.closest('[data-fuda-filter]');if(filter){fudaFilter=filter.dataset.fudaFilter;collectSig='';render();document.querySelector('[data-fuda-filter="'+fudaFilter+'"]').focus({preventScroll:true});return;}
+    const hintAction=e.target.closest('[data-hint-action]');if(hintAction){if(hintAction.dataset.hintAction==='people')openSheet('people');else{$('#playSheet').close();$('.blk[data-k="'+ORDER.find(k=>D[k].who===fudaWho)+'"]').focus();}return;}
+    const missing=e.target.closest('.fuda.locked');if(missing){showFudaHint(missing.dataset.who,Number(missing.dataset.i));return;}
+    const scene=e.target.closest('[data-scene]'),pairButton=e.target.closest('[data-pair]');
+    if(scene){startSceneVisit(scene.dataset.scene);return;}if(pairButton){const pair=PAIR_CARDS.find(p=>p.id===pairButton.dataset.pair);if(pairReady(pair)){returnToFudaBook=true;$('#playSheet').close();openFuda('pair:'+pair.id,0);}else startSceneVisit('pair',pair);return;}
     if(e.target.closest('#dailyBtn')){ drawDaily(); collectSig=''; render(); return; }
     const w=e.target.closest('.fw'); if(w){ fudaWho=w.dataset.who; collectSig=''; render(); return; }
     const d=e.target.closest('.fuda.got'); if(!d) return; openFuda(d.dataset.who, Number(d.dataset.i)); });
-  $('#fudaBig').addEventListener('click', ()=>{ $('#fudaBig').classList.remove('show'); render(); });
+  $('#fudaBig').addEventListener('click', ()=>{ $('#fudaBig').classList.remove('show'); render();if(returnToFudaBook){returnToFudaBook=false;openSheet('collection');} });
 
+  const CLICK_SETS=[
+    {id:'night',title:'夜の灯り',kind:'level',costs:[30,60,100,160,220],names:['玄関の灯り','市場の灯り','丘への灯り','詰所の灯り','広場の灯り'],seal:'夜景の記念印'},
+    {id:'flowers',title:'五つの椿飾り',kind:'shards',costs:[10000,20000,40000,70000,100000],names:['広場の紅椿','家の椿鉢','市場の椿鉢','丘の椿鉢','詰所の椿鉢'],seal:'椿めぐりの記念印'},
+    {id:'bunting',title:'町の祝い飾り',kind:'shards',costs:[150000,220000,320000,450000,600000],names:['広場の花旗','家の軒飾り','市場の祝い旗','丘の道飾り','詰所の紅旗'],seal:'彩りの町の記念印'}
+  ];
+  let tapBloomTimer=null,clickSetSignature='',lastPetalCount=-1;
+  function tapState(){
+    if(!S.tapBloom||typeof S.tapBloom!=='object'||Array.isArray(S.tapBloom))S.tapBloom={};
+    S.tapBloom.count=Math.max(0,Math.floor(Number(S.tapBloom.count)||0))%40;
+    S.tapBloom.full=Math.max(0,Math.floor(Number(S.tapBloom.full)||0));return S.tapBloom;
+  }
+  function collectTap(random=Math.random){
+    const t=tapState(),base=perTap();t.count++;
+    const full=t.count===40,lucky=!full&&random()<.06;
+    const amount=base*(full?11:lucky?5:1);gain(amount);
+    if(full){t.count=0;t.full++;}return {amount,full,lucky};
+  }
+  function setCount(id){return Math.max(0,Math.min(5,Math.floor(Number(S.clickSets?.[id])||0)));}
+  function claimSet(id){
+    const set=CLICK_SETS.find(s=>s.id===id);if(!set)return false;const count=setCount(id);if(count>=5)return false;
+    const price=set.costs[count];if(set.kind==='level'?townLevel()<price:!S.got.all||S.n<price)return false;
+    if(!S.clickSets||typeof S.clickSets!=='object'||Array.isArray(S.clickSets))S.clickSets={};
+    if(set.kind==='shards')S.n-=price;S.clickSets[id]=count+1;save();return true;
+  }
+  function renderTapBloom(){if(!$('#tapBloom').classList.contains('lit')){const n=tapState().count;if(n===lastPetalCount)return;lastPetalCount=n;$('#tapBloom').innerHTML='<svg aria-hidden="true" viewBox="-12 -12 24 24" width="20" height="20" style="vertical-align:middle">'+[0,1,2,3,4].map(i=>'<ellipse cy="-5" rx="3.5" ry="6" transform="rotate('+(i*72)+')" fill="'+(n>i*8?'#B0413E':'#D0C5B6')+'"/>').join('')+'<circle r="2" fill="#D5B77C"/></svg> 満開まで '+(40-n)+' 回';}}
+  function initClickRewards(){
+    const flower=document.createElement('span');flower.id='tapBloom';flower.title='40回押すと満開。10回分のかけらを追加で受け取れます。途中の回数は保存されます。';$('#nearbyGoal')?.before(flower);
+    if(!flower.isConnected)document.querySelector('.journey').appendChild(flower);
+    const shelf=document.createElement('section');shelf.id='clickSets';shelf.className='reward-sets';shelf.innerHTML='<h3>町のコレクション</h3><p>灯りはレベルの贈り物。椿と祝い飾りは、全灯後にかけらで集められます。飾りは町に自動で増えます。</p><p>手元のかけら <strong id="setPocket"></strong></p><div id="setRows"></div><p id="setMessage" role="status"></p>';document.querySelector('[data-section="gifts"]').appendChild(shelf);
+    shelf.addEventListener('click',e=>{const b=e.target.closest('[data-set]');if(!b)return;const set=CLICK_SETS.find(s=>s.id===b.dataset.set),n=setCount(set.id);if(!claimSet(set.id))return;render();$('#setMessage').textContent=set.names[n]+'が町に増えました。'+(setCount(set.id)===5?set.title+'コンプリート！ '+set.seal+'を獲得しました。':'');const next=document.querySelector('[data-set="'+set.id+'"]');if(next)next.focus({preventScroll:true});});
+    const guide=document.createElement('p');guide.textContent='40回押すと椿が満開になり、その時の一押し10回分が追加で届きます。回数は途中で閉じても保存。ときどき一押しが5倍の「大きな灯り」になります。速さや連続タップは条件になりません。';document.querySelector('[data-section="info"]').appendChild(guide);
+  }
+  function renderClickRewards(){
+    renderTapBloom();$('#setPocket').textContent=fmt(S.n);
+    const sig=JSON.stringify(CLICK_SETS.map(s=>[setCount(s.id),s.kind==='level'?townLevel()>=s.costs[setCount(s.id)]:S.got.all&&S.n>=s.costs[setCount(s.id)]]));
+    if(sig===clickSetSignature)return;clickSetSignature=sig;
+    $('#setRows').innerHTML=CLICK_SETS.map(s=>{const n=setCount(s.id),price=s.costs[n],ready=n<5&&(s.kind==='level'?townLevel()>=price:S.got.all&&S.n>=price);return '<div><h3>'+s.title+' '+n+' / 5</h3>'+s.names.map((name,i)=>'<span style="color:'+(i<n?'var(--beni)':'var(--soft)')+'">'+(i<n?'✿':'○')+' '+name+'　</span>').join('')+(n===5?'<p class="set-seal">✿ コンプリート · '+s.seal+'</p>':'<div class="set-row"><span>'+s.names[n]+'<br>'+(s.kind==='level'?'Lv.'+price+'の贈り物（消費なし）':fmt(price)+' かけら'+(!S.got.all?' · 全灯後に解放':''))+'</span><button data-set="'+s.id+'" '+(ready?'':'disabled')+'>'+(s.kind==='level'?'受け取る':'集める')+'</button></div>')+'</div>';}).join('');
+    renderSetArt();
+  }
+  function renderSetArt(){
+    const ns='http://www.w3.org/2000/svg';let layer=$('#setArt');if(!layer){layer=document.createElementNS(ns,'g');layer.id='setArt';layer.setAttribute('class','garden-decoration');$('#map').insertBefore(layer,$('#figs'));}
+    const lights=[[205,214],[203,440],[515,450],[514,212],[433,325]],spots=[[280,300],[65,192],[80,423],[550,424],[650,192]];
+    let art='';for(let i=0;i<setCount('night');i++){const [x,y]=lights[i];art+='<g transform="translate('+x+','+y+')">'+STREET_LAMP_ART+'</g>';}
+    for(let i=0;i<setCount('flowers');i++){const [x,y]=spots[i];art+='<g transform="translate('+x+','+y+')"><path d="M-10-4H10L7 4H-7Z" fill="#AA9680"/>'+[-8,0,8].map((dx,j)=>'<use href="#camellia" x="'+dx+'" y="'+(-19-j%2*5)+'" width="10" height="10"/>').join('')+'</g>';}
+    for(let i=0;i<setCount('bunting');i++){const [x,y]=spots[i];art+='<g transform="translate('+(x+22)+','+y+')"><path d="M0 0V-42M0-40H22" fill="none" stroke="#756C5D" stroke-width="2"/><path d="M2-40H22V-20L12-26L2-20Z" fill="#B0413E"/><use href="#camellia" x="7" y="-37" width="10" height="10"/></g>';}
+    layer.innerHTML=art;
+    let glow=$('#setNightLights');if(!glow){glow=document.createElementNS(ns,'svg');glow.id='setNightLights';glow.setAttribute('viewBox','0 0 720 480');glow.setAttribute('class','night-lamp-light');glow.setAttribute('aria-hidden','true');town.appendChild(glow);}
+    glow.innerHTML='<defs><radialGradient id="setGlow"><stop stop-color="#F3CBA7" stop-opacity=".6"/><stop offset="1" stop-color="#F3CBA7" stop-opacity="0"/></radialGradient></defs>'+lights.slice(0,setCount('night')).map(([x,y])=>'<circle cx="'+x+'" cy="'+(y-36)+'" r="24" fill="url(#setGlow)"/><path d="M'+(x-4)+' '+(y-42)+'h8l-1 12h-6Z" fill="#F0C7A5"/>').join('');
+  }
+
+  // Short cached tap sample; bounded voices keep repeated taps quiet and cheap.
+  let tapContext=null,tapBuffer=null,tapLoading=null,tapLast=-1;
+  const tapVoices=new Set();
+  let bloomBuffer=null,bloomLoading=null,bloomVoice=null;
+  function stopTapSounds(){if(bloomVoice){try{bloomVoice.stop();}catch{}bloomVoice.disconnect();bloomVoice=null;}for(const v of tapVoices){try{v.stop();}catch{}v.disconnect();}tapVoices.clear();}
+  function prepareTapSound(){
+    if(!S.tapSound)return Promise.resolve();
+    try{
+      if(!tapContext)tapContext=new (window.AudioContext||window.webkitAudioContext)();
+      const resumed=tapContext.resume();
+      if(!tapLoading)tapLoading=fetch('audio/tap_wood_b.wav').then(r=>{if(!r.ok)throw Error('tap audio');return r.arrayBuffer();}).then(b=>tapContext.decodeAudioData(b)).then(b=>{tapBuffer=b;}).catch(()=>{tapLoading=null;});
+      if(!bloomLoading)bloomLoading=fetch('audio/bloom_koto_b.wav').then(r=>{if(!r.ok)throw Error('bloom audio');return r.arrayBuffer();}).then(b=>tapContext.decodeAudioData(b)).then(b=>{bloomBuffer=b;}).catch(()=>{bloomLoading=null;});
+      return Promise.all([resumed,tapLoading,bloomLoading]).catch(()=>{});
+    }catch{return Promise.resolve();}
+  }
+  function playBloomSound(){
+    if(!S.tapSound||document.hidden)return;
+    prepareTapSound();
+    if(!bloomBuffer||tapContext.state!=='running')return;
+    stopTapSounds();
+    const voice=tapContext.createBufferSource(),gain=tapContext.createGain();
+    voice.buffer=bloomBuffer;gain.gain.value=.45;voice.connect(gain);gain.connect(tapContext.destination);bloomVoice=voice;
+    voice.onended=()=>{if(bloomVoice===voice)bloomVoice=null;voice.disconnect();gain.disconnect();};voice.start();
+  }
+  function playTapSound(){
+    if(!S.tapSound||document.hidden)return;
+    prepareTapSound();
+    if(!tapBuffer||tapContext.state!=='running')return;
+    const now=tapContext.currentTime;if(now-tapLast<.045)return;tapLast=now;
+    if(tapVoices.size>=2){const first=tapVoices.values().next().value;first.stop();first.disconnect();tapVoices.delete(first);}
+    const voice=tapContext.createBufferSource(),gain=tapContext.createGain();
+    voice.buffer=tapBuffer;gain.gain.value=.45;voice.connect(gain);gain.connect(tapContext.destination);tapVoices.add(voice);
+    voice.onended=()=>{tapVoices.delete(voice);voice.disconnect();gain.disconnect();};voice.start();
+  }
+  document.addEventListener('click',()=>{if(S.tapSound)prepareTapSound();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopTapSounds();});
   // タップ
   let lastLeak=0;
   $('#map').addEventListener('pointerdown', e => {
-    const g=e.target.closest('.blk'); if(!g) return; const k=g.dataset.k;
+    const g=e.target.closest('.blk'); const k=g?g.dataset.k:'hiroba';
     if(k!=='hiroba' && !S.lit[k]) return;
-    const v=perTap(); gain(v); const r=town.getBoundingClientRect(); burst(e.clientX-r.left, e.clientY-r.top, fmt(v));
+    if(e.isPrimary===false||e.button>0)return;
+    const reward=collectTap();if(reward.full)playBloomSound();else playTapSound();const r=town.getBoundingClientRect();burst(e.clientX-r.left,e.clientY-r.top,fmt(reward.amount));
+    if(reward.full||reward.lucky){$('#tapBloom').textContent=reward.full?'✿ 満開！ +'+fmt(reward.amount):'✦ 大きな灯り！ +'+fmt(reward.amount);$('#tapBloom').classList.add('lit');clearTimeout(tapBloomTimer);tapBloomTimer=setTimeout(()=>{$('#tapBloom').classList.remove('lit');lastPetalCount=-1;renderTapBloom();},1700);}
     // 灯った区画から、時々声が漏れる
     // 灯った区画から、時々声が漏れる(クリア後は漏れやすく・未収集の声を優先)
     const leakP = S.ended ? 0.35 : 0.18, leakGap = S.ended ? 1500 : 2500;
     if(S.lit[k] && Date.now()-lastLeak>leakGap && Math.random()<leakP){ lastLeak=Date.now(); const who=D[k].who, pool=V[who].r;
       const have=S.koe[who]||[]; const rest=pool.filter(x=>!have.includes(x)); const src = rest.length? rest : pool;
       const l=src[Math.floor(Math.random()*src.length)]; addKoe(who,l); showVoice(who,l); }
-    checkStages(); render(); if(Math.random()<0.2) save();
+    checkStages(); render(); save();
   });
   document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x===t)); document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on', p.id==='p-'+t.dataset.p)); }));
   $('#reset').addEventListener('click', ()=>{ if(confirm('町を白黒に戻しますか?(集めたものも消えます)')){ localStorage.removeItem(KEY); location.reload(); } });
@@ -707,29 +1200,53 @@
     else { p.style.left=(Math.random()*100)+'vw'; }
     p.style.setProperty('--sx', (Math.random()*160-80)+'px'); p.style.setProperty('--rot', (Math.random()*720-360)+'deg');
     p.style.animationDuration=(OP_MODE==='fall' ? 4+Math.random()*4 : 3.5+Math.random()*3.5)+'s'; p.style.animationDelay=(Math.random()*(OP_MODE==='fall'?1.8:2.4))+'s'; op.appendChild(p); setTimeout(()=>p.remove(), 10000); } }
+  let openingStarted=false,openingContext=null,openingGain=null,openingBuffer=null,openingLoad=null,openingSource=null,openingRun=0,openingPlayed=false;
+  function stopOpeningSound(){
+    openingRun++;if(openingSource){const source=openingSource;openingSource=null;source.onended=null;try{source.stop();}catch{}source.disconnect();}op.dataset.soundState='stopped';
+  }
+  async function prepareOpeningSound(){
+    if(!openingContext){openingContext=new (window.AudioContext||window.webkitAudioContext)();openingGain=openingContext.createGain();openingGain.gain.value=.35*.55;openingGain.connect(openingContext.destination);}
+    const resume=openingContext.resume();
+    if(!openingLoad){openingLoad=fetch('audio/op_koto.mp3').then(r=>{if(!r.ok)throw Error('Koto load failed');return r.arrayBuffer();}).then(bytes=>openingContext.decodeAudioData(bytes)).then(buffer=>{openingBuffer=buffer;return buffer;}).catch(e=>{openingLoad=null;throw e;});}
+    await Promise.all([resume,openingLoad]);
+  }
+  function playPetalSound(){
+    if(openingPlayed||!S.bgm||document.hidden||!opRunning||!openingBuffer||openingContext?.state!=='running')return;
+    openingPlayed=true;const source=openingContext.createBufferSource();openingSource=source;source.buffer=openingBuffer;source.loop=false;source.connect(openingGain);
+    op.dataset.soundState='playing';source.onended=()=>{source.disconnect();if(openingSource===source){openingSource=null;op.dataset.soundState='ended';}};source.start();
+  }
+  async function startOpening(withSound){
+    if(openingStarted||!opRunning)return;openingStarted=true;S.bgm=!!withSound;S.tapSound=!!withSound;updateTapButton();S.got.bgmAsked=true;save();$('#openingChoice').hidden=true;bgm.pause();openingPlayed=false;const run=openingRun;
+    if(S.bgm){op.dataset.soundState='loading';try{await prepareOpeningSound();}catch{op.dataset.soundState='unavailable';}}
+    if(run!==openingRun||!opRunning||document.hidden)return;
+    if(op.dataset.soundState!=='unavailable')op.dataset.soundState=withSound?'ready':'muted';
+    const at=(ms,fn)=>opTimers.push(setTimeout(fn,ms));
+    at(600,()=>$('#op1').classList.add('on'));at(2400,()=>$('#op2').classList.add('on'));at(4300,()=>$('#opDot').classList.add('on'));
+    at(5000,()=>petals(28));at(6000,()=>{if(withSound)playPetalSound();});at(5600,()=>$('#opTitle').classList.add('on'));at(7000,()=>$('#opGo').classList.add('on'));
+  }
   function runOpening(){
     op.classList.add('show'); op.classList.toggle('wind', OP_MODE==='wind'); op.classList.toggle('diag', OP_MODE==='diag'); opRunning=true;
-    const at=(ms,fn)=>opTimers.push(setTimeout(fn,ms));
-    at(600, ()=>$('#op1').classList.add('on'));
-    at(2400, ()=>$('#op2').classList.add('on'));
-    at(4300, ()=>$('#opDot').classList.add('on'));
-    at(5000, ()=>petals(28));
-    at(5600, ()=>$('#opTitle').classList.add('on'));
-    at(7000, ()=>$('#opGo').classList.add('on'));
+    stopOpeningSound();opTimers.forEach(clearTimeout);opTimers=[];openingStarted=false;bgm.pause();
+    for(const id of ['op1','op2','opDot','opTitle','opGo'])$('#'+id).classList.remove('on');op.querySelectorAll('.petal').forEach(p=>p.remove());
+    let choices=$('#openingChoice');if(!choices){choices=document.createElement('div');choices.id='openingChoice';choices.innerHTML='<p>色灯し</p><button type="button" data-opening="sound">音ありで、はじめる</button><button type="button" data-opening="silent">音なしで、はじめる</button>';op.appendChild(choices);choices.addEventListener('pointerdown',e=>e.stopPropagation());choices.addEventListener('click',e=>{const button=e.target.closest('[data-opening]');if(button)startOpening(button.dataset.opening==='sound');});}choices.hidden=false;
+
   }
-  function endOpening(){ opTimers.forEach(clearTimeout); opTimers=[]; op.classList.remove('show'); opRunning=false; S.opDone=true; save(); if(!S.navDone) showNav(0); }
-  op.addEventListener('pointerdown', ()=>{ if(opRunning) endOpening(); });
+  function endOpening(){ stopOpeningSound(); opTimers.forEach(clearTimeout); opTimers=[]; op.classList.remove('show'); opRunning=false; S.opDone=true; save(); if(S.bgm)applyBgm(); if(!S.navDone) showNav(0); }
+  op.addEventListener('click', e=>{if(e.target.closest('#openingChoice'))return;if(opRunning&&openingStarted)endOpening();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopOpeningSound();});
   // 導入ナビ
   const NAV = ['この町は、白黒です。\nまん中の「広場」を、押してみてください。', '押すと「感情のかけら」が集まります。\nかけらが集まると、町に色が灯ります。', 'かけらを「町の人」に渡すと、\n頼まなくても集まるようになります。\n\n灯った場所からは、声と絵と歌が漏れます。'];
   let navI=0;
-  function showNav(i){ navI=i; $('#navText').innerHTML = NAV[i].replace(/\n/g,'<br>'); $('#navDots').textContent = NAV.map((_,j)=> j===i?'●':'○').join(' '); $('#navNext').textContent = i===NAV.length-1 ? 'はじめる' : 'つぎへ'; $('#nav').classList.add('show'); }
-  $('#navNext').addEventListener('click', ()=>{ if(navI<NAV.length-1) showNav(navI+1); else { $('#nav').classList.remove('show'); S.navDone=true; save(); } });
-  $('#navSkip').addEventListener('click', ()=>{ $('#nav').classList.remove('show'); S.navDone=true; save(); });
-  $('#help').addEventListener('click', ()=> showNav(0));
+  function showNav(){ coachOpen=true; $('#nav').classList.remove('show'); renderJourney(); $('#coach').scrollIntoView({block:'nearest'}); }
+  $('#navNext').addEventListener('click', ()=>showNav());
+  $('#navSkip').addEventListener('click', ()=>finishCoach());
+  $('#help').addEventListener('click', ()=>showNav());
 
   // ループ
   setInterval(()=>{ const v=perSec(); if(v>0){ gain(v/4); checkStages(); render(); } ravenTick(Date.now()); }, 250);
   setInterval(save, 5000);
+  window.addEventListener('pagehide',save);
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(); });
 
   // ───── 灯り方(第四段 9/13): 段が上がると、絵の中の灯りや花が紅にともる ─────
   // 座標は建物の絵(png)の画素で書く。画面座標への換算は下で自動(xMidYMax meet と同じ計算)
@@ -745,6 +1262,7 @@
   (function buildAccents(){
     const NS='http://www.w3.org/2000/svg';
     for(const k in ACC){
+      if(['ie','hiroba','ichiba','oka','tsumesho'].includes(k))continue;
       const [bx,by,bw,bh,W,H,W0] = IMGBOX[k]; const s = Math.min(bw/W, bh/H); const ox = bx + (bw - W*s)/2, oy = by + bh - H*s; const kx = W/(W0||W);
       const M = (x,y) => [ox + x*kx*s, oy + y*s];
       const g = document.createElementNS(NS,'g'); g.setAttribute('class','acc');
@@ -761,8 +1279,393 @@
     }
   })();
 
-  load(); render();
-  if(S.lit.hiroba){ bgmBtn.hidden=false; bgmBtn.textContent = S.bgm ? '♪ 町の音: 入' : '♪ 町の音: 切'; /* 自動再生はタップ後に */ if(S.bgm) document.addEventListener('pointerdown', ()=>applyBgm(), {once:true}); }
+
+  // The garden is additive save data: old records retain every existing field.
+
+  // Version 2: keep early pacing; migrate existing level and fractional progress once.
+  function levelFloor(level){return levelCurveFloor(level)-(Number(S.levelPacing?.offset)||0);}
+  function levelStep(level){return level<=10?25*level:level*(level+10)*(level+10)/16;}
+  function levelCurveFloor(level){
+    if(level<=11)return 12.5*level*(level-1);
+    const sum=n=>{const a=n*(n+1)/2;return (a*a+20*n*(n+1)*(2*n+1)/6+100*a)/16;};
+    return 1125+sum(level-1)-sum(9);
+  }
+  function townLevel(total=S.total){
+    const xp=Math.max(0,(Number(total)||0)+(Number(S.levelPacing?.offset)||0));
+    let low=1,high=2;while(levelCurveFloor(high)<=xp&&high<1073741824)high*=2;
+    while(low+1<high){const mid=Math.floor((low+high)/2);if(levelCurveFloor(mid)<=xp)low=mid;else high=mid;}return low;
+  }
+  function migrateLevelPacing(){
+    if(S.levelPacing?.version===2&&Number.isFinite(S.levelPacing.offset))return;
+    const total=Math.max(0,Number(S.total)||0),level=Math.max(1,Math.floor((1+Math.sqrt(1+.32*total))/2));
+    const fraction=Math.max(0,Math.min(1,(total-12.5*level*(level-1))/(25*level)));
+    S.levelPacing={version:2,offset:levelCurveFloor(level)+fraction*levelStep(level)-total};save();
+  }
+  function levelTapBonus(){ return (townLevel()-1)/10; }
+  let lastShownLevel=null, levelNoticeTimer=null;
+  function renderLevel(){
+    const level=townLevel(), base=levelFloor(level), span=levelStep(level);
+    const xp=Math.max(0,Math.min(span,S.total-base)), remaining=Math.max(0,Math.ceil(span-xp));
+    $('#townLevel').textContent='Lv.'+level;
+    $('#levelBonus').textContent='一押し +'+fmt(levelTapBonus())+' の力';
+    $('#levelMeter').max=span; $('#levelMeter').value=xp;
+    $('#levelMeter').setAttribute('aria-valuetext','レベル'+level+'。次のレベルまであと'+remaining+'経験値');
+    $('#levelXP').textContent=fmt(Math.floor(xp))+' / '+fmt(span)+' 経験値';
+    $('#levelNext').textContent='次のLv.まで あと'+fmt(remaining);
+    if(lastShownLevel!==null && level>lastShownLevel){
+      const notice=$('#levelNotice'); clearTimeout(levelNoticeTimer);
+      notice.textContent='レベルアップ！ Lv.'+level+'　ひと押しの力が増えました'; notice.hidden=false;
+      levelNoticeTimer=setTimeout(()=>{notice.hidden=true;},4500);
+    }
+    lastShownLevel=level;
+  }
+
+
+  // Two explicit, one-time milestones. Older saves have no reward receipts.
+  const LEVEL_REWARDS=[
+    {id:'lv5_shards',level:5,title:'かけらの贈り物',description:'100かけらが届きます。次の頼みごとや庭づくりに。',amount:100},
+    {id:'lv10_pot',level:10,title:'広場の椿の鉢',description:'広場に飾られる、節目の椿。育ててきた町に、思い出が残ります。'},
+    {id:'lv15_bench',level:15,title:'広場の休憩ベンチ',description:'背もたれと座面を整えたベンチ。住人が道を歩いて訪れ、腰を下ろして休むようになります。'},
+    {id:'lv20_lamps',level:20,title:'道沿いの街灯',description:'道に小さな街灯が並びます。眺めモードで夜にすると、柔らかく灯ります。'},
+    {id:'lv25_market',level:25,title:'市場の小さな休憩席',description:'市場に二人分の休憩席ができます。住人が居合わせて、一緒に休むことがあります。'}
+  ];
+  const POT_ART='<ellipse cx="0" cy="3" rx="15" ry="3" fill="#3A362F" opacity=".12"/><path d="M-10 -10 L-7 2 Q0 5 7 2 L10 -10Z" fill="#ECE7DC" stroke="#6B665C"/><path d="M-11 -11 Q0 -14 11 -11 L10 -8 Q0 -5 -10 -8Z M-6 -2 L6 -2" fill="#DED8CB" stroke="#6B665C"/><path d="M0 -10 Q-3 -24 2 -35 M0 -19 Q-11 -22 -11 -29 M0 -23 Q11 -27 10 -33" fill="none" stroke="#3A362F" stroke-width="1.3"/><path d="M-1 -17 Q-14 -20 -12 -26 Q-3 -25 -1 -17 M0 -21 Q13 -22 13 -29 Q3 -28 0 -21" fill="#6B665C"/><use href="#camellia" x="-4" y="-42" width="13" height="13"/><use href="#camellia" x="-17" y="-34" width="11" height="11"/><use href="#camellia" x="6" y="-38" width="11" height="11"/>';
+  const BENCH_ART='<g stroke="#625C50" stroke-width="1" stroke-linejoin="round"><path d="M-17 -24H17V-11H-17Z" fill="#C4B69E"/><path d="M-15 -21H15 M-15 -17H15" fill="none"/><path d="M-19 -10L-15 -14H15L19 -10V-7H-19Z" fill="#DFD0B5"/><path d="M-15 -7V0 M15 -7V0 M-20 -16V-7 M20 -16V-7" stroke-width="2"/><path d="M-3 -22L0 -24L3 -22L0 -20Z" fill="#B0413E" stroke="none"/></g>';
+  const STREET_LAMP_ART='<g stroke="#625C50" stroke-width="1.2"><circle class="street-halo" cy="-36" r="23" fill="#E4BBA1" stroke="none"/><path d="M-5 0H5 M0 0V-27" stroke-width="2"/><path class="street-glass" d="M-6-43H6L4-28H-4Z" fill="#E0D6C2"/><path d="M-8-44L0-51L8-44Z" fill="#8A8273"/><path d="M0-42V-29"/></g>';
+  const MARKET_SEAT_ART='<g transform="translate(-17,0)">'+BENCH_ART+'</g><g transform="translate(17,0)">'+BENCH_ART+'</g>';
+  let pendingGift=null, potDrawn=false, benchDrawn=false;
+  function renderLaterGifts(){
+    for(const [id,receipt,positions,art,label] of [['streetLamps','lv20_lamps',[[248,390],[472,390],[360,435]],STREET_LAMP_ART,'Lv.20の贈り物、道沿いの街灯'],['marketSeats','lv25_market',[[145,440]],MARKET_SEAT_ART,'Lv.25の贈り物、市場の休憩席']]){
+      if(!rewardClaimed(receipt)||$('#'+id))continue;const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id=id;g.setAttribute('class','garden-decoration');g.setAttribute('aria-label',label);g.innerHTML=positions.map(([x,y])=>'<g transform="translate('+x+','+y+')">'+art+'</g>').join('');$('#map').insertBefore(g,$('#figs'));
+      if(id==='streetLamps'){const light=document.createElementNS('http://www.w3.org/2000/svg','svg');light.setAttribute('viewBox','0 0 720 480');light.setAttribute('class','night-lamp-light');light.setAttribute('aria-hidden','true');light.innerHTML='<defs><radialGradient id="streetNightGlow"><stop stop-color="#E4BBA1" stop-opacity=".65"/><stop offset="1" stop-color="#E4BBA1" stop-opacity="0"/></radialGradient></defs>'+positions.map(([x,y])=>'<circle cx="'+x+'" cy="'+(y-36)+'" r="27" fill="url(#streetNightGlow)"/><path d="M'+(x-4)+' '+(y-42)+'h8l-1 12h-6Z" fill="#F0C7A5" opacity=".85"/>').join('');town.appendChild(light);}
+    }
+  }
+  function rewardClaimed(id){return S.levelRewards?.[id]===true;}
+  function claimLevelReward(id){
+    const reward=LEVEL_REWARDS.find(r=>r.id===id);
+    if(!reward||townLevel()<reward.level||rewardClaimed(id))return false;
+    if(!S.levelRewards||typeof S.levelRewards!=='object'||Array.isArray(S.levelRewards))S.levelRewards={};
+    S.levelRewards[id]=true;
+    if(reward.amount)gain(reward.amount);
+    checkStages();save();return true;
+  }
+  let giftToShow=null,giftMomentTimer=null;
+  const GIFT_PLACES={lv10_pot:{selector:'#milestonePot',x:447,y:300,text:'広場に、椿の鉢が届きました'},lv15_bench:{selector:'#restBench',x:322,y:305,text:'広場のベンチが整いました。住人が休みに来ます'},lv20_lamps:{selector:'#streetLamps',x:360,y:397,text:'道沿いに街灯が並びました。眺めモードの夜に灯ります'},lv25_market:{selector:'#marketSeats',x:145,y:428,text:'市場に二人分の席ができました'}};
+  function showGiftPlace(id,message){
+    const place=GIFT_PLACES[id];if(!place)return;
+    let ring=$('#giftSpotlight');if(!ring){ring=document.createElementNS('http://www.w3.org/2000/svg','ellipse');ring.id='giftSpotlight';ring.setAttribute('rx','35');ring.setAttribute('ry','22');ring.setAttribute('fill','none');ring.setAttribute('stroke','#B0413E');ring.setAttribute('stroke-width','2');ring.setAttribute('pointer-events','none');$('#map').appendChild(ring);}
+    ring.setAttribute('cx',place.x);ring.setAttribute('cy',place.y);ring.style.display='block';
+    const notice=$('#townGrowthNotice');notice.textContent=message||place.text;notice.hidden=false;
+    clearTimeout(townGrowthTimer);clearTimeout(giftMomentTimer);giftMomentTimer=setTimeout(()=>{ring.style.display='none';notice.hidden=true;},6500);
+  }
+  function noteFirstGiftUse(id,message){
+    if(!rewardClaimed(id)||S.giftUseSeen?.[id])return;
+    if(!S.giftUseSeen||typeof S.giftUseSeen!=='object'||Array.isArray(S.giftUseSeen))S.giftUseSeen={};S.giftUseSeen[id]=true;save();showGiftPlace(id,message);
+  }
+  function initGifts(){
+    $('#giftOpen').addEventListener('click',()=>{
+      const reward=LEVEL_REWARDS.find(r=>!rewardClaimed(r.id)&&townLevel()>=r.level);if(!reward)return;
+      pendingGift=reward.id;const dialog=$('#giftDialog');
+      $('#giftMilestone').textContent='町 Lv.'+reward.level+' の贈り物';$('#giftTitle').textContent=reward.title;
+      $('#giftDescription').textContent=reward.description;$('#giftResult').textContent='';
+      $('#giftArt').innerHTML='<div class="paper-parcel"><span>贈</span></div>';
+      $('#giftUnwrap').hidden=false;$('#giftUnwrap').disabled=false;$('#giftDone').textContent='あとで開ける';
+      dialog.classList.remove('unwrapped');dialog.showModal();$('#giftUnwrap').focus();
+    });
+    $('#giftUnwrap').addEventListener('click',()=>{
+      const reward=LEVEL_REWARDS.find(r=>r.id===pendingGift);if(!reward)return;
+      $('#giftUnwrap').disabled=true;
+      const claimed=claimLevelReward(reward.id);
+      if(!claimed){$('#giftResult').textContent='この贈り物は受け取り済みです。';return;}
+      if(GIFT_PLACES[reward.id])giftToShow=reward.id;
+      render();$('#giftDialog').classList.add('unwrapped');$('#giftUnwrap').hidden=true;$('#giftDone').textContent='町に戻る';
+      $('#giftArt').innerHTML=reward.amount?'<div class="gift-shards">✦<b>100</b><span>かけら</span></div>':'<svg viewBox="-25 -48 50 58" width="130" height="150">'+POT_ART+'</svg>';
+      if(reward.id==='lv15_bench')$('#giftArt').innerHTML='<svg viewBox="-28 -32 56 40" width="170" height="125">'+BENCH_ART+'</svg>';
+      $('#giftResult').textContent=reward.amount?'100かけらを受け取りました。町の経験値にも加わります。':'椿の鉢が広場に届きました。町を眺めてみてください。';if(reward.id==='lv15_bench')$('#giftResult').textContent='広場のベンチが整いました。住人が順番に休みに来ます。';if(reward.id==='lv20_lamps'){$('#giftArt').innerHTML='<svg viewBox="-30 -60 60 70" width="130" height="150">'+STREET_LAMP_ART+'</svg>';$('#giftResult').textContent='道沿いに街灯が立ちました。眺めモードの夜に灯ります。';}
+      if(reward.id==='lv25_market'){$('#giftArt').innerHTML='<svg viewBox="-44 -32 88 42" width="180" height="110">'+MARKET_SEAT_ART+'</svg>';$('#giftResult').textContent='市場に二人分の席ができました。住人が居合わせる様子を眺めてみてください。';}
+      $('#giftDone').focus();
+    });
+    $('#giftView').addEventListener('click',()=>{town.scrollIntoView({block:'center',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});const latest=[...LEVEL_REWARDS].reverse().find(r=>GIFT_PLACES[r.id]&&rewardClaimed(r.id));if(latest)showGiftPlace(latest.id);});
+    $('#giftDialog').addEventListener('close',()=>{pendingGift=null;$('#dockGifts').focus();if(giftToShow){showGiftPlace(giftToShow);giftToShow=null;}});
+  }
+  function renderGifts(){
+    renderLaterGifts();
+    const waiting=LEVEL_REWARDS.find(r=>!rewardClaimed(r.id)),ready=waiting&&townLevel()>=waiting.level;
+    $('#giftLabel').textContent=waiting?(ready?'節目の贈り物が届いています':'次のご褒美'):'節目の贈り物 5 / 5';
+    $('#giftHint').textContent=waiting?'Lv.'+waiting.level+'　'+waiting.title:'椿の鉢、ベンチ、街灯、市場の休憩席が町に残りました。';
+    $('#giftOpen').hidden=!ready;$('#giftOpen').textContent=ready?'Lv.'+waiting.level+'の包みを開く':'包みを開く';
+    $('#giftView').hidden=!LEVEL_REWARDS.some(r=>!r.amount&&rewardClaimed(r.id));
+    $('#giftView').textContent=rewardClaimed('lv20_lamps')||rewardClaimed('lv25_market')?'町の贈り物を見る':rewardClaimed('lv15_bench')?'広場の贈り物を見る':'椿の鉢を見る';
+    if(rewardClaimed('lv15_bench')&&!benchDrawn){const bench=document.createElementNS('http://www.w3.org/2000/svg','g');bench.id='restBench';bench.setAttribute('class','garden-decoration');bench.setAttribute('transform','translate(322,320)');bench.setAttribute('aria-label','Lv.15の贈り物、休憩ベンチ');bench.innerHTML=BENCH_ART;$('#map').insertBefore(bench,$('#figs'));benchDrawn=true;}
+    if(rewardClaimed('lv10_pot')&&!potDrawn){
+      const pot=document.createElementNS('http://www.w3.org/2000/svg','g');pot.id='milestonePot';pot.setAttribute('transform','translate(447,318)');pot.setAttribute('class','garden-decoration');pot.setAttribute('aria-label','Lv.10の贈り物、椿の鉢');pot.innerHTML=POT_ART;$('#map').insertBefore(pot,$('#figs'));potDrawn=true;
+    }
+  }
+
+
+  function openSheet(section){
+    for(const el of document.querySelectorAll('.sheet-section'))el.hidden=el.dataset.section!==section;
+    $('#sheetTitle').textContent={info:'町の育ち方',people:'町の人に頼む',collection:'集めたもの',garden:'椿の小庭',gifts:'節目の贈り物'}[section];
+    if(section==='garden'&&!S.got.all)$('#gardenLocked').hidden=false;else $('#gardenLocked').hidden=true;
+    if(!$('#playSheet').open)$('#playSheet').showModal();
+    $('#sheetClose').focus();
+  }
+  function initPlayScene(){
+    const wrap=$('.wrap');wrap.id='playScene';
+    const dialog=document.createElement('dialog');dialog.id='playSheet';dialog.setAttribute('aria-labelledby','sheetTitle');
+    dialog.innerHTML='<div class="sheet-header"><h2 id="sheetTitle"></h2><form method="dialog"><button id="sheetClose" aria-label="町に戻る">閉じる</button></form></div><div id="sheetContent"></div>';
+    document.body.appendChild(dialog);
+    const sections={};for(const id of ['info','people','collection','garden','gifts']){const section=document.createElement('section');section.className='sheet-section';section.dataset.section=id;section.hidden=true;$('#sheetContent').appendChild(section);sections[id]=section;}
+    const move=(selector,id)=>{const el=$(selector);if(el)sections[id].appendChild(el);};
+    move('.ledger','info');$('.ledger').open=true;move('.hud','info');move('#districts','info');move('#nextHint','info');move('.foot','info');
+    const balance=document.createElement('p');balance.className='people-balance';balance.innerHTML='手元のかけら <strong id="peoplePocket">0</strong>';sections.people.appendChild(balance);
+    move('#knights','people');move('.tabs','collection');for(const id of ['koe','e','uta'])move('#p-'+id,'collection');move('#gardenPanel','garden');move('.level-gifts','gifts');move('#levelBonus','info');
+    const locked=document.createElement('p');locked.id='gardenLocked';locked.textContent='町が全灯すると、ここで椿の小庭を育てられます。';sections.garden.appendChild(locked);
+    for(const el of [...wrap.children])if(el.matches('h2,.lead'))el.remove();
+    const dock=document.createElement('nav');dock.className='play-dock';dock.setAttribute('aria-label','町のメニュー');
+    for(const [id,label]of [['people','頼みごと'],['collection','札・絵・歌'],['garden','小庭'],['gifts','贈り物'],['info','詳細']]){const button=document.createElement('button');button.type='button';button.textContent=label;button.id=id==='gifts'?'dockGifts':'dock-'+id;button.addEventListener('click',()=>openSheet(id));dock.appendChild(button);}wrap.appendChild(dock);
+    const voice=$('#voice');wrap.insertBefore(voice,dock);voice.setAttribute('aria-live','polite');
+    const controls=document.createElement('div');controls.className='town-controls';for(const id of ['bgmBtn','nagameBtn','clockBtn'])controls.appendChild($('#'+id));town.appendChild(controls);
+    // Non-dialog collection popups must be above the sheet: close it before their normal handlers run.
+    dialog.addEventListener('click',e=>{if(e.target.closest('.fuda.got,#dailyBtn'))returnToFudaBook=true;if(e.target.closest('.fuda.got,#dailyBtn,#giftOpen,#giftView,#gardenView,#help'))dialog.close();},true);
+    $('#help').addEventListener('click',()=>dialog.close());
+    buildTownScene(); initTownGrowth(); initSceneWeather(); initPortraitViewer();
+  }
+  function buildTownScene(){
+    const ns='http://www.w3.org/2000/svg';const roads=document.createElementNS(ns,'g');roads.id='townRoads';roads.setAttribute('aria-hidden','true');
+    const d=PATH_EDGES.map(([a,b])=>'M'+PATH_NODES[a].join(' ')+' L'+PATH_NODES[b].join(' ')).join(' ');
+    for(const cls of ['road-verge','road-surface','road-stones']){const p=document.createElementNS(ns,'path');p.setAttribute('d',d);p.setAttribute('class',cls);p.setAttribute('fill','none');p.setAttribute('stroke-linejoin','round');p.setAttribute('stroke-linecap','round');roads.appendChild(p);}
+    $('#map').insertBefore(roads,$('.blk'));
+    const tree=document.createElementNS(ns,'g');tree.id='plazaTree';tree.dataset.depth='282';tree.setAttribute('class','garden-decoration');
+    tree.innerHTML='<path d="M355 266 Q363 241 351 215 M363 265 Q370 240 384 226 M358 248 L339 225" fill="none" stroke="#625C50" stroke-width="5" stroke-linecap="round"/><path d="M302 223 C289 210 299 192 314 189 C309 171 332 161 347 170 C356 152 382 161 385 174 C404 165 427 183 420 198 C439 207 424 231 409 229 C401 246 380 241 371 237 C351 250 332 239 332 231 C320 242 306 237 302 223Z" fill="#B8B0A0" stroke="#625C50" stroke-width="1.2"/><path d="M311 200 Q323 187 336 199 M344 180 Q358 173 372 188 M381 207 Q397 191 415 207 M332 220 Q349 205 366 221 M370 228 Q385 216 402 225" fill="none" stroke="#8F8777" stroke-width="1"/>';
+    $('#figs').appendChild(tree);
+  }
+
+
+  const TOWN_FINISHES={
+    hiroba:['広場に、小さな植木鉢','ベンチと石畳に、細工が増える','広場に椿が咲く'],
+    ie:['玄関に、椿の鉢','軒先に格子と小さな灯り','窓辺と生垣に、椿が咲く'],
+    ichiba:['市場に、店先の看板','店先に品物と木箱が並ぶ','市場の軒先に、紅の飾り'],
+    oka:['丘に、道しるべ','見晴らしの場所に、小さな柵','丘の道に、椿が咲く'],
+    tsumesho:['詰所に、玄関の灯り','入口に、紋様と植木鉢','詰所の入口に、紅の旗']
+  };
+  let townGrowthSeen=null,townGrowthTimer=null;
+  function initTownGrowth(){
+    const ns='http://www.w3.org/2000/svg';
+    const flower=(x,y,size=11)=>'<use href="#camellia" x="'+x+'" y="'+y+'" width="'+size+'" height="'+size+'"/>';
+    const pot=(x,y)=>'<g transform="translate('+x+','+y+')"><ellipse cy="2" rx="12" ry="3" fill="#625C50" opacity=".12"/><path d="M-8-10H8L6 1H-6Z" fill="#C4B9A6"/><path d="M-9-11H9V-8H-9Z" fill="#DED5C4"/><path d="M0-11V-29 M0-20Q-12-31-11-22Q-7-16 0-18 M0-23Q11-35 11-27Q8-20 0-21" fill="#8E8876"/><ellipse cy="-31" rx="3" ry="4" fill="#B0413E" stroke="none"/></g>';
+    const lamp=(x,y)=>'<g transform="translate('+x+','+y+')"><path d="M0 0V-30H8" fill="none" stroke-width="2"/><path d="M4-29H12L11-18H5Z" fill="#D99A8E"/><path d="M3-30L8-34L13-30Z" fill="#898171"/></g>';
+    const art={
+      hiroba:[pot(286,298),'<path d="M311 301H335 M311 307H335 M405 295H428 M405 301H428"/><path d="M300 324Q360 351 420 324 M286 313Q275 292 278 274" fill="none" stroke="#968B79" stroke-dasharray="3 3"/><path d="M309 310V318 M337 310V318 M403 302V310 M430 302V310" stroke-width="2"/>',flower(273,267)+flower(284,275)+flower(278,283)+'<path d="M340 318Q360 324 380 318" fill="none"/>'+flower(339,315,9)+flower(355,318,9)+flower(373,315,9)],
+      ie:[pot(88,190),'<path d="M74 116L74 124 M82 117L82 125 M90 118L90 126 M98 120L98 128 M106 121L106 129 M114 122L114 130 M122 123L122 131 M130 125L130 133 M138 126L138 134 M146 127L146 135 M154 128L154 136" stroke="#756C5D"/><path d="M77 166L108 171L108 177L77 172Z" fill="#A89D89"/>'+lamp(218,179),flower(76,153)+flower(89,156)+flower(99,157)+flower(48,157)+flower(58,163)+flower(204,162)],
+      ichiba:['<path d="M218 408V377 M209 379H228V395H209Z" fill="#DDD4C3"/><path d="M212 384H224 M212 389H220"/>','<path d="M49 410L67 407L78 413L60 417Z M49 410V423L60 429L78 424V413 M60 417V429" fill="#B6A993"/><path d="M82 412H107V426H82Z" fill="#D6C9B6"/><path d="M83 417H106 M86 412V426 M102 412V426"/><g fill="#A99884"><ellipse cx="88" cy="409" rx="4" ry="3"/><ellipse cx="97" cy="408" rx="4" ry="3"/><ellipse cx="103" cy="410" rx="3" ry="2"/></g>','<path d="M52 345Q100 361 151 345" fill="none"/><path d="M64 350L66 362L75 353 M88 354L94 366L100 354 M115 354L121 365L128 352" fill="#B0413E" stroke="none"/>'+flower(210,369)+pot(192,431)],
+      oka:['<path d="M522 425V398 M513 399H536L541 404L536 409H513Z" fill="#D3C7B4"/>','<path d="M563 422V399 M585 424V401 M607 419V397 M563 405L585 407L607 403 M563 412L585 414L607 410" fill="none" stroke="#958774" stroke-width="3"/>',flower(507,413)+flower(536,427)+flower(623,414)+flower(644,397)+flower(659,381)],
+      tsumesho:[lamp(508,189),pot(647,195)+'<path d="M551 181L573 190L595 181 M555 179L573 186L591 179" fill="none" stroke="#A49780"/><path d="M541 144L546 149L541 154L536 149Z" fill="#C4B49B"/>','<path d="M617 114V152 M616 117H633L633 143L625 138L617 143Z" fill="#B0413E"/><path d="M623 122V131 M620 126H627" stroke="#E9D5C4"/>'+flower(635,160)+flower(646,168)]
+    };
+    for(const k of ORDER){
+      const host=document.querySelector('.blk[data-k="'+k+'"]');
+      for(let i=0;i<3;i++){const g=document.createElementNS(ns,'g');g.setAttribute('class','town-finish');g.dataset.stage=String(i+1);g.setAttribute('aria-hidden','true');g.setAttribute('stroke','#776E60');g.setAttribute('stroke-width','1');g.setAttribute('stroke-linejoin','round');g.innerHTML=art[k][i];host.appendChild(g);}
+    }
+    const note=document.createElement('div');note.id='townGrowthNotice';note.setAttribute('role','status');note.hidden=true;town.appendChild(note);
+    const guide=document.createElement('p');guide.className='growth-guide';guide.textContent='道も町のレベルとともに育ちます。Lv.10で縁が整い、Lv.20で敷石が並びます。灯りが育つと、町の景色も少しずつ整います。鉢や看板から、軒先の細工、椿の咲く景色へ。全灯後は「小庭」でさらに育てられます。';document.querySelector('[data-section="info"]').appendChild(guide);
+  }
+  function renderTownGrowth(){
+    const road=$('#townRoads'),level=townLevel();road.classList.toggle('road-kept',level>=10);road.classList.toggle('road-paved',level>=20);
+    const changed=[];
+    for(const k of ORDER){const stage=Math.max(0,Math.min(3,S.lit[k]||0));const host=document.querySelector('.blk[data-k="'+k+'"]');
+      for(const g of host.querySelectorAll('.town-finish'))g.classList.toggle('revealed',stage>=Number(g.dataset.stage));
+      if(townGrowthSeen&&stage>townGrowthSeen[k]){changed.push(TOWN_FINISHES[k][stage-1]);queueTownVisit(k);host.classList.remove('finish-glow');void host.getBoundingClientRect();host.classList.add('finish-glow');}
+    }
+    townGrowthSeen=Object.fromEntries(ORDER.map(k=>[k,S.lit[k]||0]));
+    if(changed.length){const note=$('#townGrowthNotice');note.textContent=changed.length===1?changed[0]:changed[0]+' ほか'+(changed.length-1)+'か所も育ちました';note.hidden=false;clearTimeout(townGrowthTimer);townGrowthTimer=setTimeout(()=>note.hidden=true,4500);}
+  }
+
+
+
+  let sceneVisit=null,sceneTickTime=Date.now(),sceneNoticeAt=0;
+  function sceneResting(f){return !!f&&!f.el.classList.contains('walk')&&f.wait>0&&((f.destination==='bench'&&rewardClaimed('lv15_bench'))||(MARKET_SEATS.includes(f.destination)&&rewardClaimed('lv25_market')))&&Math.hypot(f.tx-f.x,f.ty-f.y)<1.5;}
+  function sceneConditions(){
+    const active=Object.entries(SCENE_IDS).filter(([w,id])=>!!figs[id]);const on=document.body.classList.contains('nagame');const out=[];
+    for(const [w,id]of active){if(on&&timeOfDay()==='yoru')out.push([w,0]);if(sceneResting(figs[id]))out.push([w,1]);if(on&&S.weather==='rain')out.push([w,3]);}
+    for(const pair of PAIR_CARDS){const fs=pair.who.map(w=>figs[SCENE_IDS[w]]);if(fs.every(f=>sceneResting(f)&&MARKET_SEATS.includes(f.destination))&&fs[0].destination!==fs[1].destination)for(const w of pair.who)out.push([w,2]);}
+    return out;
+  }
+  function advanceSceneProgress(conditions,seconds){
+    if(!S.sceneProgress||typeof S.sceneProgress!=='object'||Array.isArray(S.sceneProgress))S.sceneProgress={};
+    for(const [who,i]of conditions){if(hasScene(who,i))continue;const key=SCENE_IDS[who]+':'+i;S.sceneProgress[key]=Math.min(12,(Number(S.sceneProgress[key])||0)+seconds);}
+    const ready=[];for(const who of ALLWHO)for(let i=0;i<4;i++)if(!hasScene(who,i)&&S.sceneProgress[SCENE_IDS[who]+':'+i]>=12)ready.push([who,i]);return ready;
+  }
+  function sceneTick(){
+    const now=Date.now(),dt=Math.min(1.5,(now-sceneTickTime)/1000);sceneTickTime=now;
+    if(document.hidden||$('#op').classList.contains('show')||$('#playSheet').open||$('#giftDialog').open||$('#fudaBig').classList.contains('show'))return;
+    if(sceneVisit&&now>sceneVisit.until)sceneVisit=null;
+    const ready=advanceSceneProgress(sceneConditions(),dt);if(ready.length&&now-sceneNoticeAt>=4500){const [who,i]=ready[0];addKoe(who,V2_LINES[who][i]);showVoice(who,V2_LINES[who][i]);sceneNoticeAt=now;save();render();}
+    if(sceneVisit?.kind==='pair'&&PAIR_CARDS.some(p=>p.who.every(w=>sceneVisit.ids.includes(SCENE_IDS[w]))&&pairReady(p)))sceneVisit=null;
+    if(sceneVisit?.kind==='rest'&&ALLWHO.some(w=>sceneVisit.ids.includes(SCENE_IDS[w])&&hasScene(w,1)))sceneVisit=null;
+  }
+  function startSceneVisit(kind,pair){
+    const help=$('#fudaHint')&&!$('#fudaHint').hidden?$('#hintHelp'):$('#sceneHelp');const say=t=>{if(help)help.textContent=t;};
+    if(!nagameUnlocked()){say('町Lv.10で、時間と天気を選んで眺められます。');return;}
+    if(kind==='rest'&&!rewardClaimed('lv15_bench')){say('Lv.15の贈り物「休憩ベンチ」を受け取ると、休憩の札を集められます。');return;}
+    if(kind==='rest'){const id=SCENE_IDS[fudaWho];if(!figs[id]){say(fudaWho+'が町に来るよう、頼みごとをしてみましょう。');return;}sceneVisit={kind,ids:[id],until:Date.now()+180000};for(const f of Object.values(figs))if(sceneResting(f))f.wait=Math.min(f.wait,1);}
+    if(kind==='pair'){
+      if(!rewardClaimed('lv25_market')){say('Lv.25の贈り物「市場の休憩席」が必要です。');return;}
+      const missing=pair.who.filter(w=>!figs[SCENE_IDS[w]]);if(missing.length){say(missing.join('・')+'が町に来るよう、頼みごとをしてみましょう。');return;}
+      sceneVisit={kind,ids:pair.who.map(w=>SCENE_IDS[w]),until:Date.now()+180000};
+      for(const f of Object.values(figs)){if(sceneResting(f))f.wait=Math.min(f.wait,1);}
+    }
+    if(kind==='night')S.timeMode='yoru';if(kind==='rain')S.weather='rain';
+    $('#playSheet').close();setNagame(true);save();
+    if(kind==='pair')showGiftPlace('lv25_market','二人が道を通って市場へ向かいます。少し眺めてみてください');
+    if(kind==='rest')showGiftPlace('lv15_bench','住人が休むと、場面の札が届きます');
+  }
+  function initSceneWeather(){
+    const button=document.createElement('button');button.id='weatherBtn';button.type='button';button.addEventListener('click',()=>{S.weather=S.weather==='rain'?'clear':'rain';save();applySceneWeather();});$('.town-controls').appendChild(button);
+    const rain=document.createElement('div');rain.id='sceneRain';rain.setAttribute('aria-hidden','true');town.appendChild(rain);
+    applySceneWeather();setInterval(sceneTick,1000);
+  }
+  function applySceneWeather(){const on=document.body.classList.contains('nagame');const b=$('#weatherBtn');if(!b)return;b.hidden=!on;b.textContent=S.weather==='rain'?'☂ 雨':'☀ 晴れ';document.body.classList.toggle('scene-rain',on&&S.weather==='rain');}
+
+  let nextSceneSignature='';
+  function initNextScene(){
+    const seed=document.querySelector('.journey-goal>.seed');
+    const preview=document.createElementNS('http://www.w3.org/2000/svg','svg');preview.id='nextScene';preview.setAttribute('aria-hidden','true');seed.after(preview);
+    const benefit=document.createElement('small');benefit.id='nextBenefit';$('#townRemaining').after(benefit);
+  }
+  function renderNextScene(next){
+    const svg=$('#nextScene');svg.hidden=!next;svg.style.display=next?'block':'none';
+    $('#nextBenefit').textContent=next?(next.stage===1?(next.k==='hiroba'?'翼樹が現れ、声の札が届きます':'灯る場所が増え、声の札が届きます'):next.stage===2?'景色が育ち、絵も届きます':'椿が咲き、歌の札も届きます'):'小庭で、好きな場所から育てられます';
+    const signature=next?next.k+':'+next.stage:'complete';if(signature===nextSceneSignature)return;nextSceneSignature=signature;svg.replaceChildren();if(!next)return;
+    const boxes={hiroba:'260 150 200 190',ie:'35 55 200 155',ichiba:'35 295 200 150',oka:'485 295 200 150',tsumesho:'485 55 200 150'};
+    svg.setAttribute('viewBox',boxes[next.k]);const host=document.querySelector('.blk[data-k="'+next.k+'"]');
+    const base=host.querySelector('.scene-art').cloneNode(true);base.style.opacity='1';svg.appendChild(base);
+    if(next.k==='hiroba'){const tree=$('#plazaTree').cloneNode(true);tree.removeAttribute('id');tree.style.opacity='1';svg.appendChild(tree);}
+    for(const source of host.querySelectorAll('.town-finish')){if(Number(source.dataset.stage)>next.stage)continue;const g=source.cloneNode(true);g.classList.add('revealed');svg.appendChild(g);}
+  }
+
+  let coachOpen=false, gardenKey='hiroba', selectedDistrict=null, gardenSignature='';
+  const GARDEN_STEPS=['つぼみを育てる','椿を咲かせる','花の小道を育てる'];
+  const GARDEN_PRICES=[1800,5200,12000];
+  const GARDEN_SPOTS={hiroba:[310,325],ie:[75,211],ichiba:[75,448],oka:[531,448],tsumesho:[531,211]};
+  function gardenLevel(k){ return Math.max(0,Math.min(3,Math.floor(Number(S.garden?.[k])||0))); }
+  function gardenPrice(k){ return GARDEN_PRICES[gardenLevel(k)]||0; }
+  function gardenTotal(){ return ORDER.reduce((n,k)=>n+gardenLevel(k),0); }
+  function nextMilestone(k){
+    const stage=S.lit[k]||0;
+    if(stage>=3) return null;
+    const target=stageTarget(k,stage+1), base=stageTarget(k,stage);
+    return {k,stage:stage+1,target,left:Math.max(0,Math.ceil(target-S.total)),ratio:Math.max(0,Math.min(1,(S.total-base)/(target-base)))};
+  }
+  function milestoneTitle(m){ return m.stage===1 ? D[m.k].name+'に、最初の灯り' : m.stage===2 ? D[m.k].name+'が色づき、絵が届く' : D[m.k].name+'に椿が咲き、歌の札が届く'; }
+  function finishCoach(){ coachOpen=false; S.navDone=true; save(); renderJourney(); }
+  function nearbyGoal(){
+    const ready=LEVEL_REWARDS.find(r=>!rewardClaimed(r.id)&&townLevel()>=r.level);
+    if(ready)return {section:'gifts',text:'届いています：'+ready.title+'を受け取る'};
+    const lamps=CLICK_SETS[0],lampCount=setCount('night');if(lampCount<5&&townLevel()>=lamps.costs[lampCount])return {section:'gifts',text:'届いています：'+lamps.names[lampCount]+'を受け取る'};
+    if(S.got.all&&gardenTotal()===15){const set=CLICK_SETS.find(s=>s.kind==='shards'&&setCount(s.id)<5);if(set){const left=Math.max(0,Math.ceil(set.costs[setCount(set.id)]-S.n));return {section:'gifts',text:left?'あと '+fmt(left)+' かけらで、'+set.names[setCount(set.id)]:set.names[setCount(set.id)]+'を集められます'};}}
+    const next=ORDER.map(nextMilestone).filter(Boolean).sort((a,b)=>a.target-b.target)[0];
+    const gift=LEVEL_REWARDS.find(r=>!rewardClaimed(r.id)&&r.level>townLevel());
+    if(S.got.all&&gardenTotal()<15){
+      const k=ORDER.filter(k=>gardenLevel(k)<3).sort((a,b)=>gardenPrice(a)-gardenPrice(b))[0];
+      const left=Math.max(0,Math.ceil(gardenPrice(k)-S.n));
+      return {section:'garden',k,text:left?'あと '+fmt(left)+' かけらで、'+D[k].name+'の「'+GARDEN_STEPS[gardenLevel(k)]+'」へ':D[k].name+'の小庭を育てられます'};
+    }
+    if(gift&&(!next||levelFloor(gift.level)<=next.target))return {section:'gifts',text:'あと '+fmt(Math.ceil(levelFloor(gift.level)-S.total))+' かけらで、Lv.'+gift.level+'の贈り物'};
+    if(next)return {section:'info',k:next.k,text:'次のお楽しみ：'+milestoneTitle(next)};
+    return {section:'collection',text:'集めた札を眺める・まだ出会っていない声を探す'};
+  }
+  function initJourney(){
+    migrateLevelPacing();
+    initGifts(); initPlayScene(); initNextScene(); initClickRewards();
+    const goal=document.createElement('button');goal.id='nearbyGoal';goal.type='button';document.querySelector('.journey').appendChild(goal);
+    goal.addEventListener('click',()=>{const next=nearbyGoal();if(next.section==='garden')gardenKey=next.k;if(next.section==='info')selectedDistrict=next.k;renderJourney();openSheet(next.section);});
+    if(!S.garden || typeof S.garden!=='object' || Array.isArray(S.garden)) S.garden={};
+    coachOpen=!S.navDone;
+    if(gardenLevel(gardenKey)>=3) gardenKey=ORDER.find(k=>gardenLevel(k)<3)||'hiroba';
+    const note=document.createElement('p'); note.id='districtNote'; note.className='district-note'; $('#districts').after(note);
+    for(const k of ORDER){
+      const b=document.createElement('button'); b.type='button'; b.className='district'; b.dataset.k=k;
+      b.innerHTML='<span class="seed" aria-hidden="true"><i></i></span><strong>'+D[k].name+'</strong><small></small>';
+      b.addEventListener('click',()=>{ selectedDistrict=k; renderJourney(); }); $('#districts').appendChild(b);
+      const g=document.createElement('button'); g.type='button'; g.dataset.k=k;
+      g.innerHTML=D[k].name+'<small></small>'; g.addEventListener('click',()=>{gardenKey=k; $('#gardenMessage').textContent=''; renderJourney();}); $('#gardenChoices').appendChild(g);
+    }
+    for(const g of document.querySelectorAll('.blk')){
+      g.setAttribute('role','button'); g.tabIndex=0;
+      g.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); const r=g.getBoundingClientRect(); g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:r.left+r.width/2,clientY:r.top+r.height/2})); }});
+    }
+    $('#knights').addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.closest('.kn')){ e.preventDefault(); e.target.closest('.kn').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true})); }});
+    $('#coachSkip').addEventListener('click',finishCoach);
+    $('#gardenView').addEventListener('click',()=>town.scrollIntoView({block:'center',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
+    $('#coachAction').addEventListener('click',()=>{
+      if(S.up.ignis>0){ finishCoach(); return; }
+      const el=S.lit.hiroba&&S.n>=cost(K[0]) ? $('.kn[data-id="ignis"]') : $('.blk[data-k="hiroba"]');
+      if(el.matches('.kn')) openSheet('people');
+      el.scrollIntoView({block:'center',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); el.focus({preventScroll:true});
+    });
+    $('#gardenGrow').addEventListener('click',()=>{
+      const k=gardenKey, lv=gardenLevel(k), price=gardenPrice(k);
+      if(!S.got.all || lv>=3 || S.n<price) return;
+      S.n-=price; S.garden[k]=lv+1; save(); bloomAt(k); render(); queueTownVisit(k);
+      $('#gardenMessage').textContent=D[k].name+'の景色が育ちました。'+(gardenTotal()===15?'五か所の椿が、すべて育ちました。町を眺めてみてください。':'町に増えた椿を、眺めてみてください。');
+    });
+  }
+  function renderJourney(){
+    renderLevel(); renderGifts(); renderClickRewards();
+    const goal=nearbyGoal();$('#nearbyGoal').textContent=goal.text+' ›';$('#nearbyGoal').title=goal.text;
+    $('#pocket').textContent=fmt(S.n); $('#earned').textContent=fmt(S.total);
+    const next=ORDER.map(nextMilestone).filter(Boolean).sort((a,b)=>a.target-b.target)[0];
+    $('#chapter').textContent=S.got.all?'灯った町を、育てる':!S.lit.hiroba?'はじまりの一灯':'町に、少しずつ紅を';
+    $('#nextTitle').textContent=next?'次は：'+TOWN_FINISHES[next.k][next.stage-1]:gardenTotal()<15?'町に、椿の小庭を':'あなたが灯した町';
+    renderNextScene(next);
+    $('#nextHint').textContent=next?'あと '+fmt(next.left)+' かけら。灯った場所を押して集めましょう。':gardenTotal()<15?'かけらを渡して、五か所の景色を育てられます。':'町を眺めたり、まだ出会っていない声の札を集めたりできます。';
+    const townRatio=next?next.ratio:gardenTotal()/15;
+    $('#seedFill').style.height=(townRatio*100)+'%';
+    $('#townMeter').value=townRatio*100;
+    $('#townMeter').setAttribute('aria-valuetext',next?'次の変化まであと'+next.left+'かけら':'椿の小庭 '+gardenTotal()+' / 15段階');
+    $('#townRemaining').textContent=next?'あと '+fmt(next.left)+' かけら':gardenTotal()+' / 15 段階';
+    $('#dockGifts').textContent=LEVEL_REWARDS.some(r=>!rewardClaimed(r.id)&&townLevel()>=r.level)?'贈り物 ✦':'贈り物';
+    $('#coach').hidden=!coachOpen;
+    document.body.classList.toggle('learning',coachOpen && !S.navDone && !S.up.ignis);
+    let instruction='',action='広場へ',target='hiroba';
+    if(!S.lit.hiroba) instruction='① まん中の広場を押してみましょう。最初の灯りまで、あと '+Math.max(0,Math.ceil(stageTarget('hiroba',1)-S.total))+' かけら。';
+    else if(!S.up.ignis && S.n<cost(K[0])) instruction='② 翼樹が町に現れました。広場を押して、手元に15かけら集めましょう。';
+    else if(!S.up.ignis){instruction='③ 町の人の「お茶を頼む」を押しましょう。これからは少しずつ自動でも集まります。';action='頼みごとへ';target='ignis';}
+    else { instruction='お茶を頼むと、自動でもかけらが増えます。押せばもっと早く、予告の景色へ近づきます。'; action='自由に遊ぶ';target=''; }
+    $('#coachText').textContent=instruction; $('#coachAction').textContent=action;
+    document.querySelectorAll('.guide-target').forEach(el=>el.classList.remove('guide-target'));
+    if(coachOpen && target){const el=target==='hiroba'?$('.blk[data-k="hiroba"]'):$('.kn[data-id="ignis"]'); if(el) el.classList.add('guide-target');}
+    for(const b of $('#districts').children){ const k=b.dataset.k,m=nextMilestone(k); b.querySelector('i').style.height=(m?m.ratio*100:100)+'%'; b.querySelector('small').textContent=m?'あと '+fmt(m.left):'三段の灯り'; b.classList.toggle('selected',selectedDistrict===k); b.setAttribute('aria-label',D[k].name+'：'+(m?milestoneTitle(m)+'まで、あと'+m.left+'かけら':'三段階すべて達成')); }
+    $('#districtNote').textContent=selectedDistrict?(nextMilestone(selectedDistrict)?milestoneTitle(nextMilestone(selectedDistrict)):'この場所の三段階のご褒美は、すべて届きました。'):'場所の花びらを押すと、次の変化が分かります。';
+    for(const g of document.querySelectorAll('.blk')){const k=g.dataset.k; g.setAttribute('aria-label',D[k].name+(k==='hiroba'||S.lit[k]?'を押して、かけらを集める':'：まだ灯っていません'));g.setAttribute('aria-disabled',String(k!=='hiroba'&&!S.lit[k]));}
+    $('#gardenPanel').hidden=!S.got.all;
+    $('#gardenCount').textContent=gardenTotal()+' / 15 段階';
+    for(const b of $('#gardenChoices').children){const lv=gardenLevel(b.dataset.k);b.querySelector('small').textContent=['まだこれから','つぼみ','椿','花の小道'][lv]; b.classList.toggle('selected',b.dataset.k===gardenKey);b.setAttribute('aria-pressed',String(b.dataset.k===gardenKey));}
+    const lv=gardenLevel(gardenKey),price=gardenPrice(gardenKey);
+    $('#gardenNext').textContent=lv<3?D[gardenKey].name+'：次は「'+GARDEN_STEPS[lv]+'」。'+(S.n<price?'あと '+fmt(Math.ceil(price-S.n))+' かけら。':'育てられるだけのかけらが集まりました。'):D[gardenKey].name+'の小庭は完成です。'+(gardenTotal()<15?'ほかの場所も育てられます。':'五か所すべて完成しました。');
+    $('#gardenGrow').textContent=lv<3?fmt(price)+' かけらを渡して、'+GARDEN_STEPS[lv]:'この小庭は完成';
+    $('#gardenGrow').disabled=!S.got.all||lv>=3||S.n<price;
+    const sig=JSON.stringify([gardenKey,...ORDER.map(gardenLevel)]); if(sig!==gardenSignature){ gardenSignature=sig; renderGardenArt(); }
+  }
+  function renderGardenArt(){
+    let layer=$('#gardenArt'); if(!layer){layer=document.createElementNS('http://www.w3.org/2000/svg','g'); layer.id='gardenArt'; layer.setAttribute('class','garden-decoration'); $('#map').insertBefore(layer,$('#figs'));}
+    layer.replaceChildren(); $('#gardenDetail').innerHTML='<path d="M-20 4 Q15 -3 70 4" fill="none" stroke="#B5AE9E"/><text x="25" y="-10" text-anchor="middle" fill="#6B665C" font-size="5">ここに、椿が育ちます</text>';
+    for(const k of ORDER){const lv=gardenLevel(k);if(!lv)continue;const [x,y]=GARDEN_SPOTS[k]; const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('transform','translate('+x+','+y+')');
+      let art='<ellipse cx="0" cy="3" rx="25" ry="4" fill="#3A362F" opacity=".08"/><path d="M-18 2 Q0 -3 18 2 M-10 0 Q-16 -10 -11 -19 M0 0 Q5 -12 1 -23 M11 0 Q19 -10 15 -18" fill="none" stroke="#6B665C" stroke-width="1.1"/>';
+      for(const [bx,by] of [[-11,-19],[1,-23],[15,-18]]) art+=lv===1?'<ellipse cx="'+bx+'" cy="'+by+'" rx="2.5" ry="4" fill="#B0413E" opacity=".7"/>':'<use href="#camellia" x="'+(bx-5)+'" y="'+(by-5)+'" width="10" height="10"/>';
+      if(lv===3) for(let i=0;i<7;i++) art+='<use href="#camellia" x="'+(22+i*6)+'" y="'+(Math.sin(i)*3)+'" width="5" height="5" opacity=".65"/>';
+      g.innerHTML=art;layer.appendChild(g); if(k===gardenKey) $('#gardenDetail').innerHTML=art;
+    }
+  }
+
+  load(); initJourney(); render();
+  if(typeof S.tapSound!=='boolean')S.tapSound=!!S.bgm;
+  const tapButton=document.createElement('button');tapButton.id='tapSoundButton';tapButton.type='button';
+  function updateTapButton(){tapButton.textContent='タップ音：'+(S.tapSound?'入':'切');tapButton.setAttribute('aria-pressed',String(S.tapSound));}
+  tapButton.addEventListener('click',()=>{S.tapSound=!S.tapSound;if(S.tapSound)prepareTapSound().then(()=>playTapSound());else stopTapSounds();updateTapButton();save();});
+  updateTapButton();document.querySelector('[data-section="info"]').appendChild(tapButton);
+  const openingPreview=document.createElement('button');openingPreview.textContent='花びらの音を確かめる';openingPreview.addEventListener('click',()=>{$('#playSheet').close();runOpening();});document.querySelector('[data-section="info"]').appendChild(openingPreview);
+  if(S.lit.hiroba){ bgmBtn.hidden=false; bgmBtn.textContent = S.bgm ? '♪ 町の音: 入' : '♪ 町の音: 切'; /* 自動再生はタップ後に */ updateBgmButton(); }
   if(!S.opDone || Q.get('replay')==='1') runOpening(); else if(!S.navDone) showNav(0);   // ?replay=1 で何度でも
 })();
 </script>
