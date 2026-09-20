@@ -395,10 +395,7 @@
   #nextBenefit { display:block; color:var(--soft); font-size:.6rem; line-height:1.3; margin-top:2px; }
   .journey-goal strong { white-space:normal; }
   @media(max-width:480px){#nextScene{width:52px;height:42px;}#nextBenefit{font-size:.57rem;}}
-  .seated-legs { display:none; }
   .fig.seated .bd { transform:translateY(-10px); animation:none; }
-  .fig.seated .sp { clip-path:url(#seatedBodyClip); }
-  .fig.seated .seated-legs { display:block; }
   .fig.seated .activity { opacity:1; }
   .street-halo { opacity:0; transition:opacity 1.5s; }
   .town svg.night-lamp-light { position:absolute; left:0; top:0; width:100%; height:calc(100% - 32px); pointer-events:none; z-index:2; opacity:0; transition:opacity 1.5s; }
@@ -469,7 +466,7 @@
   </section>
   <div class="town" id="town">
     <svg viewBox="0 0 720 480" id="map">
-      <defs><clipPath id="seatedBodyClip"><rect x="-12" y="-30" width="24" height="20"/></clipPath><pattern id="paving" width="20" height="12" patternUnits="userSpaceOnUse"><rect width="20" height="12" fill="#E3DCCD"/><path d="M0 0H20 M0 6H20 M0 12H20 M10 0V6 M0 6V12 M20 6V12" fill="none" stroke="#CFC7B8" stroke-width=".55"/></pattern>
+      <defs><pattern id="paving" width="20" height="12" patternUnits="userSpaceOnUse"><rect width="20" height="12" fill="#E3DCCD"/><path d="M0 0H20 M0 6H20 M0 12H20 M10 0V6 M0 6V12 M20 6V12" fill="none" stroke="#CFC7B8" stroke-width=".55"/></pattern>
         <!-- 紅の印: 花びら一枚(9/13 本人決定。五弁の花から差替。付け根だけほんのり白い) -->
         <linearGradient id="petalG" x1="-6" y1="9" x2="7" y2="-7" gradientUnits="userSpaceOnUse">
           <stop offset="0" stop-color="#F7E7E2"/><stop offset=".14" stop-color="#E9948C"/><stop offset=".42" stop-color="#D4655C"/><stop offset="1" stop-color="#B0413E"/>
@@ -843,7 +840,7 @@
     return true;
   }
   function pickTarget(f){
-    f.el.classList.remove('seated','noticing');f.seatStarted=false;f.growthReaction=null;
+    setSeatedPose(f,false);f.el.classList.remove('noticing');f.seatStarted=false;f.growthReaction=null;
     if(sceneVisit?.kind==='pair'&&sceneVisit.ids.includes(f.id)){const seat=MARKET_SEATS[sceneVisit.ids.indexOf(f.id)];if(nearestNode([f.x,f.y])!==seat&&marketSeatAvailable(f,seat)){f.destination=seat;return PATH_NODES[seat].slice();}}
     if(sceneVisit?.kind==='rest'&&sceneVisit.ids.includes(f.id)&&nearestNode([f.x,f.y])!=='bench'&&benchAvailable(f)){f.destination='bench';return PATH_NODES.bench.slice();}
     if(f.growthPending&&!sceneVisit&&!$('#playSheet').open){const visit=f.growthPending;f.growthPending=null;f.growthReaction=visit;f.destination=visit.stop;return PATH_NODES[visit.stop].slice();}
@@ -854,10 +851,30 @@
     let choices=STOPS[k].filter(id=>id!==nearestNode([f.x,f.y])&&(id!=='bench'||!rewardClaimed('lv15_bench')||benchAvailable(f)));if(!choices.length)choices=STOPS.hiroba.filter(id=>id!==nearestNode([f.x,f.y])&&(id!=='bench'||!rewardClaimed('lv15_bench')||benchAvailable(f)));
     const id=choices[Math.floor(Math.random()*choices.length)];f.destination=id;return PATH_NODES[id].slice();
   }
+  // Match the authored seated pose to the standing head size in the 30px frame.
+  // Feet stay at image y=0; the seated body offset aligns them with the bench feet.
+  const SEATED_HEIGHT=30;
+  function usesSeatedArt(id,atSeat,inMarket){return atSeat&&(id!=='echo'||inMarket);}
+  function setSeatedPose(f,seated){
+    const wasSeated=f.el.classList.contains('seated');
+    const sp=f.el.querySelector('.sp');
+    f.el.classList.toggle('seated',seated);
+    if(seated!==wasSeated){
+      sp.setAttribute('y',seated?-SEATED_HEIGHT:-30);
+      sp.setAttribute('height',seated?SEATED_HEIGHT:30);
+    }
+    if(seated){
+      const href='img/chibi/hd/'+f.id+'_sit.webp';
+      if(sp.getAttribute('href')!==href)sp.setAttribute('href',href);
+      f.el.classList.remove('flip');
+    }else if(wasSeated){
+      sp.setAttribute('href','img/chibi/hd/'+f.id+'_side.webp');
+    }
+  }
   function makeFig(id, name){
     const g = document.createElementNS('http://www.w3.org/2000/svg','g'); g.setAttribute('class','fig');
     // 9/13 町の化粧: 人影を箱庭のミニキャラ(高解像度版)に。横向きを基本に、歩くと足違い、縦移動は前・後ろ姿
-    g.innerHTML = `<g class="bd"><image class="sp" href="img/chibi/hd/${id}_side.webp" x="-12" y="-30" width="24" height="30" preserveAspectRatio="xMidYMax meet"/><path class="seated-legs" d="M-3 -10L6 -8L7 0 M1 -10L10 -7L11 0" fill="none" stroke="#49453F" stroke-width="3" stroke-linecap="round"/></g><text x="0" y="12" text-anchor="middle" font-size="8" fill="#6B665C" letter-spacing="1">${name}</text><text class="activity" x="0" y="22" text-anchor="middle" font-size="7" fill="#6B665C"></text>`;
+    g.innerHTML = `<g class="bd"><image class="sp" href="img/chibi/hd/${id}_side.webp" x="-12" y="-30" width="24" height="30" preserveAspectRatio="xMidYMax meet"/></g><text x="0" y="12" text-anchor="middle" font-size="8" fill="#6B665C" letter-spacing="1">${name}</text><text class="activity" x="0" y="22" text-anchor="middle" font-size="7" fill="#6B665C"></text>`;
     $('#figs').appendChild(g);
     const home = CENTER[S.lit[HOME[id]]?HOME[id]:'hiroba'];
     const f = { id, el:g, x:home[0], y:home[1], wait: 1+Math.random()*3, speed: 14+Math.random()*8 };
@@ -882,16 +899,17 @@
         if(f.el.classList.contains('walk')){ f.el.classList.remove('walk'); sp.setAttribute('href', `img/chibi/hd/${f.id}_side.webp`); }
         const inMarket=MARKET_SEATS.includes(f.destination);
         const seated=inMarket?marketSeatAvailable(f,f.destination):f.destination==='bench'&&rewardClaimed('lv15_bench')&&benchAvailable(f);
-        f.el.classList.toggle('seated',seated&&f.id!=='echo');
-        if(seated){if(!f.seatStarted){f.wait=Math.max(f.wait,inMarket?22:8);f.seatStarted=true;}if(inMarket)f.marketVisited=true;else f.benchVisited=true;f.el.classList.remove('flip');sp.setAttribute('href','img/chibi/hd/'+f.id+'.webp');}
-        f.el.querySelector('.activity').textContent=seated&&f.id==='echo'?'ベンチのそばで撮影':seated?(inMarket?(Object.values(figs).some(other=>other!==f&&MARKET_SEATS.includes(other.destination)&&other.el.classList.contains('seated'))?'隣でひと休み':'市場でひと休み'):'ベンチでひと休み'):STOP_LABEL[f.destination]||'';
+        const sitting=usesSeatedArt(f.id,seated,inMarket);
+        setSeatedPose(f,sitting);
+        if(seated){if(!f.seatStarted){f.wait=Math.max(f.wait,inMarket?22:8);f.seatStarted=true;}if(inMarket)f.marketVisited=true;else f.benchVisited=true;f.el.classList.remove('flip');if(!sitting)sp.setAttribute('href','img/chibi/hd/'+f.id+'.webp');}
+        f.el.querySelector('.activity').textContent=seated&&!sitting?'ベンチのそばで撮影':seated?(inMarket?(Object.values(figs).some(other=>other!==f&&MARKET_SEATS.includes(other.destination)&&other.el.classList.contains('seated'))?'隣でひと休み':'市場でひと休み'):'ベンチでひと休み'):STOP_LABEL[f.destination]||'';
         growthReaction(f);
         if(seated&&!inMarket)noteFirstGiftUse('lv15_bench','広場のベンチを、住人が使ってくれました');
         if(seated&&inMarket&&Object.values(figs).some(other=>other!==f&&MARKET_SEATS.includes(other.destination)&&other.el.classList.contains('seated')))noteFirstGiftUse('lv25_market','市場の休憩席で、二人が一緒にひと休み');
         if(seated&&sceneVisit&&sceneVisit.ids.includes(f.id)&&((inMarket&&sceneVisit.kind==='pair')||(!inMarket&&sceneVisit.kind==='rest')))f.wait=Math.max(f.wait,2);
         f.wait -= dt; if(f.wait<=0){ const tg = pickTarget(f); f.q = planPath([f.x,f.y], tg); const n = f.q.shift()||tg; f.tx=n[0]; f.ty=n[1]; f.wait = 5+Math.random()*6; if(Math.abs(f.tx-f.x) > 2) f.el.classList.toggle('flip', f.tx > f.x); f.el.classList.add('walk'); f.step=0; }   // 横向きの絵は左向き→右へ歩く時だけ反転(9/13)
       } else {
-        f.el.classList.remove('seated');
+        setSeatedPose(f,false);
         f.el.querySelector('.activity').textContent='';
         const st = Math.min(d, f.speed*dt); f.x += dx/d*st; f.y += dy/d*st;
         f.el.setAttribute('transform', `translate(${f.x.toFixed(1)},${f.y.toFixed(1)})`);
@@ -1671,3 +1689,4 @@
 </script>
 </body>
 </html>
+
