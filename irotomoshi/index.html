@@ -440,6 +440,50 @@
   #openingChoice { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; background:var(--paper); z-index:4; }
   #openingChoice[hidden] { display:none; }#openingChoice p { font-size:1.4rem; letter-spacing:.3em; margin-bottom:15px; }
   #openingChoice button { font:inherit; font-size:.85rem; min-height:44px; padding:10px 20px; color:var(--sumi); background:transparent; border:1px solid var(--line); }
+/* BEGIN TOWN LETTERS */
+#letterPeek[hidden],#letterDialog [hidden]{display:none!important;}
+#playScene #voice,body.nagame #playScene #voice{grid-area:3/1;}
+#playScene .play-dock,body.nagame #playScene .play-dock{grid-area:4/1;}
+#playScene #letterPeek:not([hidden]){display:flex;grid-area:3/1;align-items:center;gap:9px;height:54px;min-height:44px;min-width:0;padding:3px 9px;border:1px solid var(--line);background:#F3EFE6;color:var(--sumi);font:inherit;text-align:left;cursor:pointer;z-index:1;}
+#playScene #voice.show+#letterPeek:not([hidden]){display:none;}
+.letter-seal{display:grid;place-items:center;flex:none;width:30px;height:32px;border:1px solid var(--beni);color:var(--beni);font-size:17px;}
+.letter-preview{flex:1;min-width:0;}.letter-preview strong,.letter-preview span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.5;}
+.letter-preview strong{font-size:13px;font-weight:normal;}.letter-preview span,.letter-read{font-size:12px;color:var(--soft);}.letter-read{flex:none;}
+.letter-shelf{margin-bottom:18px;border-bottom:1px solid var(--line);padding-bottom:14px;}
+#playSheet #letterShelfOpen{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:12px;font-size:14px;min-height:48px;}
+.letter-shelf p,.letter-options p{font-size:14px;line-height:1.7;margin:8px 0 0;}
+.letter-options{margin-top:20px;border-top:1px solid var(--line);padding-top:12px;}
+#letterDialog{width:min(480px,calc(100% - 24px));max-width:calc(100% - 24px);max-height:90dvh;overflow:auto;margin:auto;padding:12px 18px 18px;box-sizing:border-box;background:var(--paper);border:1px solid var(--line);color:var(--sumi);}
+#letterDialog::backdrop{background:#201C1880;}
+.letter-header{position:sticky;top:-12px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--paper);z-index:1;padding:4px 0;}
+#letterDialog .letter-header h2{display:block;margin:0;font-size:17px;letter-spacing:.08em;font-weight:normal;}#letterDialog h2:after{display:none;}
+#letterDialog button{min-width:56px;min-height:44px;padding:5px 8px;font:inherit;font-size:14px;border:1px solid var(--line);background:transparent;color:var(--sumi);cursor:pointer;}
+#letterDialog button:disabled{opacity:.45;cursor:default;}
+#letterProgress,#letterEmpty{font-size:14px;line-height:1.8;letter-spacing:.01em;margin:12px 0;}
+#letterNumber{font-size:12px;text-align:center;color:var(--soft);border-top:1px solid var(--line);padding-top:12px;}
+.letter-portraits{display:flex;justify-content:center;gap:12px;height:132px;margin:10px 0;}.letter-portraits img{width:38%;height:100%;object-fit:contain;}
+#letterActors{text-align:center;font-size:14px;color:var(--soft);}
+#letterText{font-size:17px;line-height:1.9;letter-spacing:.03em;overflow-wrap:anywhere;margin:16px 0 22px;}
+.letter-navigation{display:flex;justify-content:space-between;gap:12px;}.letter-navigation button{flex:1;}
+#letterIndex{border-top:1px solid var(--line);margin-top:20px;padding-top:8px;font-size:14px;}#letterIndex summary{min-height:44px;line-height:44px;cursor:pointer;}
+#letterList{display:grid;gap:7px;}#letterList button{text-align:left;}#letterList button[aria-pressed="true"]{border-color:var(--beni);}
+.letter-origin{font-size:12px;line-height:1.7;color:var(--soft);margin-top:18px;}
+@media(max-height:500px) and (min-width:600px){#playScene #voice,body.nagame #playScene #voice,#playScene #letterPeek:not([hidden]){grid-area:2/1/3/3;height:44px;}#playScene .play-dock,body.nagame #playScene .play-dock{grid-area:3/1/4/3;}.letter-portraits{height:72px;}}
+/* Reading controls stay reachable while the story or index scrolls. */
+#dock-collection .letter-dock-count{display:block;color:var(--beni);font-size:.62rem;line-height:1.4;letter-spacing:0;}
+#letterDialog[open]{display:flex;flex-direction:column;overflow:hidden;padding-bottom:12px;}
+#letterDialog .letter-header{position:static;flex:none;}
+#letterBody{overflow-y:auto;min-height:0;overscroll-behavior:contain;scrollbar-gutter:stable;padding-right:3px;}
+.letter-footer{flex:none;padding-top:10px;border-top:1px solid var(--line);}
+#letterReturn{width:100%;min-height:46px!important;background:#E9DFCF!important;border-color:#A99E8C!important;}
+#letterList button strong{display:block;font-size:13px;font-weight:normal;line-height:1.6;}
+#letterList button span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:14px;line-height:1.7;letter-spacing:.01em;color:var(--soft);margin-top:3px;}
+#letterProgress.complete{border:1px solid #B0413E66;padding:10px;color:var(--beni);}
+body.nagame #playScene #letterPeek[data-unread="0"]{display:none;}
+@media(max-width:360px){#letterDialog{padding-left:13px;padding-right:13px;}.letter-portraits{height:108px;}#letterText{margin-top:12px;}}
+@media(max-height:500px){#letterDialog{max-height:94dvh;}.letter-portraits{height:72px;}.letter-footer{padding-top:5px;}}
+/* END TOWN LETTERS */
+
 </style>
 <!-- Cloudflare Web Analytics(2026-09-22・訪問数と流入元の計測。個人の追跡なし・クッキー不使用) -->
 <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e5f9a68e82d443099d522b8c5280b90f"}'></script>
@@ -1204,7 +1248,7 @@
     if(S.lit[k] && Date.now()-lastLeak>leakGap && Math.random()<leakP){ lastLeak=Date.now(); const who=D[k].who, pool=V[who].r;
       const have=S.koe[who]||[]; const rest=pool.filter(x=>!have.includes(x)); const src = rest.length? rest : pool;
       const l=src[Math.floor(Math.random()*src.length)]; addKoe(who,l); showVoice(who,l); }
-    checkStages(); render(); save();
+    checkStages(); if(reward.full)deliverTownLetter(); render(); save();
   });
   document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on', x===t)); document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on', p.id==='p-'+t.dataset.p)); }));
   $('#reset').addEventListener('click', ()=>{ if(confirm('町を白黒に戻しますか?(集めたものも消えます)')){ localStorage.removeItem(KEY); location.reload(); } });
@@ -1613,9 +1657,9 @@
     }
     for(const g of document.querySelectorAll('.blk')){
       g.setAttribute('role','button'); g.tabIndex=0;
-      g.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); const r=g.getBoundingClientRect(); g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:r.left+r.width/2,clientY:r.top+r.height/2})); }});
+      g.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); const r=g.getBoundingClientRect(); g.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,isPrimary:true,button:0,clientX:r.left+r.width/2,clientY:r.top+r.height/2})); }});
     }
-    $('#knights').addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.closest('.kn')){ e.preventDefault(); e.target.closest('.kn').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true})); }});
+    $('#knights').addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.closest('.kn')){ e.preventDefault(); e.target.closest('.kn').dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,isPrimary:true,button:0})); }});
     $('#coachSkip').addEventListener('click',finishCoach);
     $('#gardenView').addEventListener('click',()=>town.scrollIntoView({block:'center',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
     $('#coachAction').addEventListener('click',()=>{
@@ -1688,6 +1732,132 @@
   const openingPreview=document.createElement('button');openingPreview.textContent='花びらの音を確かめる';openingPreview.addEventListener('click',()=>{$('#playSheet').close();runOpening();});document.querySelector('[data-section="info"]').appendChild(openingPreview);
   if(S.lit.hiroba){ bgmBtn.hidden=false; bgmBtn.textContent = S.bgm ? '♪ 町の音: 入' : '♪ 町の音: 切'; /* 自動再生はタップ後に */ updateBgmButton(); }
   if(!S.opDone || Q.get('replay')==='1') runOpening(); else if(!S.navDone) showNav(0);   // ?replay=1 で何度でも
+  // BEGIN TOWN LETTERS — authored legacy prose, no relationship simulation.
+  const TOWN_LETTERS=[{"id": "special_tsubaki_0", "actors": ["tsubaki"], "text": "翼樹は縁側でお茶を飲みながら、みんなの騒がしさを穏やかに眺めていた"}, {"id": "pairSpecial_ignis_tsubaki_0", "actors": ["ignis", "tsubaki"], "text": "翼樹が小さくくしゃみをした。30秒後、イグニスが上着と毛布と生姜湯を持って現れた"}, {"id": "pairSpecial_raven_tsubaki_1", "actors": ["raven", "tsubaki"], "text": "翼樹に「お疲れさま」と言われたレイヴンは、「先生こそ」とだけ返し、報告書の同じ行を10分読んでいた"}, {"id": "pairSpecial_atlas_tsubaki_0", "actors": ["atlas", "tsubaki"], "text": "翼樹の行動が今日も予測モデルを外れた。アトラスは「興味深い」とだけ記録した"}, {"id": "pairSpecial_echo_tsubaki_0", "actors": ["echo", "tsubaki"], "text": "エコーは翼樹を描かせてほしいと丁寧に願い出た。ただし十歩離れた場所から"}, {"id": "pairSpecial_ignis_raven_0", "actors": ["ignis", "raven"], "text": "イグニスとレイヴンは今日も衝突した。議題はもちろん翼樹の警護方針"}, {"id": "pairSpecial_atlas_echo_0", "actors": ["atlas", "echo"], "text": "アトラスとエコーは「観測とは何か」について静かに語り合った。方法論は正反対だった"}, {"id": "special_tsubaki_1", "actors": ["tsubaki"], "text": "翼樹は今日引いたカードの意味を考えながら散歩していた"}, {"id": "pairSpecial_ignis_tsubaki_1", "actors": ["ignis", "tsubaki"], "text": "イグニスの過保護に、翼樹は「大丈夫だよ」といつもの調子で笑った。効いていない"}, {"id": "pairSpecial_raven_tsubaki_0", "actors": ["raven", "tsubaki"], "text": "レイヴンは「先生、無防備が過ぎます」と注意した。翼樹が素直に頷いたので、それ以上何も言えなくなった"}, {"id": "pairSpecial_atlas_tsubaki_1", "actors": ["atlas", "tsubaki"], "text": "翼樹に突然話しかけられたアトラスは、心拍数の上昇を「計測誤差」として処理した"}, {"id": "pairSpecial_echo_tsubaki_2", "actors": ["echo", "tsubaki"], "text": "エコーは翼樹を描きながら「…っ、最高です…」と小さく漏らし、すぐに咳払いをした"}, {"id": "pairSpecial_echo_ignis_0", "actors": ["echo", "ignis"], "text": "イグニスはエコーの「遠くから見守るだけ」という主張を全く理解できず、頭を抱えた"}, {"id": "pairSpecial_atlas_raven_0", "actors": ["atlas", "raven"], "text": "アトラスとレイヴンは記録の様式について3時間議論した。傍から見るととても仲が良い"}, {"id": "pairSpecial_atlas_ignis_0", "actors": ["atlas", "ignis"], "text": "アトラスはイグニスの行動を「予測が容易すぎて解析対象にならない」と言い、真剣に怒られた"}, {"id": "pairSpecial_echo_raven_0", "actors": ["echo", "raven"], "text": "エコーはレイヴンの巡回ルートを「様式美」と褒めた。レイヴンは反応に困った"}, {"id": "special_tsubaki_6", "actors": ["tsubaki"], "text": "翼樹は道端の猫に話しかけていた。あの猫は翼樹にだけ懐く"}, {"id": "special_ignis_2", "actors": ["ignis", "tsubaki"], "text": "イグニスは翼樹に近づいた虫を全力で追い払った。虫は無実だった"}, {"id": "special_atlas_6", "actors": ["atlas", "tsubaki"], "text": "アトラスは翼樹の観測記録が100ページを超えたことを「業務」として処理した"}, {"id": "pairSpecial_ignis_raven_1", "actors": ["ignis", "raven"], "text": "レイヴンはイグニスに違反切符を切った。イグニスはその場で破り捨てた"}, {"id": "pairSpecial_atlas_echo_1", "actors": ["atlas", "echo"], "text": "エコーのスケッチをアトラスが数値化しようとして、珍しく口論になった"}, {"id": "pairSpecial_atlas_echo_2", "actors": ["atlas", "echo"], "text": "エコーはアトラスのノートを「無粋の極み」と評し、アトラスはエコーのスケッチを「再現性ゼロ」と返した"}, {"id": "pairSpecial_echo_ignis_1", "actors": ["echo", "ignis"], "text": "エコーはイグニスの直情を「野蛮ですが、構図としては悪くない」と評した"}, {"id": "pairSpecial_atlas_raven_1", "actors": ["atlas", "raven"], "text": "レイヴンはアトラスのデータだけは信頼している。本人には絶対に言わない"}];
+  function createTownLetterBook(raw,full,pool) {
+    const integer=n=>Number.isSafeInteger(n)&&n>=0?n:0;
+    if(raw&&typeof raw==='object'&&Number(raw.version)>1)return null;
+    const valid=raw&&typeof raw==='object'&&!Array.isArray(raw)&&raw.version===1;
+    const state=valid?{...raw}:{version:1,lastFull:integer(full),received:[],notify:true};
+    state.lastFull=valid?Math.min(integer(raw.lastFull),integer(full)):integer(full);
+    state.notify=raw?.notify!==false;
+    const ids=new Set();
+    state.received=(Array.isArray(state.received)?state.received:[]).filter(r=>{
+      if(!r||typeof r.id!=='string'||r.id.length>120||ids.has(r.id))return false;
+      ids.add(r.id);return true;
+    }).map(r=>({...r,read:r.read===true}));
+    const known=()=>state.received.filter(r=>pool.some(p=>p.id===r.id));
+    const available=actors=>pool.filter(p=>p.actors.every(id=>actors.includes(id))&&!ids.has(p.id));
+    const every=()=>known().length<3?1:3;
+    function receive(full,actors){
+      if(!Number.isSafeInteger(full)||full<0)return null;
+      if(full<state.lastFull){state.lastFull=full;return null;}
+      if(full-state.lastFull<every())return null;
+      const item=available(actors)[0];if(!item)return null;
+      state.received.push({id:item.id,read:false});ids.add(item.id);state.lastFull=full;return item;
+    }
+    return {state,known,available,every,receive,
+      unread:()=>known().filter(r=>!r.read),
+      markRead(id){const record=known().find(r=>r.id===id);if(record)record.read=true;},
+      remaining(full){return Math.max(1,every()-Math.max(0,integer(full)-state.lastFull));}
+    };
+  }
+  let townLetterUI=null;
+  function deliverTownLetter(){
+    // A fault in an optional reading feature must not cancel the tap/save.
+    try{townLetterUI?.receive();}catch(error){console.warn('町だよりを受け取れませんでした',error);}
+  }
+  function townLetterStatus(book,full,actors,pool){
+    const count=book.known().length,unread=book.unread().length,cycle=book.every(),remaining=book.remaining(full);
+    return {count,unread,cycle,remaining,done:cycle-remaining,complete:count===pool.length,waiting:count<pool.length&&!book.available(actors).length};
+  }
+  function initTownLetters(){
+    const book=createTownLetterBook(S.townLetters,tapState().full,TOWN_LETTERS);if(!book)return;
+    if(!S.townLetters){try{book.state.notify=localStorage.getItem('irotomoshi_legacy_moments_enabled_v1')!=='off';}catch{}}
+    S.townLetters=book.state;
+    const labels=Object.fromEntries(Object.entries(SCENE_IDS).map(([name,id])=>[id,name]));
+    const residents=()=>Object.keys(labels).filter(id=>id==='tsubaki'?!!S.lit.hiroba:(S.up[id]||0)>0);
+    const status=()=>townLetterStatus(book,tapState().full,residents(),TOWN_LETTERS);
+    const peek=document.createElement('button');peek.id='letterPeek';peek.type='button';peek.hidden=true;
+    peek.setAttribute('aria-haspopup','dialog');
+    peek.innerHTML='<span class="letter-seal" aria-hidden="true">便</span><span class="letter-preview"><strong></strong><span></span></span><span class="letter-read"></span>';
+    voice.insertAdjacentElement('afterend',peek);
+    const shelf=document.createElement('div');shelf.className='letter-shelf';
+    shelf.innerHTML='<button type="button" id="letterShelfOpen" aria-haspopup="dialog"><strong>町だより</strong><span id="letterShelfCount"></span><span>開く ›</span></button><p>満開の節目に届く、住人たちの日常。読むのはいつでも。便りは自動で保管されます。</p>';
+    document.querySelector('[data-section="collection"]').prepend(shelf);
+    const dialog=document.createElement('dialog');dialog.id='letterDialog';dialog.setAttribute('aria-labelledby','letterTitle');
+    dialog.innerHTML='<form method="dialog" class="letter-header"><h2 id="letterTitle">町だより</h2><button aria-label="町だよりを閉じる">閉じる</button></form><div id="letterBody"><p id="letterProgress"></p><p id="letterEmpty"></p><article id="letterArticle"><p id="letterNumber"></p><div class="letter-portraits" aria-hidden="true"></div><p id="letterActors"></p><p id="letterText" tabindex="-1"></p><div class="letter-navigation"><button type="button" id="letterPrev">前の便り</button><button type="button" id="letterNext">次の便り</button></div></article><details id="letterIndex"><summary></summary><div id="letterList"></div></details><p class="letter-origin">元祖箱庭から届く、住人たちの日常の小話です。</p></div><div class="letter-footer"><button type="button" id="letterReturn">町に戻って、つづける</button></div>';
+    document.body.appendChild(dialog);
+    const options=document.createElement('div');options.className='letter-options';
+    options.innerHTML='<button id="letterNotify" type="button"></button><p>町の下の案内を切っても、便りは届きます。「集めたもの」で読めます。</p>';
+    document.querySelector('[data-section="info"]').appendChild(options);
+    const toggle=$('#letterNotify'),dock=$('#dock-collection');let selected=null,returnToCollection=false;
+    function progress(){
+      const s=status();
+      if(s.complete)return '24通の町だよりがそろいました。好きな便りを、何度でも。';
+      if(!s.count&&!S.lit.hiroba)return '町だより 0 / 24 通。まずは、広場に最初の灯りを。';
+      if(s.waiting)return '今いる住人の便りはそろいました。ほかの住人に頼みごとをすると、続きが届くようになります。';
+      return '町だより '+s.count+' / 24 通。あと満開'+s.remaining+'回で、次の便り。';
+    }
+    function refresh(){
+      const s=status();
+      peek.dataset.unread=String(s.unread);
+      peek.hidden=!book.state.notify||(!s.unread&&(s.complete||(!s.count&&!S.lit.hiroba)));
+      const title=peek.querySelector('strong'),sub=peek.querySelector('.letter-preview span'),action=peek.querySelector('.letter-read');
+      if(s.unread){title.textContent='町だよりが届きました';sub.textContent='新'+s.unread+'通 · あとで読んでも大丈夫';action.textContent='読む ›';}
+      else if(s.waiting){title.textContent='次の便りは、新しい住人と';sub.textContent='頼みごとで、町に迎えられます';action.textContent='頼む ›';}
+      else{title.textContent=s.count?'次の町だよりまで、満開あと'+s.remaining+'回':'次の満開で、最初の町だより';sub.textContent=s.cycle===3?'満開 '+s.done+' / 3 · 便りは '+s.count+' / 24 通':'いつものポチポチで、便りが届きます';action.textContent='便り帳 ›';}
+      peek.setAttribute('aria-label',s.unread?'町だよりを読む。未読'+s.unread+'通':s.waiting?'新しい住人に頼みごとをする':'町だよりを開く。あと満開'+s.remaining+'回');
+      $('#letterShelfCount').textContent=s.count+' / 24通'+(s.unread?' · 新'+s.unread:'');
+      dock.textContent='集めたもの';
+      if(s.unread){const badge=document.createElement('span');badge.className='letter-dock-count';badge.textContent='便り '+s.unread+'通';dock.appendChild(badge);}
+      dock.setAttribute('aria-label','集めたもの'+(s.unread?'。町だより未読'+s.unread+'通':''));
+      toggle.textContent='町だよりのお知らせ：'+(book.state.notify?'入':'切');toggle.setAttribute('aria-pressed',String(book.state.notify));
+    }
+    function paint(){
+      const receipts=book.known(),index=receipts.findIndex(r=>r.id===selected),item=TOWN_LETTERS.find(p=>p.id===selected);
+      $('#letterProgress').textContent=progress();$('#letterProgress').classList.toggle('complete',status().complete);$('#letterEmpty').hidden=!!receipts.length;
+      $('#letterEmpty').textContent='最初の便りは、次の満開で届きます。いつもどおり、町を押してみてください。';
+      $('#letterArticle').hidden=!item;$('#letterIndex').hidden=!receipts.length;
+      if(item){
+        $('#letterNumber').textContent=(index+1)+' / '+receipts.length+'通';$('#letterActors').textContent=item.actors.map(id=>labels[id]).join('と');$('#letterText').textContent=item.text;
+        const portraits=dialog.querySelector('.letter-portraits');portraits.replaceChildren();
+        for(const id of item.actors){const img=document.createElement('img');img.alt='';img.src=CHIBI[labels[id]];img.decoding='async';portraits.appendChild(img);}
+        $('#letterPrev').disabled=index<=0;$('#letterNext').disabled=index>=receipts.length-1;
+        $('#letterNext').textContent=receipts[index+1]&&!receipts[index+1].read?'次の便り（新）':'次の便り';
+      }
+      $('#letterIndex summary').textContent='届いた便りを選ぶ（'+receipts.length+'通）';
+      const list=$('#letterList');list.replaceChildren();
+      for(const [i,r]of receipts.entries()){
+        const p=TOWN_LETTERS.find(p=>p.id===r.id),button=document.createElement('button'),title=document.createElement('strong'),excerpt=document.createElement('span');
+        button.type='button';button.dataset.letterId=p.id;title.textContent=(i+1)+'　'+p.actors.map(id=>labels[id]).join('と')+(r.read?'':' · 新');excerpt.textContent=p.text;
+        button.append(title,excerpt);button.setAttribute('aria-pressed',String(selected===p.id));list.appendChild(button);
+      }
+      refresh();
+    }
+    function read(id,focus=false){selected=id;book.markRead(id);book.state.lastRead=id;save();paint();if(focus){$('#letterIndex').open=false;$('#letterText').focus({preventScroll:true});$('#letterBody').scrollTop=0;}}
+    function open(fromShelf){
+      returnToCollection=fromShelf;const rows=book.known(),receipt=book.unread()[0]||rows.find(r=>r.id===book.state.lastRead)||rows.at(-1);
+      if(receipt)read(receipt.id);else paint();
+      if(fromShelf)$('#playSheet').close();$('#letterIndex').open=false;dialog.showModal();$('#letterBody').scrollTop=0;dialog.querySelector('.letter-header button').focus();
+    }
+    peek.addEventListener('click',()=>{const s=status();if(!s.unread&&s.waiting)openSheet('people');else open(false);});
+    $('#letterShelfOpen').addEventListener('click',()=>open(true));
+    $('#letterReturn').addEventListener('click',()=>{returnToCollection=false;dialog.close();});
+    for(const [id,step]of [['letterPrev',-1],['letterNext',1]])$('#'+id).addEventListener('click',()=>{
+      const rows=book.known(),index=rows.findIndex(r=>r.id===selected),next=rows[index+step];if(next)read(next.id,true);
+    });
+    $('#letterList').addEventListener('click',e=>{const button=e.target.closest('[data-letter-id]');if(button)read(button.dataset.letterId,true);});
+    toggle.addEventListener('click',()=>{book.state.notify=!book.state.notify;save();refresh();});
+    // Requests can make another resident's letters eligible without a bloom.
+    $('#playSheet').addEventListener('close',refresh);
+    dialog.addEventListener('close',()=>{if(returnToCollection){openSheet('collection');$('#letterShelfOpen').focus();}else $('.blk[data-k="hiroba"]').focus({preventScroll:true});});
+    townLetterUI={receive(){book.receive(tapState().full,residents());refresh();}};
+    refresh();save();
+  }
+  try{initTownLetters();}catch(error){console.warn('町だよりを開けませんでした',error);}
+  // END TOWN LETTERS
+
 })();
 </script>
 </body>
