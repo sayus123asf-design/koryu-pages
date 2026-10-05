@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>住人の間 | 翼樹〜Arcana〜</title>
+<meta name="description" content="白黒の町に住むものたち。翼樹と騎士たちの名鑑。">
+<meta property="og:title" content="住人の間 | 翼樹〜Arcana〜">
+<meta property="og:description" content="翼樹は、誰のものにもならない。それでも彼らは、側に立ち続ける。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://tubaki-arcana.com/images/kao_tsubaki.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1c1a17; --paper:#ece7dc; --sumi:#2f2b25; --sumi-soft:#57524a; --akane:#b0413e; --line:#c4bca9; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:'Zen Old Mincho',serif; background:var(--paper); color:var(--sumi); line-height:2.05; font-size:17px; }
+  a { color:inherit; text-decoration:none; }
+
+  /* ---- 上の黒い間 ---- */
+  .top { background:var(--ink); color:#ddd8cc; text-align:center; padding:4.5rem 1.5rem 4.5rem; }
+  .top .back { font-size:.8rem; letter-spacing:.3em; color:#9a9486; border-bottom:1px solid #4a453c; padding-bottom:3px; }
+  .top .dot { width:9px; height:9px; border-radius:50%; background:var(--akane); margin:2.6rem auto 0; }
+  .top h1 { margin-top:1.4rem; font-size:clamp(1.8rem,6vw,2.5rem); letter-spacing:.42em; text-indent:.42em; color:#f0ebdf; font-weight:700; }
+  .top .en { margin-top:.3rem; font-size:.74rem; letter-spacing:.5em; text-indent:.5em; color:#8f897c; }
+  .vow { margin-top:3.2rem; font-size:clamp(1rem,3.6vw,1.15rem); letter-spacing:.14em; color:#d6d0c2; }
+  .vow p + p { margin-top:1.5rem; }
+
+  /* ---- 本文 ---- */
+  section { max-width:860px; margin:0 auto; padding:4.8rem 1.5rem 1rem; }
+  h2 { font-size:1.22rem; letter-spacing:.4em; text-indent:.4em; text-align:center; font-weight:700; color:var(--sumi); }
+  h2::after { content:""; display:block; width:34px; height:1px; background:var(--sumi-soft); margin:1.1rem auto 0; }
+  .poem { margin-top:2.2rem; text-align:center; color:var(--sumi); }
+  .poem p + p { margin-top:1.3rem; }
+  .qa { margin-top:3.2rem; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2.4rem 2.6rem; }
+  .qa h3 { font-size:1.02rem; letter-spacing:.3em; font-weight:700; padding-bottom:.5rem; border-bottom:1px solid var(--line); margin-bottom:.9rem; }
+  .qa p { color:var(--sumi); }
+  .qa p + p { margin-top:.9rem; }
+  .coda { margin-top:3.6rem; text-align:center; color:var(--sumi-soft); }
+
+  /* ---- 住人(額: 墨の額) ---- */
+  .resident { margin-top:4.6rem; display:grid; grid-template-columns:minmax(0,310px) minmax(0,1fr); gap:3rem; align-items:start; }
+  .gaku { background:linear-gradient(145deg,#34302a,#1c1a17 45%,#2a2622); padding:11px; box-shadow:0 16px 32px rgba(28,26,23,.26),inset 0 0 0 1px rgba(255,255,255,.08); }
+  .gaku .mat { background:#f5f1e8; padding:20px 20px 0; box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),inset 0 2px 6px rgba(0,0,0,.12); }
+  .gaku img { display:block; width:100%; height:auto; aspect-ratio:3/4; object-fit:cover; outline:1px solid #b5ae9e; outline-offset:3px; }
+  .gaku .plate { padding:15px 0 13px; text-align:center; font-size:.78rem; letter-spacing:.35em; text-indent:.35em; color:var(--sumi-soft); }
+  .gaku .plate .num { color:var(--akane); margin-right:.4em; }
+  .who .title { font-size:.85rem; letter-spacing:.35em; color:var(--sumi-soft); }
+  .who h3 { margin-top:.2rem; font-size:1.8rem; letter-spacing:.3em; font-weight:700; }
+  .who .kana { font-size:.74rem; letter-spacing:.4em; color:var(--sumi-soft); }
+  .who .body { margin-top:1.6rem; }
+  .who .body p + p { margin-top:1.2rem; }
+  .who .voice { margin-top:1.6rem; color:var(--akane); letter-spacing:.08em; }
+  .who .ask { margin-top:1.8rem; padding-top:1.3rem; border-top:1px solid var(--line); font-size:.95rem; color:var(--sumi-soft); }
+  .who .ask a { display:inline-block; margin-top:.3rem; color:var(--sumi); border-bottom:1px solid var(--line); padding-bottom:2px; }
+
+  .cards { margin-top:4.6rem; text-align:center; color:var(--sumi-soft); }
+  .guest { margin-top:3.2rem; text-align:center; font-size:.95rem; color:var(--sumi-soft); }
+  .guest a { color:var(--sumi); border-bottom:1px solid var(--line); padding-bottom:2px; }
+  footer { margin-top:5rem; background:var(--ink); color:#9a9486; text-align:center; padding:3rem 1.5rem 3.5rem; font-size:.8rem; letter-spacing:.2em; }
+  footer a { border-bottom:1px solid #4a453c; padding-bottom:2px; }
+
+  /* ---- ふわっと現れる ---- */
+  .fade { opacity:0; transform:translateY(14px); transition:opacity 1.6s ease, transform 1.6s ease; }
+  .fade.on { opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce) { .fade { opacity:1; transform:none; transition:none; } html { scroll-behavior:auto; } }
+
+  @media (max-width:680px) {
+    body { font-size:16.5px; }
+    .qa { grid-template-columns:1fr; gap:2rem; }
+    .resident { grid-template-columns:1fr; gap:2rem; }
+    .gaku { max-width:310px; margin:0 auto; }
+    .who { text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="back" href="index.html">◂ 翼樹〜Arcana〜 へ戻る</a>
+  <div class="dot"></div>
+  <h1>住人の間</h1>
+  <div class="en">THE RESIDENTS</div>
+  <div class="vow">
+    <p>翼樹は、誰のものにもならない<br>翼樹は、誰も選ばない</p>
+    <p>それでも彼らは<br>側に立ち続ける<br>ずっと、、、</p>
+  </div>
+</header>
+
+<section>
+  <div class="poem fade">
+    <p>白黒の町<br>感情だけが色を持つ</p>
+    <p>翼樹はタロットの声を代弁する器<br>騎士たちは翼樹に向いている</p>
+  </div>
+
+  <div class="qa">
+    <div class="fade"><h3>なぜ白黒か</h3><p>白黒の町に住むものたち<br>色を持つのは、彼らの感情だけ</p><p>この町で色を見たら<br>それは誰かの気持ち</p></div>
+    <div class="fade"><h3>何者か</h3><p>人の姿を借りた、カードの意味</p><p>翼樹はカードたちの思いの代弁者<br>騎士たちはカードに属するもの</p></div>
+    <div class="fade"><h3>なぜタロットか</h3><p>大アルカナは<br>零から始まる、二十二の魂の旅<br>終われば、また次の零へ</p></div>
+    <div class="fade"><h3>なぜ翼樹だけか</h3><p>翼樹だけが、カードたちの声を代弁できる<br>だからカードに属するものは<br>みな翼樹に引き寄せられる</p><p>そして翼樹だけが<br>それに気づいていない</p></div>
+  </div>
+
+  <div class="coda fade">
+    <p>翼樹は、カードの声を代弁するだけ<br>けれど騎士たちは<br>自分でも気づかなかった心の声を知る</p>
+    <p style="margin-top:1.3rem">ただ、離れられない<br>それは、騎士たち自身にも分からない</p>
+  </div>
+</section>
+
+<section>
+  <h2 class="fade">住人たち</h2>
+
+  <article class="resident fade" id="tsubaki">
+    <div class="gaku"><div class="mat"><img src="images/kao_tsubaki.jpg" alt="翼樹の肖像" loading="lazy"><div class="plate">── 代弁者 ──</div></div></div>
+    <div class="who">
+      <div class="title">星の器</div><h3>翼樹</h3><div class="kana">TSUBAKI</div>
+      <div class="body"><p>カードを一枚引いて<br>その声を代弁するもの<br>言葉は少なく<br>黒い髪に飾りはひとつもない</p><p>騎士たちの誰とも同じ距離にいて<br>向けられた想いにはまだ気づいていない</p></div>
+      <p class="voice">(みんな、少し過保護だと思う)</p>
+      <div class="ask">では、なぜ誰の腕にも沈まないのか<br><a href="https://note.com/huge_eagle3122/n/nc52d672e542c" target="_blank" rel="noopener">→ 星々の器は、誰の腕にも沈まない</a></div>
+    </div>
+  </article>
+
+  <article class="resident fade" id="ignis">
+    <div class="gaku"><div class="mat"><img src="images/kao_ignis.jpg" alt="イグニスの肖像" loading="lazy"><div class="plate"><span class="num">XIV</span>節制</div></div></div>
+    <div class="who">
+      <div class="title">守護の炎</div><h3>イグニス</h3><div class="kana">IGNIS</div>
+      <div class="body"><p>翼樹に仕える執事にして料理人<br>朝食の卵が二つになっても<br>理由は言わない</p><p>想いはすべて<br>言葉でなく行動に変えてしまう</p></div>
+      <p class="voice">(触れたい)</p>
+      <div class="ask">では、なぜ彼は一度も理由を言わないのか<br><a href="https://note.com/huge_eagle3122/n/n157c0d2db8ae" target="_blank" rel="noopener">→ 汚れてなどいなかった。</a></div>
+    </div>
+  </article>
+
+  <article class="resident fade" id="raven">
+    <div class="gaku"><div class="mat"><img src="images/kao_raven.jpg" alt="レイヴンの肖像" loading="lazy"><div class="plate"><span class="num">IV</span>皇帝</div></div></div>
+    <div class="who">
+      <div class="title">規律の監査官</div><h3>レイヴン</h3><div class="kana">RAVEN</div>
+      <div class="body"><p>町の規律を預かる監査官<br>翼樹を「先生」と呼び<br>その距離まで規定で測る</p><p>感情を監査記録の書式に閉じ込めようとして<br>いつも失敗する</p></div>
+      <p class="voice">(先生は、規則の外におられる)</p>
+      <div class="ask">では、なぜ彼は手袋を脱がないのか<br><a href="https://note.com/huge_eagle3122/n/ne35852703f44" target="_blank" rel="noopener">→ 興味などない。</a></div>
+    </div>
+  </article>
+
+  <article class="resident fade" id="atlas">
+    <div class="gaku"><div class="mat"><img src="images/kao_atlas.jpg" alt="アトラスの肖像" loading="lazy"><div class="plate"><span class="num">IX</span>隠者</div></div></div>
+    <div class="who">
+      <div class="title">沈黙の観測者</div><h3>アトラス</h3><div class="kana">ATLAS</div>
+      <div class="body"><p>すべてを数えて記録する研究者<br>誤差は0.3以内<br>感情は筆圧にだけ出る</p><p>いちばん大事なことだけは<br>書かないことで残す</p></div>
+      <p class="voice">(今日の記録には、感情が混入している)</p>
+      <div class="ask">では、なぜ彼は「心配していない」と書いたのか<br><a href="https://note.com/huge_eagle3122/n/nd6a1c01531bd" target="_blank" rel="noopener">→ 別に、心配していない。</a></div>
+    </div>
+  </article>
+
+  <article class="resident fade" id="echo">
+    <div class="gaku"><div class="mat"><img src="images/kao_echo.jpg" alt="エコーの肖像" loading="lazy"><div class="plate"><span class="num">I</span>魔術師</div></div></div>
+    <div class="who">
+      <div class="title">非接触の審美家</div><h3>エコー</h3><div class="kana">ECHO</div>
+      <div class="body"><p>美しいものをレンズ越しに見る写真家<br>その指は、翼樹の1センチ手前で止まる</p><p>触れる代わりに<br>構図に収めて愛する</p></div>
+      <p class="voice">(記録できないものだけが、美しい)</p>
+      <div class="ask">では、なぜ彼は白紙を額に入れたのか<br><a href="https://note.com/huge_eagle3122/n/n61b4638ce5dd" target="_blank" rel="noopener">→ 失敗作では、ありません。</a></div>
+    </div>
+  </article>
+
+  <div class="cards fade"><p>大アルカナは二十二枚<br>声が届いた札は、まだ四枚</p></div>
+  <div class="guest fade">
+    <p>これは物語(正史)の説明<br>箱庭の町では、別の暮らしが始まっている</p>
+    <p style="margin-top:1.6rem">※ この町には、ときどき隣の世界から来客があります<br><a href="https://tubaki.substack.com/" target="_blank" rel="noopener">→ Another Room 〜隣室の手紙〜</a></p>
+  </div>
+</section>
+
+<footer>
+  <a href="index.html">◂ 翼樹〜Arcana〜 へ戻る</a>
+  <p style="margin-top:1.6rem">© 2026 翼樹〜Arcana〜 / こりゅう</p>
+</footer>
+
+<script>
+  (function(){
+    var els=document.querySelectorAll('.fade');
+    if(!('IntersectionObserver' in window)){ els.forEach(function(e){e.classList.add('on')}); return; }
+    var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); } }); },{rootMargin:'0px 0px -8% 0px'});
+    els.forEach(function(e){ io.observe(e); });
+  })();
+</script>
+</body>
+</html>
