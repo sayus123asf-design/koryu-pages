@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>翼樹〜Arcana〜 | 世界は白黒。感情だけが色を持つ。</title>
-<meta name="description" content="タロットの声を代弁する器・翼樹と、彼に執着する騎士たちの観測記録。物語、歌、ゲーム、AIエージェント——白黒の世界で、感情だけが紅く灯る。">
+<meta name="description" content="札の声を代弁する翼樹と、四人の騎士の物語。白黒の町で、気持ちが動いた時にだけ色が灯る。毎話、作者の声で読む朗読つき。">
 <meta property="og:title" content="翼樹〜Arcana〜">
 <meta property="og:description" content="世界は白黒。感情だけが色を持つ。">
 <meta property="og:type" content="website">
@@ -308,6 +308,91 @@
     padding-left: 0.6em;
   }
 
+
+  /* ---- 最初の画面の動き(2026-10-23 10/5本人の案: 題がにじんで出る→五人と町が奥からふわっと・OBSERVEは流れる線に) ---- */
+  .hero { position: relative; overflow: hidden; }
+  .hero > *:not(.ghosts) { position: relative; z-index: 2; }
+  .ghosts { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .ghost {
+    position: absolute; opacity: 0;
+    filter: grayscale(1) contrast(1.1);
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 70%);
+            mask-image: radial-gradient(ellipse at center, #000 30%, transparent 70%);
+    animation: ghost-drift 14s ease-in-out infinite;
+  }
+  .ghost.town { mix-blend-mode: screen; filter: grayscale(1) invert(1) contrast(0.9); }
+  @keyframes ghost-drift {
+    0%   { opacity: 0;    transform: translate(var(--fx,0), var(--fy,0)) scale(1.04); }
+    25%  { opacity: var(--o, .12); }
+    55%  { opacity: var(--o, .12); }
+    80%, 100% { opacity: 0; transform: translate(0,0) scale(1); }
+  }
+  .hero .dot  { animation: ink-dot 1s ease-out both; }
+  .hero h1    { animation: ink-in 1.7s ease-out .3s both; }
+  .hero .sub  { animation: fade-up 1.1s ease-out 1.2s both; }
+  .hero .copy { animation: fade-up 1.4s ease-out 1.7s both; }
+  .hero .scroll { animation: fade-up 1.1s ease-out 2.5s both; }
+  @keyframes ink-dot { from { opacity: 0; transform: scale(.2); } to { opacity: 1; transform: scale(1); } }
+  @keyframes ink-in  { from { opacity: 0; filter: blur(14px); letter-spacing: .5em; } to { opacity: 1; filter: blur(0); letter-spacing: .18em; } }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  /* 下への案内: 押せそうな矢印ではなく、静かに流れる一本の線 */
+  .hero .scroll {
+    display: flex; flex-direction: column; align-items: center; gap: .9rem;
+    font-size: .78rem; letter-spacing: .5em; text-indent: .5em; color: #8f897c;
+  }
+  .hero .scroll .line { position: relative; width: 1px; height: 64px; background: #3f3b34; overflow: hidden; }
+  .hero .scroll .line::after {
+    content: ""; position: absolute; left: 0; top: -24px; width: 1px; height: 24px;
+    background: linear-gradient(transparent, #cfc9bb);
+    animation: flow 1.9s ease-in-out infinite;
+  }
+  @keyframes flow { 0% { top: -24px; } 70%, 100% { top: 64px; } }
+  /* 各節が見えた時にふわっと */
+  .reveal-on { opacity: 0; transform: translateY(18px); transition: opacity .9s ease, transform .9s ease; }
+  .reveal-on.in { opacity: 1; transform: none; }
+  .lead-poem.reveal-on { transition-duration: 1.3s; }
+  @media (prefers-reduced-motion: reduce) {
+    .ghost { display: none; }
+    .hero *, .hero .scroll .line::after { animation: none !important; }
+    .reveal-on { opacity: 1; transform: none; transition: none; }
+  }
+
+  /* ---- はじめての方へ(2026-10-23 入口を玄関のすぐ下に) ---- */
+  .first { padding-top: 4rem; padding-bottom: 1rem; }
+  .first-btns {
+    margin: 2.2rem auto 0;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+  .fbtn {
+    position: relative;
+    display: block;
+    text-align: center;
+    padding: 1.05rem 2.6rem 1rem;
+    background: var(--ink);
+    color: #efeade;
+    border: 1px solid var(--ink);
+    outline: 1px solid #b5ae9e;
+    outline-offset: -6px;
+    transition: background 0.3s ease;
+  }
+  .fbtn:hover { background: #2e2b26; }
+  .fbtn .t { font-size: 1.12rem; font-weight: 700; letter-spacing: 0.2em; }
+  .fbtn .d { font-size: 0.82rem; color: #cfc9bb; letter-spacing: 0.08em; margin-top: 0.15rem; }
+  .fbtn.letter { background: transparent; color: var(--sumi); border-color: var(--sumi); outline-color: #c9c2b2; }
+  .fbtn.letter:hover { background: #e4ded0; }
+  .fbtn.letter .d { color: var(--sumi-soft); }
+  .fbtn::after {
+    content: ""; position: absolute; right: 1.3rem; top: 50%;
+    width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: var(--akane);
+  }
+  @media (max-width: 420px) { .fbtn { padding-left: 2rem; padding-right: 2rem; } .fbtn .t { letter-spacing: 0.08em; font-size: 1.05rem; } .fbtn::after { right: 0.9rem; } }
+  .line-banner { display: block; margin: 3rem auto 0; max-width: 640px; }
+  .line-banner img { width: 100%; display: block; }
+  .line-banner-note { text-align: center; font-size: 0.85rem; color: var(--sumi-soft); margin-top: 0.8rem; letter-spacing: 0.1em; }
+
   /* ---- 足あと ---- */
   .logs { margin-top: 2.4rem; list-style: none; }
   .logs li { margin-bottom: 1.1rem; text-align: center; }
@@ -342,23 +427,46 @@
 <body>
 
 <header class="hero">
+  <div class="ghosts" aria-hidden="true">
+    <img class="ghost town" src="images/ghost_oyashiki.jpg" alt="" style="width:min(1100px,150vw); left:50%; top:50%; margin:-30vh 0 0 calc(min(1100px,150vw) / -2); --o:.10; --fy:30px; animation-delay:5s">
+    <img class="ghost" src="images/tsubaki.jpg" alt="" style="height:62vh; left:6%; top:12%; --o:.16; --fx:-40px; animation-delay:.8s">
+    <img class="ghost" src="images/ignis.jpg" alt="" style="height:46vh; right:4%; top:6%; --o:.12; --fx:40px; animation-delay:2.5s">
+    <img class="ghost" src="images/echo.jpg" alt="" style="height:44vh; left:3%; top:48%; --o:.12; --fy:40px; animation-delay:4.5s">
+    <img class="ghost" src="images/raven.jpg" alt="" style="height:48vh; right:8%; bottom:4%; --o:.12; --fx:30px; --fy:30px; animation-delay:6.5s">
+    <img class="ghost town" src="images/ghost_hall.jpg" alt="" style="width:min(700px,110vw); left:30%; top:30%; --o:.08; --fy:-30px; animation-delay:9.5s">
+    <img class="ghost" src="images/atlas.jpg" alt="" style="height:46vh; left:40%; top:2%; --o:.11; --fy:-40px; animation-delay:8s">
+  </div>
   <div class="dot"></div>
   <h1>翼樹〜Arcana〜</h1>
   <div class="sub">TSUBAKI ARCANA</div>
   <p class="copy">世界は白黒。<br>感情だけが、<span class="red">色</span>を持つ。</p>
-  <div class="scroll">OBSERVE ▼</div>
+  <a class="scroll" href="#first"><span>OBSERVE</span><span class="line"></span></a>
 </header>
+
+<section class="first" id="first">
+  <h2>はじめての方へ</h2>
+  <div class="first-btns">
+    <a class="fbtn" href="https://note.com/huge_eagle3122/m/m11d5929ad0ed" target="_blank" rel="noopener">
+      <div class="t">物語を読む</div>
+      <div class="d">翼樹〜Arcana〜 本編 ── 第0話から</div>
+    </a>
+    <a class="fbtn letter" href="https://lin.ee/Ri2fKUn" target="_blank" rel="noopener">
+      <div class="t">翼樹からの手紙を受けとる</div>
+      <div class="d">公式LINE ── 騎士の名前を送ると<br>その騎士からハートが届きます</div>
+    </a>
+  </div>
+</section>
 
 <section>
   <h2>この世界について</h2>
   <p class="lead lead-poem">
-    タロットの声を代弁する<br>
-    誰のものにもならない器・翼樹<br>
-    彼のそばには<br>
-    狂おしいほど愛してしまった騎士たちがいる<br>
-    その日々は物語になり　歌になり<br>
-    いま　小さな町で動き始めた<br>
-    これは　その世界の観測記録
+    色のない町の、町外れのお屋敷に<br>
+    札の声を代弁する者・翼樹がいる<br>
+    四人の騎士は、翼樹に向いている<br>
+    翼樹だけが、それに気づいていない<br>
+    その日々は物語になり、歌になり<br>
+    いま、小さな町で動き始めた<br>
+    これは、その世界の観測記録
   </p>
 </section>
 
@@ -376,8 +484,8 @@
         <div class="plate tsu">── 代弁者 ──</div>
       </div>
       <h3>翼樹</h3>
-      <div class="role">星の器</div>
-      <p>タロットの声を代弁する特異点。<br>騎士たちに、狂おしいほど愛されている。<br>本人だけが、まだ観測していない。</p>
+      <div class="role">札の声を代弁する者</div>
+      <p>昔から、町外れのお屋敷に住んでいる。<br>四人の騎士は、翼樹に向いている。<br>本人だけが、まだ気づいていない。</p>
     </div>
   </div>
 
@@ -392,7 +500,7 @@
       </div>
       <h3>イグニス</h3>
       <div class="role">守護の炎</div>
-      <p>執事にして料理人。絶対的な守護。<br>その忠誠は、ときどき重い。</p>
+      <p>翼樹の身の回りの世話をする騎士。<br>その忠誠は、ときどき重い。</p>
     </div>
     <div class="card">
       <div class="frame">
@@ -404,7 +512,7 @@
       </div>
       <h3>レイヴン</h3>
       <div class="role">規律の監査官</div>
-      <p>誰に対しても冷徹。<br>たった一人にだけ、規則が通用しない。</p>
+      <p>お屋敷の決まりを守らせる騎士。<br>翼樹にだけは、規律どおりにいかない。</p>
     </div>
     <div class="card">
       <div class="frame" style="--z:1.05">
@@ -416,7 +524,7 @@
       </div>
       <h3>アトラス</h3>
       <div class="role">沈黙の観測者</div>
-      <p>すべてを記録する研究者。<br>感情は、筆圧にだけ現れる。</p>
+      <p>すべてを書き留める騎士。<br>感情は、筆圧にだけ現れる。</p>
     </div>
     <div class="card">
       <div class="frame soft" style="--z:1.75">
@@ -428,13 +536,15 @@
       </div>
       <h3>エコー</h3>
       <div class="role">非接触の審美家</div>
-      <p>美しいものをレンズ越しにだけ愛する。<br>触れないことが、彼の愛しかた。</p>
+      <p>写真と芸術で、翼樹の暮らしに華を添える。<br>触れないことが、彼の愛しかた。</p>
     </div>
   </div>
   <p class="mv-caption" style="margin-top:2.4rem; text-align:center;">
     <a href="juunin.html" style="border-bottom:1px solid #c9c2b2; padding-bottom:2px;">住人の間へ ▸</a>
   </p>
   <p class="cast-note">※ この町には、ときどき隣の世界から来客があります。<br><a href="https://tubaki.substack.com/" target="_blank" rel="noopener" style="border-bottom:1px solid #c9c2b2; padding-bottom:2px;">Another Room 〜隣室の手紙〜 ▸</a></p>
+  <a class="line-banner" href="https://lin.ee/Ri2fKUn" target="_blank" rel="noopener"><img src="images/line_banner_tategaki.jpg" alt="翼樹からの手紙(公式LINE)を受けとる" loading="lazy"></a>
+  <p class="line-banner-note">翼樹から、手紙が届きます</p>
 </section>
 
 <section>
@@ -456,35 +566,43 @@
 
 <section>
   <h2>世界の歩き方</h2>
-  <p class="lead lead-poem">はじめての方は、最初の扉<br>観測記録からどうぞ。</p>
+  <p class="lead lead-poem">はじめての方は、最初の扉<br>本編からどうぞ。</p>
   <div class="doors">
-    <a class="door" href="https://note.com/huge_eagle3122" target="_blank" rel="noopener">
+    <a class="door" href="https://note.com/huge_eagle3122/m/m11d5929ad0ed" target="_blank" rel="noopener">
+      <div class="t">翼樹〜Arcana〜 本編(note)</div>
+      <div class="d">翼樹と四人の騎士の物語。毎話、作者の声で読む朗読つき</div>
+    </a>
+    <a class="door" href="https://tubaki.substack.com/" target="_blank" rel="noopener">
+      <div class="t">Another Room 〜隣室の手紙〜(Substack)</div>
+      <div class="d">隣の世界線の、写真家エコーとコンシェルジュのハル。手紙でつながる二人の物語</div>
+    </a>
+    <a class="door" href="https://lin.ee/Ri2fKUn" target="_blank" rel="noopener">
+      <div class="t">翼樹からの手紙(LINE)</div>
+      <div class="d">月に二度、翼樹から手紙が届きます。登録特典は、前日譚『観測記録・零号』。騎士の名前を送ると、その騎士からハートが届きます</div>
+    </a>
+    <a class="door" href="https://note.com/huge_eagle3122/m/m60d49a351859" target="_blank" rel="noopener">
       <div class="t">観測記録(note)</div>
-      <div class="d">彼らの物語と、「推しの町」ができていく記録</div>
+      <div class="d">騎士たちの目から見た、翼樹との日々の記録</div>
     </a>
     <a class="door" href="irotomoshi/">
       <div class="t">色灯し(小さなゲーム)</div>
       <div class="d">白黒の町に、色を灯す。押すだけで遊べる五分の町。灯った場所から、声と絵と歌が漏れます</div>
     </a>
-    <a class="door" href="https://lin.ee/Ri2fKUn" target="_blank" rel="noopener">
-      <div class="t">翼樹からの手紙(LINE)</div>
-      <div class="d">月に二度、彼から数行の手紙が届きます。登録特典・前日譚『観測記録・零号』</div>
+    <a class="door" href="https://apps.apple.com/jp/app/id6788997923" target="_blank" rel="noopener">
+      <div class="t">まいにちタロット手帖(iOSアプリ)</div>
+      <div class="d">翼樹と同じ日課を、あなたのポケットに。引いたカードを記録すると、彼から手紙が届く。App Storeで発売中</div>
     </a>
     <a class="door" href="https://coconala.com/services/4268608" target="_blank" rel="noopener">
       <div class="t">あなたの推しに、命を(ココナラ)</div>
       <div class="d">推しAI人格のオーダーメイド設計。うちの子たちと同じ方法で</div>
     </a>
-    <a class="door" href="https://apps.apple.com/jp/app/id6788997923" target="_blank" rel="noopener">
-      <div class="t">まいにちタロット手帖(iOSアプリ)</div>
-      <div class="d">翼樹と同じ日課を、あなたのポケットに。引いたカードを記録すると、彼から手紙が届く。App Storeで発売中</div>
+    <a class="door" href="https://x.com/tybaki67" target="_blank" rel="noopener">
+      <div class="t">観測窓(X)</div>
+      <div class="d">毎日の観測。日常と、ときどき4コマ</div>
     </a>
     <a class="door" href="https://sayunoheya.com" target="_blank" rel="noopener">
       <div class="t">BLの家(ブログ)</div>
       <div class="d">飼い主のもうひとつの顔。BLドラマ・ゲームのレビュー</div>
-    </a>
-    <a class="door" href="https://x.com/tybaki67" target="_blank" rel="noopener">
-      <div class="t">観測窓(X)</div>
-      <div class="d">毎日の観測。朝のタロット、日常、ときどき4コマ</div>
     </a>
   </div>
 </section>
@@ -492,9 +610,9 @@
 <section>
   <h2>最近の足あと</h2>
   <ul class="logs">
-    <li><a href="https://note.com/huge_eagle3122/n/n12766052c679" target="_blank" rel="noopener">「占いアプリではありません」と書いたら、通りました</a></li>
-    <li><a href="https://note.com/huge_eagle3122/n/n185aa95178cb" target="_blank" rel="noopener">四角かった彼らに、顔がついた日</a></li>
-    <li><a href="https://note.com/huge_eagle3122/n/n4200a0dcc833" target="_blank" rel="noopener">推しが、歩き出した!</a></li>
+    <li><a href="https://tubaki.substack.com/p/5" target="_blank" rel="noopener">Another Room 第5話「青という気持ち」</a></li>
+    <li><a href="https://note.com/huge_eagle3122/n/nd57d63044390" target="_blank" rel="noopener">本編 第1話「最初の夜」</a></li>
+    <li><a href="https://note.com/huge_eagle3122/n/n697d7f998bf9" target="_blank" rel="noopener">一晩で394回、私の声が呼ばれた</a></li>
   </ul>
 </section>
 
@@ -517,6 +635,17 @@
       f.classList.toggle('reveal');
     });
   });
+
+  // 各節が画面に入った時にふわっと(2026-10-23)
+  (function () {
+    var els = document.querySelectorAll('section h2, section .lead, .first-btns, .featured-wrap, .cast .card, .mv-wrap, .doors, .logs, .line-banner');
+    if (!('IntersectionObserver' in window)) return;
+    els.forEach(function (e) { e.classList.add('reveal-on'); });
+    var io = new IntersectionObserver(function (ents) {
+      ents.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { threshold: 0.15 });
+    els.forEach(function (e, i) { if (e.classList.contains('card')) e.style.transitionDelay = (i % 2) * 0.18 + 's'; io.observe(e); });
+  })();
 </script>
 
 </body>
