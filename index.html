@@ -282,11 +282,25 @@
   .doors { margin-top: 2.6rem; border-top: 1px solid #d8d2c4; }
   .door {
     display: block;
+    position: relative;
     padding: 1.35rem 0.4rem;
     border-bottom: 1px solid #d8d2c4;
-    transition: background 0.3s ease;
+    transition: background 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
   }
-  .door:hover { background: #e4ded0; }
+  /* 2026-10-23 本人: カーソルが来たら、ふわっと浮く */
+  .door:hover, .door:focus-visible {
+    background: #f3efe6;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 22px rgba(28,26,23,0.12);
+    z-index: 1;
+  }
+  .door .t::before { display: inline-block; margin-right: 0.45em; transition: transform 0.35s ease; }
+  .door:hover .t::before, .door:focus-visible .t::before { transform: translateX(4px); }
+  .fbtn { transition: background 0.3s ease, transform 0.35s ease, box-shadow 0.35s ease; }
+  .fbtn:hover, .fbtn:focus-visible { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(28,26,23,0.22); }
+  .fbtn::after { transition: transform 0.35s ease; }
+  .fbtn:hover::after, .fbtn:focus-visible::after { transform: translateX(5px); }
+  @media (prefers-reduced-motion: reduce) { .door:hover, .fbtn:hover { transform: none; } }
   .door .t {
     font-size: 1.02rem;
     letter-spacing: 0.18em;
