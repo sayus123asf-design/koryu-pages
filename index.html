@@ -296,9 +296,8 @@
   }
   .door .t::before { display: inline-block; margin-right: 0.45em; transition: transform 0.35s ease; }
   .door:hover .t::before, .door:focus-visible .t::before { transform: translateX(4px); }
-  .fbtn { transition: background 0.3s ease, transform 0.35s ease, box-shadow 0.35s ease; }
   .fbtn:hover, .fbtn:focus-visible { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(28,26,23,0.22); }
-  .fbtn::after { transition: transform 0.35s ease; }
+  .fbtn::after { transition: transform 0.7s cubic-bezier(.22,.8,.32,1); }
   .fbtn:hover::after, .fbtn:focus-visible::after { transform: translateX(5px); }
   @media (prefers-reduced-motion: reduce) { .door:hover, .fbtn:hover { transform: none; } }
   .door .t {
@@ -390,7 +389,7 @@
     border: 1px solid var(--ink);
     outline: 1px solid #b5ae9e;
     outline-offset: -6px;
-    transition: background 0.3s ease;
+    transition: background 0.7s ease, transform 0.7s cubic-bezier(.22,.8,.32,1), box-shadow 0.7s ease;  /* 10/23本人: 扉よりゆっくり */
   }
   .fbtn:hover { background: #2e2b26; }
   .fbtn .t { font-size: 1.12rem; font-weight: 700; letter-spacing: 0.2em; }
